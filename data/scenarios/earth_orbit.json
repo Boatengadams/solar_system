@@ -1,0 +1,20 @@
+{
+  "id": "earth_orbit",
+  "name": "Earth Orbit",
+  "description": "A focused two-body Sun/Earth scenario for studying a planetary orbit.",
+  "epoch": "J2000",
+  "reference_frame": "heliocentric",
+  "body_references": ["sun", "earth"],
+  "settings": {
+    "timestep_s": 3600.0,
+    "time_scale": 1.0,
+    "integrator": "velocity_verlet",
+    "trails_enabled": true,
+    "vectors_enabled": false,
+    "labels_enabled": false
+  },
+  "educational": {
+    "lesson": "circular_orbits",
+    "experiment": "kepler_test"
+  }
+}

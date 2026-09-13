@@ -1,0 +1,11 @@
+{
+  "id": "bagsolar-1",
+  "name": "BAGSOLAR-1",
+  "type": "Spacecraft",
+  "mass_kg": 1000.0,
+  "radius_m": 5.0,
+  "initial_position_m": [147099586259.31, 420000000.0, 0.0],
+  "initial_velocity_mps": [-1020.0, 30286.777677663151, 0.0],
+  "parent_id": "earth",
+  "visual": {"color_rgba": [235, 235, 235, 255], "accent_rgba": [90, 220, 255, 255], "display_radius_px": 4.0}
+}

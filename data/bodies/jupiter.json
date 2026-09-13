@@ -1,0 +1,12 @@
+{
+  "id": "jupiter",
+  "name": "Jupiter",
+  "type": "Planet",
+  "mass_kg": 1.8982e27,
+  "radius_m": 6.9911e7,
+  "initial_position_m": [740296028682.87244, 0.0, 0.0],
+  "initial_velocity_mps": [0.0, 13712.818136916603, 0.0],
+  "parent_id": "sun",
+  "visual": {"color_rgba": [195, 145, 95, 255], "accent_rgba": [255, 215, 155, 255], "display_radius_px": 6.0},
+  "orbital": {"semi_major_axis_m": 778479000000.0, "eccentricity": 0.0489, "orbital_period_s": 374336251.2}
+}

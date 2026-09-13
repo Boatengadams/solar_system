@@ -1,0 +1,33 @@
+Start testing: Sep 12 19:52 EDT
+----------------------------------------------------------
+1/2 Testing: bagsolar_physics_tests
+1/2 Test: bagsolar_physics_tests
+Command: "/home/kali/Desktop/Cpp_Advance/build/bagsolar_physics_tests"
+Directory: /home/kali/Desktop/Cpp_Advance/build
+"bagsolar_physics_tests" start time: Sep 12 19:52 EDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"bagsolar_physics_tests" end time: Sep 12 19:52 EDT
+"bagsolar_physics_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/2 Testing: bagsolar_data_tests
+2/2 Test: bagsolar_data_tests
+Command: "/home/kali/Desktop/Cpp_Advance/build/bagsolar_data_tests"
+Directory: /home/kali/Desktop/Cpp_Advance
+"bagsolar_data_tests" start time: Sep 12 19:52 EDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"bagsolar_data_tests" end time: Sep 12 19:52 EDT
+"bagsolar_data_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Sep 12 19:52 EDT

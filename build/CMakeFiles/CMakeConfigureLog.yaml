@@ -1,0 +1,2350 @@
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.3/Modules/CMakeDetermineSystem.cmake:12 (find_program)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_UNAME"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "uname"
+    candidate_directories:
+      - "/home/kali/.gemini/antigravity-cli/bin/"
+      - "/home/kali/.npm-global/bin/"
+      - "/opt/apache-maven-3.9.16/bin/"
+      - "/home/kali/.kimi-code/bin/"
+      - "/home/kali/.local/bin/"
+      - "/usr/lib/jvm/java-25-openjdk-amd64/bin/"
+      - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/usr/local/sbin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/bin/"
+      - "/usr/local/games/"
+      - "/usr/games/"
+      - "/snap/bin/"
+      - "/home/kali/.dotnet/tools/"
+      - "/home/kali/go/bin/"
+      - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts/"
+    searched_directories:
+      - "/home/kali/.gemini/antigravity-cli/bin/uname"
+      - "/home/kali/.npm-global/bin/uname"
+      - "/opt/apache-maven-3.9.16/bin/uname"
+      - "/home/kali/.kimi-code/bin/uname"
+      - "/home/kali/.local/bin/uname"
+      - "/usr/lib/jvm/java-25-openjdk-amd64/bin/uname"
+      - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin/uname"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/uname"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/uname"
+      - "/usr/local/sbin/uname"
+      - "/usr/sbin/uname"
+      - "/sbin/uname"
+      - "/usr/local/bin/uname"
+    found: "/usr/bin/uname"
+    search_context:
+      ENV{PATH}:
+        - "/home/kali/.gemini/antigravity-cli/bin"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/local/games"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/kali/.dotnet/tools"
+        - "/home/kali/go/bin"
+        - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts"
+        - "/home/kali/go/bin"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake-4.3/Modules/CMakeDetermineSystem.cmake:212 (message)"
+      - "CMakeLists.txt:3 (project)"
+    message: |
+      The system is: Linux - 7.0.12+kali-amd64 - x86_64
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.3/Modules/CMakeUnixFindMake.cmake:5 (find_program)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_MAKE_PROGRAM"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "gmake"
+      - "make"
+      - "smake"
+    candidate_directories:
+      - "/home/kali/.gemini/antigravity-cli/bin/"
+      - "/home/kali/.npm-global/bin/"
+      - "/opt/apache-maven-3.9.16/bin/"
+      - "/home/kali/.kimi-code/bin/"
+      - "/home/kali/.local/bin/"
+      - "/usr/lib/jvm/java-25-openjdk-amd64/bin/"
+      - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/usr/local/sbin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/bin/"
+      - "/usr/local/games/"
+      - "/usr/games/"
+      - "/snap/bin/"
+      - "/home/kali/.dotnet/tools/"
+      - "/home/kali/go/bin/"
+      - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts/"
+    searched_directories:
+      - "/home/kali/.gemini/antigravity-cli/bin/gmake"
+      - "/home/kali/.npm-global/bin/gmake"
+      - "/opt/apache-maven-3.9.16/bin/gmake"
+      - "/home/kali/.kimi-code/bin/gmake"
+      - "/home/kali/.local/bin/gmake"
+      - "/usr/lib/jvm/java-25-openjdk-amd64/bin/gmake"
+      - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin/gmake"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/gmake"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/gmake"
+      - "/usr/local/sbin/gmake"
+      - "/usr/sbin/gmake"
+      - "/sbin/gmake"
+      - "/usr/local/bin/gmake"
+    found: "/usr/bin/gmake"
+    search_context:
+      ENV{PATH}:
+        - "/home/kali/.gemini/antigravity-cli/bin"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/local/games"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/kali/.dotnet/tools"
+        - "/home/kali/go/bin"
+        - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts"
+        - "/home/kali/go/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.3/Modules/CMakeDetermineCompiler.cmake:73 (find_program)"
+      - "/usr/share/cmake-4.3/Modules/CMakeDetermineCXXCompiler.cmake:69 (_cmake_find_compiler)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_CXX_COMPILER"
+    description: "CXX compiler"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "c++"
+      - "CC"
+      - "g++"
+      - "aCC"
+      - "cl"
+      - "bcc"
+      - "xlC"
+      - "icpx"
+      - "icx"
+      - "clang++"
+    candidate_directories:
+      - "/home/kali/.gemini/antigravity-cli/bin/"
+      - "/home/kali/.npm-global/bin/"
+      - "/opt/apache-maven-3.9.16/bin/"
+      - "/home/kali/.kimi-code/bin/"
+      - "/home/kali/.local/bin/"
+      - "/usr/lib/jvm/java-25-openjdk-amd64/bin/"
+      - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/usr/local/sbin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/bin/"
+      - "/usr/local/games/"
+      - "/usr/games/"
+      - "/snap/bin/"
+      - "/home/kali/.dotnet/tools/"
+      - "/home/kali/go/bin/"
+      - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts/"
+    searched_directories:
+      - "/home/kali/.gemini/antigravity-cli/bin/c++"
+      - "/home/kali/.npm-global/bin/c++"
+      - "/opt/apache-maven-3.9.16/bin/c++"
+      - "/home/kali/.kimi-code/bin/c++"
+      - "/home/kali/.local/bin/c++"
+      - "/usr/lib/jvm/java-25-openjdk-amd64/bin/c++"
+      - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin/c++"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/c++"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/c++"
+      - "/usr/local/sbin/c++"
+      - "/usr/sbin/c++"
+      - "/sbin/c++"
+      - "/usr/local/bin/c++"
+    found: "/usr/bin/c++"
+    search_context:
+      ENV{PATH}:
+        - "/home/kali/.gemini/antigravity-cli/bin"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/local/games"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/kali/.dotnet/tools"
+        - "/home/kali/go/bin"
+        - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts"
+        - "/home/kali/go/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.3/Modules/CMakeDetermineCompilerId.cmake:468 (find_file)"
+      - "/usr/share/cmake-4.3/Modules/CMakeDetermineCompilerId.cmake:506 (CMAKE_DETERMINE_COMPILER_ID_WRITE)"
+      - "/usr/share/cmake-4.3/Modules/CMakeDetermineCompilerId.cmake:8 (CMAKE_DETERMINE_COMPILER_ID_BUILD)"
+      - "/usr/share/cmake-4.3/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/usr/share/cmake-4.3/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "file"
+    variable: "src_in"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "CMakeCXXCompilerId.cpp.in"
+    candidate_directories:
+      - "/usr/share/cmake-4.3/Modules/"
+    found: "/usr/share/cmake-4.3/Modules/CMakeCXXCompilerId.cpp.in"
+    search_context:
+      ENV{PATH}:
+        - "/home/kali/.gemini/antigravity-cli/bin"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/local/games"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/kali/.dotnet/tools"
+        - "/home/kali/go/bin"
+        - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts"
+        - "/home/kali/go/bin"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake-4.3/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "/usr/share/cmake-4.3/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/usr/share/cmake-4.3/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:3 (project)"
+    message: |
+      Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+      Compiler: /usr/bin/c++ 
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      0
+      
+      
+      Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+      
+      The CXX compiler identification is GNU, found in:
+        /home/kali/Desktop/Cpp_Advance/build/CMakeFiles/4.3.4/CompilerIdCXX/a.out
+      
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.3/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake-4.3/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_AR"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "ar"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/home/kali/.gemini/antigravity-cli/bin/"
+      - "/home/kali/.npm-global/bin/"
+      - "/opt/apache-maven-3.9.16/bin/"
+      - "/home/kali/.kimi-code/bin/"
+      - "/home/kali/.local/bin/"
+      - "/usr/lib/jvm/java-25-openjdk-amd64/bin/"
+      - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/usr/local/sbin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/usr/local/bin/"
+      - "/bin/"
+      - "/usr/local/games/"
+      - "/usr/games/"
+      - "/snap/bin/"
+      - "/home/kali/.dotnet/tools/"
+      - "/home/kali/go/bin/"
+      - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts/"
+    found: "/usr/bin/ar"
+    search_context:
+      ENV{PATH}:
+        - "/home/kali/.gemini/antigravity-cli/bin"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/local/games"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/kali/.dotnet/tools"
+        - "/home/kali/go/bin"
+        - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts"
+        - "/home/kali/go/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.3/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake-4.3/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_RANLIB"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "ranlib"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/home/kali/.gemini/antigravity-cli/bin/"
+      - "/home/kali/.npm-global/bin/"
+      - "/opt/apache-maven-3.9.16/bin/"
+      - "/home/kali/.kimi-code/bin/"
+      - "/home/kali/.local/bin/"
+      - "/usr/lib/jvm/java-25-openjdk-amd64/bin/"
+      - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/usr/local/sbin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/usr/local/bin/"
+      - "/bin/"
+      - "/usr/local/games/"
+      - "/usr/games/"
+      - "/snap/bin/"
+      - "/home/kali/.dotnet/tools/"
+      - "/home/kali/go/bin/"
+      - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts/"
+    found: "/usr/bin/ranlib"
+    search_context:
+      ENV{PATH}:
+        - "/home/kali/.gemini/antigravity-cli/bin"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/local/games"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/kali/.dotnet/tools"
+        - "/home/kali/go/bin"
+        - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts"
+        - "/home/kali/go/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.3/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake-4.3/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_STRIP"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "strip"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/home/kali/.gemini/antigravity-cli/bin/"
+      - "/home/kali/.npm-global/bin/"
+      - "/opt/apache-maven-3.9.16/bin/"
+      - "/home/kali/.kimi-code/bin/"
+      - "/home/kali/.local/bin/"
+      - "/usr/lib/jvm/java-25-openjdk-amd64/bin/"
+      - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/usr/local/sbin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/usr/local/bin/"
+      - "/bin/"
+      - "/usr/local/games/"
+      - "/usr/games/"
+      - "/snap/bin/"
+      - "/home/kali/.dotnet/tools/"
+      - "/home/kali/go/bin/"
+      - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts/"
+    found: "/usr/bin/strip"
+    search_context:
+      ENV{PATH}:
+        - "/home/kali/.gemini/antigravity-cli/bin"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/local/games"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/kali/.dotnet/tools"
+        - "/home/kali/go/bin"
+        - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts"
+        - "/home/kali/go/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.3/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake-4.3/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_LINKER"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "ld"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/home/kali/.gemini/antigravity-cli/bin/"
+      - "/home/kali/.npm-global/bin/"
+      - "/opt/apache-maven-3.9.16/bin/"
+      - "/home/kali/.kimi-code/bin/"
+      - "/home/kali/.local/bin/"
+      - "/usr/lib/jvm/java-25-openjdk-amd64/bin/"
+      - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/usr/local/sbin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/usr/local/bin/"
+      - "/bin/"
+      - "/usr/local/games/"
+      - "/usr/games/"
+      - "/snap/bin/"
+      - "/home/kali/.dotnet/tools/"
+      - "/home/kali/go/bin/"
+      - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts/"
+    found: "/usr/bin/ld"
+    search_context:
+      ENV{PATH}:
+        - "/home/kali/.gemini/antigravity-cli/bin"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/local/games"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/kali/.dotnet/tools"
+        - "/home/kali/go/bin"
+        - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts"
+        - "/home/kali/go/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.3/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake-4.3/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_NM"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "nm"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/home/kali/.gemini/antigravity-cli/bin/"
+      - "/home/kali/.npm-global/bin/"
+      - "/opt/apache-maven-3.9.16/bin/"
+      - "/home/kali/.kimi-code/bin/"
+      - "/home/kali/.local/bin/"
+      - "/usr/lib/jvm/java-25-openjdk-amd64/bin/"
+      - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/usr/local/sbin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/usr/local/bin/"
+      - "/bin/"
+      - "/usr/local/games/"
+      - "/usr/games/"
+      - "/snap/bin/"
+      - "/home/kali/.dotnet/tools/"
+      - "/home/kali/go/bin/"
+      - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts/"
+    found: "/usr/bin/nm"
+    search_context:
+      ENV{PATH}:
+        - "/home/kali/.gemini/antigravity-cli/bin"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/local/games"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/kali/.dotnet/tools"
+        - "/home/kali/go/bin"
+        - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts"
+        - "/home/kali/go/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.3/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake-4.3/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_OBJDUMP"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "objdump"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/home/kali/.gemini/antigravity-cli/bin/"
+      - "/home/kali/.npm-global/bin/"
+      - "/opt/apache-maven-3.9.16/bin/"
+      - "/home/kali/.kimi-code/bin/"
+      - "/home/kali/.local/bin/"
+      - "/usr/lib/jvm/java-25-openjdk-amd64/bin/"
+      - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/usr/local/sbin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/usr/local/bin/"
+      - "/bin/"
+      - "/usr/local/games/"
+      - "/usr/games/"
+      - "/snap/bin/"
+      - "/home/kali/.dotnet/tools/"
+      - "/home/kali/go/bin/"
+      - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts/"
+    found: "/usr/bin/objdump"
+    search_context:
+      ENV{PATH}:
+        - "/home/kali/.gemini/antigravity-cli/bin"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/local/games"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/kali/.dotnet/tools"
+        - "/home/kali/go/bin"
+        - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts"
+        - "/home/kali/go/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.3/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake-4.3/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_OBJCOPY"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "objcopy"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/home/kali/.gemini/antigravity-cli/bin/"
+      - "/home/kali/.npm-global/bin/"
+      - "/opt/apache-maven-3.9.16/bin/"
+      - "/home/kali/.kimi-code/bin/"
+      - "/home/kali/.local/bin/"
+      - "/usr/lib/jvm/java-25-openjdk-amd64/bin/"
+      - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/usr/local/sbin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/usr/local/bin/"
+      - "/bin/"
+      - "/usr/local/games/"
+      - "/usr/games/"
+      - "/snap/bin/"
+      - "/home/kali/.dotnet/tools/"
+      - "/home/kali/go/bin/"
+      - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts/"
+    found: "/usr/bin/objcopy"
+    search_context:
+      ENV{PATH}:
+        - "/home/kali/.gemini/antigravity-cli/bin"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/local/games"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/kali/.dotnet/tools"
+        - "/home/kali/go/bin"
+        - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts"
+        - "/home/kali/go/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.3/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake-4.3/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_READELF"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "readelf"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/home/kali/.gemini/antigravity-cli/bin/"
+      - "/home/kali/.npm-global/bin/"
+      - "/opt/apache-maven-3.9.16/bin/"
+      - "/home/kali/.kimi-code/bin/"
+      - "/home/kali/.local/bin/"
+      - "/usr/lib/jvm/java-25-openjdk-amd64/bin/"
+      - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/usr/local/sbin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/usr/local/bin/"
+      - "/bin/"
+      - "/usr/local/games/"
+      - "/usr/games/"
+      - "/snap/bin/"
+      - "/home/kali/.dotnet/tools/"
+      - "/home/kali/go/bin/"
+      - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts/"
+    found: "/usr/bin/readelf"
+    search_context:
+      ENV{PATH}:
+        - "/home/kali/.gemini/antigravity-cli/bin"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/local/games"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/kali/.dotnet/tools"
+        - "/home/kali/go/bin"
+        - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts"
+        - "/home/kali/go/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.3/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake-4.3/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_DLLTOOL"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "dlltool"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/home/kali/.gemini/antigravity-cli/bin/"
+      - "/home/kali/.npm-global/bin/"
+      - "/opt/apache-maven-3.9.16/bin/"
+      - "/home/kali/.kimi-code/bin/"
+      - "/home/kali/.local/bin/"
+      - "/usr/lib/jvm/java-25-openjdk-amd64/bin/"
+      - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/usr/local/sbin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/usr/local/bin/"
+      - "/bin/"
+      - "/usr/local/games/"
+      - "/usr/games/"
+      - "/snap/bin/"
+      - "/home/kali/.dotnet/tools/"
+      - "/home/kali/go/bin/"
+      - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts/"
+    searched_directories:
+      - "/usr/bin/dlltool"
+      - "/home/kali/.gemini/antigravity-cli/bin/dlltool"
+      - "/home/kali/.npm-global/bin/dlltool"
+      - "/opt/apache-maven-3.9.16/bin/dlltool"
+      - "/home/kali/.kimi-code/bin/dlltool"
+      - "/home/kali/.local/bin/dlltool"
+      - "/usr/lib/jvm/java-25-openjdk-amd64/bin/dlltool"
+      - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin/dlltool"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/dlltool"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/dlltool"
+      - "/usr/local/sbin/dlltool"
+      - "/usr/sbin/dlltool"
+      - "/sbin/dlltool"
+      - "/usr/local/bin/dlltool"
+      - "/bin/dlltool"
+      - "/usr/local/games/dlltool"
+      - "/usr/games/dlltool"
+      - "/snap/bin/dlltool"
+      - "/home/kali/.dotnet/tools/dlltool"
+      - "/home/kali/go/bin/dlltool"
+      - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts/dlltool"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "/home/kali/.gemini/antigravity-cli/bin"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/local/games"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/kali/.dotnet/tools"
+        - "/home/kali/go/bin"
+        - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts"
+        - "/home/kali/go/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.3/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake-4.3/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_ADDR2LINE"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "addr2line"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/home/kali/.gemini/antigravity-cli/bin/"
+      - "/home/kali/.npm-global/bin/"
+      - "/opt/apache-maven-3.9.16/bin/"
+      - "/home/kali/.kimi-code/bin/"
+      - "/home/kali/.local/bin/"
+      - "/usr/lib/jvm/java-25-openjdk-amd64/bin/"
+      - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/usr/local/sbin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/usr/local/bin/"
+      - "/bin/"
+      - "/usr/local/games/"
+      - "/usr/games/"
+      - "/snap/bin/"
+      - "/home/kali/.dotnet/tools/"
+      - "/home/kali/go/bin/"
+      - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts/"
+    found: "/usr/bin/addr2line"
+    search_context:
+      ENV{PATH}:
+        - "/home/kali/.gemini/antigravity-cli/bin"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/local/games"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/kali/.dotnet/tools"
+        - "/home/kali/go/bin"
+        - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts"
+        - "/home/kali/go/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.3/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake-4.3/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_TAPI"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "tapi"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/home/kali/.gemini/antigravity-cli/bin/"
+      - "/home/kali/.npm-global/bin/"
+      - "/opt/apache-maven-3.9.16/bin/"
+      - "/home/kali/.kimi-code/bin/"
+      - "/home/kali/.local/bin/"
+      - "/usr/lib/jvm/java-25-openjdk-amd64/bin/"
+      - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/usr/local/sbin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/usr/local/bin/"
+      - "/bin/"
+      - "/usr/local/games/"
+      - "/usr/games/"
+      - "/snap/bin/"
+      - "/home/kali/.dotnet/tools/"
+      - "/home/kali/go/bin/"
+      - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts/"
+    searched_directories:
+      - "/usr/bin/tapi"
+      - "/home/kali/.gemini/antigravity-cli/bin/tapi"
+      - "/home/kali/.npm-global/bin/tapi"
+      - "/opt/apache-maven-3.9.16/bin/tapi"
+      - "/home/kali/.kimi-code/bin/tapi"
+      - "/home/kali/.local/bin/tapi"
+      - "/usr/lib/jvm/java-25-openjdk-amd64/bin/tapi"
+      - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin/tapi"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/tapi"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/tapi"
+      - "/usr/local/sbin/tapi"
+      - "/usr/sbin/tapi"
+      - "/sbin/tapi"
+      - "/usr/local/bin/tapi"
+      - "/bin/tapi"
+      - "/usr/local/games/tapi"
+      - "/usr/games/tapi"
+      - "/snap/bin/tapi"
+      - "/home/kali/.dotnet/tools/tapi"
+      - "/home/kali/go/bin/tapi"
+      - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts/tapi"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "/home/kali/.gemini/antigravity-cli/bin"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/local/games"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/kali/.dotnet/tools"
+        - "/home/kali/go/bin"
+        - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts"
+        - "/home/kali/go/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.3/Modules/Compiler/GNU-FindBinUtils.cmake:18 (find_program)"
+      - "/usr/share/cmake-4.3/Modules/CMakeDetermineCXXCompiler.cmake:207 (include)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_CXX_COMPILER_AR"
+    description: "A wrapper around 'ar' adding the appropriate '--plugin' option for the GCC compiler"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "gcc-ar-15.3"
+      - "gcc-ar-15"
+      - "gcc-ar15"
+      - "gcc-ar"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/home/kali/.gemini/antigravity-cli/bin/"
+      - "/home/kali/.npm-global/bin/"
+      - "/opt/apache-maven-3.9.16/bin/"
+      - "/home/kali/.kimi-code/bin/"
+      - "/home/kali/.local/bin/"
+      - "/usr/lib/jvm/java-25-openjdk-amd64/bin/"
+      - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/usr/local/sbin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/usr/local/bin/"
+      - "/bin/"
+      - "/usr/local/games/"
+      - "/usr/games/"
+      - "/snap/bin/"
+      - "/home/kali/.dotnet/tools/"
+      - "/home/kali/go/bin/"
+      - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts/"
+    searched_directories:
+      - "/usr/bin/gcc-ar-15.3"
+      - "/home/kali/.gemini/antigravity-cli/bin/gcc-ar-15.3"
+      - "/home/kali/.npm-global/bin/gcc-ar-15.3"
+      - "/opt/apache-maven-3.9.16/bin/gcc-ar-15.3"
+      - "/home/kali/.kimi-code/bin/gcc-ar-15.3"
+      - "/home/kali/.local/bin/gcc-ar-15.3"
+      - "/usr/lib/jvm/java-25-openjdk-amd64/bin/gcc-ar-15.3"
+      - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin/gcc-ar-15.3"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ar-15.3"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/gcc-ar-15.3"
+      - "/usr/local/sbin/gcc-ar-15.3"
+      - "/usr/sbin/gcc-ar-15.3"
+      - "/sbin/gcc-ar-15.3"
+      - "/usr/local/bin/gcc-ar-15.3"
+      - "/bin/gcc-ar-15.3"
+      - "/usr/local/games/gcc-ar-15.3"
+      - "/usr/games/gcc-ar-15.3"
+      - "/snap/bin/gcc-ar-15.3"
+      - "/home/kali/.dotnet/tools/gcc-ar-15.3"
+      - "/home/kali/go/bin/gcc-ar-15.3"
+      - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts/gcc-ar-15.3"
+    found: "/usr/bin/gcc-ar-15"
+    search_context:
+      ENV{PATH}:
+        - "/home/kali/.gemini/antigravity-cli/bin"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/local/games"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/kali/.dotnet/tools"
+        - "/home/kali/go/bin"
+        - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts"
+        - "/home/kali/go/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.3/Modules/Compiler/GNU-FindBinUtils.cmake:30 (find_program)"
+      - "/usr/share/cmake-4.3/Modules/CMakeDetermineCXXCompiler.cmake:207 (include)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_CXX_COMPILER_RANLIB"
+    description: "A wrapper around 'ranlib' adding the appropriate '--plugin' option for the GCC compiler"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "gcc-ranlib-15.3"
+      - "gcc-ranlib-15"
+      - "gcc-ranlib15"
+      - "gcc-ranlib"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/home/kali/.gemini/antigravity-cli/bin/"
+      - "/home/kali/.npm-global/bin/"
+      - "/opt/apache-maven-3.9.16/bin/"
+      - "/home/kali/.kimi-code/bin/"
+      - "/home/kali/.local/bin/"
+      - "/usr/lib/jvm/java-25-openjdk-amd64/bin/"
+      - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/usr/local/sbin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/usr/local/bin/"
+      - "/bin/"
+      - "/usr/local/games/"
+      - "/usr/games/"
+      - "/snap/bin/"
+      - "/home/kali/.dotnet/tools/"
+      - "/home/kali/go/bin/"
+      - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts/"
+    searched_directories:
+      - "/usr/bin/gcc-ranlib-15.3"
+      - "/home/kali/.gemini/antigravity-cli/bin/gcc-ranlib-15.3"
+      - "/home/kali/.npm-global/bin/gcc-ranlib-15.3"
+      - "/opt/apache-maven-3.9.16/bin/gcc-ranlib-15.3"
+      - "/home/kali/.kimi-code/bin/gcc-ranlib-15.3"
+      - "/home/kali/.local/bin/gcc-ranlib-15.3"
+      - "/usr/lib/jvm/java-25-openjdk-amd64/bin/gcc-ranlib-15.3"
+      - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin/gcc-ranlib-15.3"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ranlib-15.3"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/gcc-ranlib-15.3"
+      - "/usr/local/sbin/gcc-ranlib-15.3"
+      - "/usr/sbin/gcc-ranlib-15.3"
+      - "/sbin/gcc-ranlib-15.3"
+      - "/usr/local/bin/gcc-ranlib-15.3"
+      - "/bin/gcc-ranlib-15.3"
+      - "/usr/local/games/gcc-ranlib-15.3"
+      - "/usr/games/gcc-ranlib-15.3"
+      - "/snap/bin/gcc-ranlib-15.3"
+      - "/home/kali/.dotnet/tools/gcc-ranlib-15.3"
+      - "/home/kali/go/bin/gcc-ranlib-15.3"
+      - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts/gcc-ranlib-15.3"
+    found: "/usr/bin/gcc-ranlib-15"
+    search_context:
+      ENV{PATH}:
+        - "/home/kali/.gemini/antigravity-cli/bin"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/local/games"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/kali/.dotnet/tools"
+        - "/home/kali/go/bin"
+        - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts"
+        - "/home/kali/go/bin"
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake-4.3/Modules/CMakeDetermineCompilerABI.cmake:83 (try_compile)"
+      - "/usr/share/cmake-4.3/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:3 (project)"
+    checks:
+      - "Detecting CXX compiler ABI info"
+    directories:
+      source: "/home/kali/Desktop/Cpp_Advance/build/CMakeFiles/CMakeScratch/TryCompile-EfV2o3"
+      binary: "/home/kali/Desktop/Cpp_Advance/build/CMakeFiles/CMakeScratch/TryCompile-EfV2o3"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_CXX_SCAN_FOR_MODULES: "OFF"
+      CMAKE_CXX_STDLIB_MODULES_JSON: ""
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "CMAKE_CXX_ABI_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: '/home/kali/Desktop/Cpp_Advance/build/CMakeFiles/CMakeScratch/TryCompile-EfV2o3'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_4be24/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_4be24.dir/build.make CMakeFiles/cmTC_4be24.dir/build
+        gmake[1]: Entering directory '/home/kali/Desktop/Cpp_Advance/build/CMakeFiles/CMakeScratch/TryCompile-EfV2o3'
+        Building CXX object CMakeFiles/cmTC_4be24.dir/CMakeCXXCompilerABI.cpp.o
+        /usr/bin/c++   -v -o CMakeFiles/cmTC_4be24.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-4.3/Modules/CMakeCXXCompilerABI.cpp
+        Using built-in specs.
+        COLLECT_GCC=/usr/bin/c++
+        OFFLOAD_TARGET_NAMES=nvptx-none:amdgcn-amdhsa
+        OFFLOAD_TARGET_DEFAULT=1
+        Target: x86_64-linux-gnu
+        Configured with: ../src/configure -v --with-pkgversion='Debian 15.3.0-2' --with-bugurl=file:///usr/share/doc/gcc-15/README.Bugs --enable-languages=c,ada,c++,go,d,fortran,objc,obj-c++,m2,rust,cobol,algol68 --prefix=/usr --with-gcc-major-version-only --program-suffix=-15 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/libexec --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-libstdcxx-backtrace --enable-gnu-unique-object --disable-vtable-verify --enable-plugin --enable-default-pie --with-system-zlib --enable-libphobos-checking=release --with-target-system-zlib=auto --enable-objc-gc=auto --enable-multiarch --disable-werror --enable-cet --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none=/build/reproducible-path/gcc-15-15.3.0/debian/tmp-nvptx/usr,amdgcn-amdhsa=/build/reproducible-path/gcc-15-15.3.0/debian/tmp-gcn/usr --enable-offload-defaulted --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu --with-build-config=bootstrap-lto-lean --enable-link-serialization=3
+        Thread model: posix
+        Supported LTO compression algorithms: zlib zstd
+        gcc version 15.3.0 (Debian 15.3.0-2) 
+        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_4be24.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_4be24.dir/'
+         /usr/libexec/gcc/x86_64-linux-gnu/15/cc1plus -quiet -v -imultiarch x86_64-linux-gnu -D_GNU_SOURCE /usr/share/cmake-4.3/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles/cmTC_4be24.dir/ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -mtune=generic -march=x86-64 -version -fasynchronous-unwind-tables -o /tmp/ccgFjfMb.s
+        GNU C++17 (Debian 15.3.0-2) version 15.3.0 (x86_64-linux-gnu)
+        	compiled by GNU C version 15.3.0, GMP version 6.3.0, MPFR version 4.2.2, MPC version 1.3.1, isl version isl-0.28-GMP
+        
+        GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+        ignoring duplicate directory "/usr/include/x86_64-linux-gnu/c++/15"
+        ignoring nonexistent directory "/usr/local/include/x86_64-linux-gnu"
+        ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/15/include-fixed/x86_64-linux-gnu"
+        ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/15/include-fixed"
+        ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/15/../../../../x86_64-linux-gnu/include"
+        #include "..." search starts here:
+        #include <...> search starts here:
+         /usr/include/c++/15
+         /usr/include/x86_64-linux-gnu/c++/15
+         /usr/include/c++/15/backward
+         /usr/lib/gcc/x86_64-linux-gnu/15/include
+         /usr/local/include
+         /usr/include/x86_64-linux-gnu
+         /usr/include
+        End of search list.
+        Compiler executable checksum: b7682911ce88ba83c74cfab2092de6a4
+        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_4be24.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_4be24.dir/'
+         /usr/bin/x86_64-linux-gnu-as -v --64 -o CMakeFiles/cmTC_4be24.dir/CMakeCXXCompilerABI.cpp.o /tmp/ccgFjfMb.s
+        GNU assembler version 2.47 (x86_64-linux-gnu) using BFD version (GNU Binutils for Debian) 2.47
+        COMPILER_PATH=/usr/libexec/gcc/x86_64-linux-gnu/15/:/usr/libexec/gcc/x86_64-linux-gnu/15/:/usr/libexec/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/15/:/usr/lib/gcc/x86_64-linux-gnu/
+        LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/15/:/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/15/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/15/../../../:/lib/:/usr/lib/
+        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_4be24.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_4be24.dir/CMakeCXXCompilerABI.cpp.'
+        Linking CXX executable cmTC_4be24
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4be24.dir/link.txt --verbose=1
+        Using built-in specs.
+        COLLECT_GCC=/usr/bin/c++
+        COLLECT_LTO_WRAPPER=/usr/libexec/gcc/x86_64-linux-gnu/15/lto-wrapper
+        OFFLOAD_TARGET_NAMES=nvptx-none:amdgcn-amdhsa
+        OFFLOAD_TARGET_DEFAULT=1
+        Target: x86_64-linux-gnu
+        Configured with: ../src/configure -v --with-pkgversion='Debian 15.3.0-2' --with-bugurl=file:///usr/share/doc/gcc-15/README.Bugs --enable-languages=c,ada,c++,go,d,fortran,objc,obj-c++,m2,rust,cobol,algol68 --prefix=/usr --with-gcc-major-version-only --program-suffix=-15 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/libexec --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-libstdcxx-backtrace --enable-gnu-unique-object --disable-vtable-verify --enable-plugin --enable-default-pie --with-system-zlib --enable-libphobos-checking=release --with-target-system-zlib=auto --enable-objc-gc=auto --enable-multiarch --disable-werror --enable-cet --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none=/build/reproducible-path/gcc-15-15.3.0/debian/tmp-nvptx/usr,amdgcn-amdhsa=/build/reproducible-path/gcc-15-15.3.0/debian/tmp-gcn/usr --enable-offload-defaulted --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu --with-build-config=bootstrap-lto-lean --enable-link-serialization=3
+        Thread model: posix
+        Supported LTO compression algorithms: zlib zstd
+        gcc version 15.3.0 (Debian 15.3.0-2) 
+        COMPILER_PATH=/usr/libexec/gcc/x86_64-linux-gnu/15/:/usr/libexec/gcc/x86_64-linux-gnu/15/:/usr/libexec/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/15/:/usr/lib/gcc/x86_64-linux-gnu/
+        LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/15/:/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/15/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/15/../../../:/lib/:/usr/lib/
+        COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_4be24' '-foffload-options=-l_GCC_stdc++' '-foffload-options=-l_GCC_m' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_4be24.'
+         /usr/libexec/gcc/x86_64-linux-gnu/15/collect2 -plugin /usr/libexec/gcc/x86_64-linux-gnu/15/liblto_plugin.so -plugin-opt=/usr/libexec/gcc/x86_64-linux-gnu/15/lto-wrapper -plugin-opt=-fresolution=/tmp/cczePaLv.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -o cmTC_4be24 /usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/Scrt1.o /usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/15/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/15 -L/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/15/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/15/../../.. -L/lib -L/usr/lib -v CMakeFiles/cmTC_4be24.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/15/crtendS.o /usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/crtn.o
+        collect2 version 15.3.0
+        /usr/bin/ld -plugin /usr/libexec/gcc/x86_64-linux-gnu/15/liblto_plugin.so -plugin-opt=/usr/libexec/gcc/x86_64-linux-gnu/15/lto-wrapper -plugin-opt=-fresolution=/tmp/cczePaLv.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -o cmTC_4be24 /usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/Scrt1.o /usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/15/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/15 -L/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/15/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/15/../../.. -L/lib -L/usr/lib -v CMakeFiles/cmTC_4be24.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/15/crtendS.o /usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/crtn.o
+        GNU ld (GNU Binutils for Debian) 2.47
+        COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_4be24' '-foffload-options=-l_GCC_stdc++' '-foffload-options=-l_GCC_m' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_4be24.'
+        /usr/bin/c++  -v -Wl,-v CMakeFiles/cmTC_4be24.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_4be24
+        gmake[1]: Leaving directory '/home/kali/Desktop/Cpp_Advance/build/CMakeFiles/CMakeScratch/TryCompile-EfV2o3'
+        
+      exitCode: 0
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake-4.3/Modules/CMakeDetermineCompilerABI.cmake:217 (message)"
+      - "/usr/share/cmake-4.3/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:3 (project)"
+    message: |
+      Parsed CXX implicit include dir info: rv=done
+        found start of include info
+        found start of implicit include info
+          add: [/usr/include/c++/15]
+          add: [/usr/include/x86_64-linux-gnu/c++/15]
+          add: [/usr/include/c++/15/backward]
+          add: [/usr/lib/gcc/x86_64-linux-gnu/15/include]
+          add: [/usr/local/include]
+          add: [/usr/include/x86_64-linux-gnu]
+          add: [/usr/include]
+        end of search list found
+        collapse include dir [/usr/include/c++/15] ==> [/usr/include/c++/15]
+        collapse include dir [/usr/include/x86_64-linux-gnu/c++/15] ==> [/usr/include/x86_64-linux-gnu/c++/15]
+        collapse include dir [/usr/include/c++/15/backward] ==> [/usr/include/c++/15/backward]
+        collapse include dir [/usr/lib/gcc/x86_64-linux-gnu/15/include] ==> [/usr/lib/gcc/x86_64-linux-gnu/15/include]
+        collapse include dir [/usr/local/include] ==> [/usr/local/include]
+        collapse include dir [/usr/include/x86_64-linux-gnu] ==> [/usr/include/x86_64-linux-gnu]
+        collapse include dir [/usr/include] ==> [/usr/include]
+        implicit include dirs: [/usr/include/c++/15;/usr/include/x86_64-linux-gnu/c++/15;/usr/include/c++/15/backward;/usr/lib/gcc/x86_64-linux-gnu/15/include;/usr/local/include;/usr/include/x86_64-linux-gnu;/usr/include]
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake-4.3/Modules/CMakeDetermineCompilerABI.cmake:253 (message)"
+      - "/usr/share/cmake-4.3/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:3 (project)"
+    message: |
+      Parsed CXX implicit link information:
+        link line regex: [^( *|.*[/\\])(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
+        linker tool regex: [^[ 	]*(->|"|[0-9]+>[ 	-]*Build:[ 	0-9]+ ms[ 	]*)?[ 	]*(([^"]*[/\\])?(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)))("|,| |$)]
+        ignore line: [Change Dir: '/home/kali/Desktop/Cpp_Advance/build/CMakeFiles/CMakeScratch/TryCompile-EfV2o3']
+        ignore line: []
+        ignore line: [Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_4be24/fast]
+        ignore line: [/usr/bin/gmake  -f CMakeFiles/cmTC_4be24.dir/build.make CMakeFiles/cmTC_4be24.dir/build]
+        ignore line: [gmake[1]: Entering directory '/home/kali/Desktop/Cpp_Advance/build/CMakeFiles/CMakeScratch/TryCompile-EfV2o3']
+        ignore line: [Building CXX object CMakeFiles/cmTC_4be24.dir/CMakeCXXCompilerABI.cpp.o]
+        ignore line: [/usr/bin/c++   -v -o CMakeFiles/cmTC_4be24.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-4.3/Modules/CMakeCXXCompilerABI.cpp]
+        ignore line: [Using built-in specs.]
+        ignore line: [COLLECT_GCC=/usr/bin/c++]
+        ignore line: [OFFLOAD_TARGET_NAMES=nvptx-none:amdgcn-amdhsa]
+        ignore line: [OFFLOAD_TARGET_DEFAULT=1]
+        ignore line: [Target: x86_64-linux-gnu]
+        ignore line: [Configured with: ../src/configure -v --with-pkgversion='Debian 15.3.0-2' --with-bugurl=file:///usr/share/doc/gcc-15/README.Bugs --enable-languages=c ada c++ go d fortran objc obj-c++ m2 rust cobol algol68 --prefix=/usr --with-gcc-major-version-only --program-suffix=-15 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/libexec --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-libstdcxx-backtrace --enable-gnu-unique-object --disable-vtable-verify --enable-plugin --enable-default-pie --with-system-zlib --enable-libphobos-checking=release --with-target-system-zlib=auto --enable-objc-gc=auto --enable-multiarch --disable-werror --enable-cet --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32 m64 mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none=/build/reproducible-path/gcc-15-15.3.0/debian/tmp-nvptx/usr amdgcn-amdhsa=/build/reproducible-path/gcc-15-15.3.0/debian/tmp-gcn/usr --enable-offload-defaulted --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu --with-build-config=bootstrap-lto-lean --enable-link-serialization=3]
+        ignore line: [Thread model: posix]
+        ignore line: [Supported LTO compression algorithms: zlib zstd]
+        ignore line: [gcc version 15.3.0 (Debian 15.3.0-2) ]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_4be24.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_4be24.dir/']
+        ignore line: [ /usr/libexec/gcc/x86_64-linux-gnu/15/cc1plus -quiet -v -imultiarch x86_64-linux-gnu -D_GNU_SOURCE /usr/share/cmake-4.3/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles/cmTC_4be24.dir/ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -mtune=generic -march=x86-64 -version -fasynchronous-unwind-tables -o /tmp/ccgFjfMb.s]
+        ignore line: [GNU C++17 (Debian 15.3.0-2) version 15.3.0 (x86_64-linux-gnu)]
+        ignore line: [	compiled by GNU C version 15.3.0  GMP version 6.3.0  MPFR version 4.2.2  MPC version 1.3.1  isl version isl-0.28-GMP]
+        ignore line: []
+        ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
+        ignore line: [ignoring duplicate directory "/usr/include/x86_64-linux-gnu/c++/15"]
+        ignore line: [ignoring nonexistent directory "/usr/local/include/x86_64-linux-gnu"]
+        ignore line: [ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/15/include-fixed/x86_64-linux-gnu"]
+        ignore line: [ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/15/include-fixed"]
+        ignore line: [ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/15/../../../../x86_64-linux-gnu/include"]
+        ignore line: [#include "..." search starts here:]
+        ignore line: [#include <...> search starts here:]
+        ignore line: [ /usr/include/c++/15]
+        ignore line: [ /usr/include/x86_64-linux-gnu/c++/15]
+        ignore line: [ /usr/include/c++/15/backward]
+        ignore line: [ /usr/lib/gcc/x86_64-linux-gnu/15/include]
+        ignore line: [ /usr/local/include]
+        ignore line: [ /usr/include/x86_64-linux-gnu]
+        ignore line: [ /usr/include]
+        ignore line: [End of search list.]
+        ignore line: [Compiler executable checksum: b7682911ce88ba83c74cfab2092de6a4]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_4be24.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_4be24.dir/']
+        ignore line: [ /usr/bin/x86_64-linux-gnu-as -v --64 -o CMakeFiles/cmTC_4be24.dir/CMakeCXXCompilerABI.cpp.o /tmp/ccgFjfMb.s]
+        ignore line: [GNU assembler version 2.47 (x86_64-linux-gnu) using BFD version (GNU Binutils for Debian) 2.47]
+        ignore line: [COMPILER_PATH=/usr/libexec/gcc/x86_64-linux-gnu/15/:/usr/libexec/gcc/x86_64-linux-gnu/15/:/usr/libexec/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/15/:/usr/lib/gcc/x86_64-linux-gnu/]
+        ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/15/:/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/15/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/15/../../../:/lib/:/usr/lib/]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_4be24.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_4be24.dir/CMakeCXXCompilerABI.cpp.']
+        ignore line: [Linking CXX executable cmTC_4be24]
+        ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4be24.dir/link.txt --verbose=1]
+        ignore line: [Using built-in specs.]
+        ignore line: [COLLECT_GCC=/usr/bin/c++]
+        ignore line: [COLLECT_LTO_WRAPPER=/usr/libexec/gcc/x86_64-linux-gnu/15/lto-wrapper]
+        ignore line: [OFFLOAD_TARGET_NAMES=nvptx-none:amdgcn-amdhsa]
+        ignore line: [OFFLOAD_TARGET_DEFAULT=1]
+        ignore line: [Target: x86_64-linux-gnu]
+        ignore line: [Configured with: ../src/configure -v --with-pkgversion='Debian 15.3.0-2' --with-bugurl=file:///usr/share/doc/gcc-15/README.Bugs --enable-languages=c ada c++ go d fortran objc obj-c++ m2 rust cobol algol68 --prefix=/usr --with-gcc-major-version-only --program-suffix=-15 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/libexec --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-libstdcxx-backtrace --enable-gnu-unique-object --disable-vtable-verify --enable-plugin --enable-default-pie --with-system-zlib --enable-libphobos-checking=release --with-target-system-zlib=auto --enable-objc-gc=auto --enable-multiarch --disable-werror --enable-cet --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32 m64 mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none=/build/reproducible-path/gcc-15-15.3.0/debian/tmp-nvptx/usr amdgcn-amdhsa=/build/reproducible-path/gcc-15-15.3.0/debian/tmp-gcn/usr --enable-offload-defaulted --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu --with-build-config=bootstrap-lto-lean --enable-link-serialization=3]
+        ignore line: [Thread model: posix]
+        ignore line: [Supported LTO compression algorithms: zlib zstd]
+        ignore line: [gcc version 15.3.0 (Debian 15.3.0-2) ]
+        ignore line: [COMPILER_PATH=/usr/libexec/gcc/x86_64-linux-gnu/15/:/usr/libexec/gcc/x86_64-linux-gnu/15/:/usr/libexec/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/15/:/usr/lib/gcc/x86_64-linux-gnu/]
+        ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/15/:/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/15/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/15/../../../:/lib/:/usr/lib/]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_4be24' '-foffload-options=-l_GCC_stdc++' '-foffload-options=-l_GCC_m' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_4be24.']
+        link line: [ /usr/libexec/gcc/x86_64-linux-gnu/15/collect2 -plugin /usr/libexec/gcc/x86_64-linux-gnu/15/liblto_plugin.so -plugin-opt=/usr/libexec/gcc/x86_64-linux-gnu/15/lto-wrapper -plugin-opt=-fresolution=/tmp/cczePaLv.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -o cmTC_4be24 /usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/Scrt1.o /usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/15/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/15 -L/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/15/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/15/../../.. -L/lib -L/usr/lib -v CMakeFiles/cmTC_4be24.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/15/crtendS.o /usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/crtn.o]
+          arg [/usr/libexec/gcc/x86_64-linux-gnu/15/collect2] ==> ignore
+          arg [-plugin] ==> ignore
+          arg [/usr/libexec/gcc/x86_64-linux-gnu/15/liblto_plugin.so] ==> ignore
+          arg [-plugin-opt=/usr/libexec/gcc/x86_64-linux-gnu/15/lto-wrapper] ==> ignore
+          arg [-plugin-opt=-fresolution=/tmp/cczePaLv.res] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+          arg [-plugin-opt=-pass-through=-lc] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+          arg [--build-id] ==> ignore
+          arg [--eh-frame-hdr] ==> ignore
+          arg [-m] ==> ignore
+          arg [elf_x86_64] ==> ignore
+          arg [--hash-style=gnu] ==> ignore
+          arg [--as-needed] ==> ignore
+          arg [-dynamic-linker] ==> ignore
+          arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
+          arg [-pie] ==> ignore
+          arg [-o] ==> ignore
+          arg [cmTC_4be24] ==> ignore
+          arg [/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/Scrt1.o] ==> obj [/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/Scrt1.o]
+          arg [/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/crti.o] ==> obj [/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/crti.o]
+          arg [/usr/lib/gcc/x86_64-linux-gnu/15/crtbeginS.o] ==> obj [/usr/lib/gcc/x86_64-linux-gnu/15/crtbeginS.o]
+          arg [-L/usr/lib/gcc/x86_64-linux-gnu/15] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/15]
+          arg [-L/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu]
+          arg [-L/usr/lib/gcc/x86_64-linux-gnu/15/../../../../lib] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/15/../../../../lib]
+          arg [-L/lib/x86_64-linux-gnu] ==> dir [/lib/x86_64-linux-gnu]
+          arg [-L/lib/../lib] ==> dir [/lib/../lib]
+          arg [-L/usr/lib/x86_64-linux-gnu] ==> dir [/usr/lib/x86_64-linux-gnu]
+          arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
+          arg [-L/usr/lib/gcc/x86_64-linux-gnu/15/../../..] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/15/../../..]
+          arg [-L/lib] ==> dir [/lib]
+          arg [-L/usr/lib] ==> dir [/usr/lib]
+          arg [-v] ==> ignore
+          arg [CMakeFiles/cmTC_4be24.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+          arg [-lstdc++] ==> lib [stdc++]
+          arg [-lm] ==> lib [m]
+          arg [-lgcc_s] ==> lib [gcc_s]
+          arg [-lgcc] ==> lib [gcc]
+          arg [-lc] ==> lib [c]
+          arg [-lgcc_s] ==> lib [gcc_s]
+          arg [-lgcc] ==> lib [gcc]
+          arg [/usr/lib/gcc/x86_64-linux-gnu/15/crtendS.o] ==> obj [/usr/lib/gcc/x86_64-linux-gnu/15/crtendS.o]
+          arg [/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/crtn.o] ==> obj [/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/crtn.o]
+        ignore line: [collect2 version 15.3.0]
+        ignore line: [/usr/bin/ld -plugin /usr/libexec/gcc/x86_64-linux-gnu/15/liblto_plugin.so -plugin-opt=/usr/libexec/gcc/x86_64-linux-gnu/15/lto-wrapper -plugin-opt=-fresolution=/tmp/cczePaLv.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -o cmTC_4be24 /usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/Scrt1.o /usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/15/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/15 -L/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/15/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/15/../../.. -L/lib -L/usr/lib -v CMakeFiles/cmTC_4be24.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/15/crtendS.o /usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/crtn.o]
+        linker tool for 'CXX': /usr/bin/ld
+        collapse obj [/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/Scrt1.o] ==> [/usr/lib/x86_64-linux-gnu/Scrt1.o]
+        collapse obj [/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/crti.o] ==> [/usr/lib/x86_64-linux-gnu/crti.o]
+        collapse obj [/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/crtn.o] ==> [/usr/lib/x86_64-linux-gnu/crtn.o]
+        collapse library dir [/usr/lib/gcc/x86_64-linux-gnu/15] ==> [/usr/lib/gcc/x86_64-linux-gnu/15]
+        collapse library dir [/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu] ==> [/usr/lib/x86_64-linux-gnu]
+        collapse library dir [/usr/lib/gcc/x86_64-linux-gnu/15/../../../../lib] ==> [/usr/lib]
+        collapse library dir [/lib/x86_64-linux-gnu] ==> [/lib/x86_64-linux-gnu]
+        collapse library dir [/lib/../lib] ==> [/lib]
+        collapse library dir [/usr/lib/x86_64-linux-gnu] ==> [/usr/lib/x86_64-linux-gnu]
+        collapse library dir [/usr/lib/../lib] ==> [/usr/lib]
+        collapse library dir [/usr/lib/gcc/x86_64-linux-gnu/15/../../..] ==> [/usr/lib]
+        collapse library dir [/lib] ==> [/lib]
+        collapse library dir [/usr/lib] ==> [/usr/lib]
+        implicit libs: [stdc++;m;gcc_s;gcc;c;gcc_s;gcc]
+        implicit objs: [/usr/lib/x86_64-linux-gnu/Scrt1.o;/usr/lib/x86_64-linux-gnu/crti.o;/usr/lib/gcc/x86_64-linux-gnu/15/crtbeginS.o;/usr/lib/gcc/x86_64-linux-gnu/15/crtendS.o;/usr/lib/x86_64-linux-gnu/crtn.o]
+        implicit dirs: [/usr/lib/gcc/x86_64-linux-gnu/15;/usr/lib/x86_64-linux-gnu;/usr/lib;/lib/x86_64-linux-gnu;/lib]
+        implicit fwks: []
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake-4.3/Modules/Internal/CMakeDetermineLinkerId.cmake:38 (message)"
+      - "/usr/share/cmake-4.3/Modules/CMakeDetermineCompilerABI.cmake:299 (cmake_determine_linker_id)"
+      - "/usr/share/cmake-4.3/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:3 (project)"
+    message: |
+      Running the CXX compiler's linker: "/usr/bin/ld" "-v"
+      GNU ld (GNU Binutils for Debian) 2.47
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.3/Modules/FindPkgConfig.cmake:517 (find_program)"
+      - "CMakeLists.txt:9 (find_package)"
+    mode: "program"
+    variable: "PKG_CONFIG_EXECUTABLE"
+    description: "pkg-config executable"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "pkg-config"
+      - "pkgconf"
+    candidate_directories:
+      - "/home/kali/.gemini/antigravity-cli/bin/"
+      - "/home/kali/.npm-global/bin/"
+      - "/opt/apache-maven-3.9.16/bin/"
+      - "/home/kali/.kimi-code/bin/"
+      - "/home/kali/.local/bin/"
+      - "/usr/lib/jvm/java-25-openjdk-amd64/bin/"
+      - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/usr/local/sbin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/bin/"
+      - "/usr/local/games/"
+      - "/usr/games/"
+      - "/snap/bin/"
+      - "/home/kali/.dotnet/tools/"
+      - "/home/kali/go/bin/"
+      - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts/"
+      - "/usr/local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/"
+      - "/usr/bin/"
+      - "/usr/sbin/"
+      - "/usr/"
+      - "/bin/"
+      - "/sbin/"
+      - "/usr/X11R6/bin/"
+      - "/usr/X11R6/sbin/"
+      - "/usr/X11R6/"
+      - "/usr/pkg/bin/"
+      - "/usr/pkg/sbin/"
+      - "/usr/pkg/"
+      - "/opt/bin/"
+      - "/opt/sbin/"
+      - "/opt/"
+    searched_directories:
+      - "/home/kali/.gemini/antigravity-cli/bin/pkg-config"
+      - "/home/kali/.gemini/antigravity-cli/bin/pkgconf"
+      - "/home/kali/.npm-global/bin/pkg-config"
+      - "/home/kali/.npm-global/bin/pkgconf"
+      - "/opt/apache-maven-3.9.16/bin/pkg-config"
+      - "/opt/apache-maven-3.9.16/bin/pkgconf"
+      - "/home/kali/.kimi-code/bin/pkg-config"
+      - "/home/kali/.kimi-code/bin/pkgconf"
+      - "/home/kali/.local/bin/pkg-config"
+      - "/home/kali/.local/bin/pkgconf"
+      - "/usr/lib/jvm/java-25-openjdk-amd64/bin/pkg-config"
+      - "/usr/lib/jvm/java-25-openjdk-amd64/bin/pkgconf"
+      - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin/pkg-config"
+      - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin/pkgconf"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/pkg-config"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/pkgconf"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/pkg-config"
+      - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/pkgconf"
+      - "/usr/local/sbin/pkg-config"
+      - "/usr/local/sbin/pkgconf"
+      - "/usr/sbin/pkg-config"
+      - "/usr/sbin/pkgconf"
+      - "/sbin/pkg-config"
+      - "/sbin/pkgconf"
+      - "/usr/local/bin/pkg-config"
+      - "/usr/local/bin/pkgconf"
+    found: "/usr/bin/pkg-config"
+    search_context:
+      ENV{PATH}:
+        - "/home/kali/.gemini/antigravity-cli/bin"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/local/games"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/kali/.dotnet/tools"
+        - "/home/kali/go/bin"
+        - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts"
+        - "/home/kali/go/bin"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/usr"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.3/Modules/FindPkgConfig.cmake:761 (find_library)"
+      - "/usr/share/cmake-4.3/Modules/FindPkgConfig.cmake:811 (_pkg_find_libs)"
+      - "/usr/share/cmake-4.3/Modules/FindPkgConfig.cmake:1149 (_pkg_recalculate)"
+      - "/usr/share/cmake-4.3/Modules/FindPkgConfig.cmake:1166 (_pkg_check_modules_internal)"
+      - "CMakeLists.txt:10 (pkg_check_modules)"
+    mode: "library"
+    variable: "pkgcfg_lib_RAYLIB_raylib"
+    description: "Path to a library."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "raylib"
+    candidate_directories:
+      - "/usr/lib/x86_64-linux-gnu/"
+    found: "/usr/lib/x86_64-linux-gnu/libraylib.so"
+    search_context:
+      ENV{PATH}:
+        - "/home/kali/.gemini/antigravity-cli/bin"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.vscode/extensions/vadimcn.vscode-lldb-1.12.2/bin"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/kali/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/local/games"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/kali/.dotnet/tools"
+        - "/home/kali/go/bin"
+        - "/home/kali/.vscode/extensions/vscjava.vscode-java-debug-0.59.0/bundled/scripts/noConfigScripts"
+        - "/home/kali/go/bin"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/usr"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+...
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.3/Modules/CTest.cmake:188 (find_program)"
+      - "CMakeLists.txt:5 (include)"
+    mode: "program"
+    variable: "MEMORYCHECK_COMMAND"
+    description: "Path to the memory checking command, used for memory error detection."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "purify"
+      - "valgrind"
+      - "boundscheck"
+      - "drmemory"
+      - "cuda-memcheck"
+      - "compute-sanitizer"
+    candidate_directories:
+      - "/home/kali/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/bin/"
+      - "/usr/local/games/"
+      - "/usr/games/"
+      - "/snap/bin/"
+      - "/home/kali/.dotnet/tools/"
+      - "/usr/local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/"
+      - "/usr/bin/"
+      - "/usr/sbin/"
+      - "/usr/"
+      - "/bin/"
+      - "/sbin/"
+      - "/usr/X11R6/bin/"
+      - "/usr/X11R6/sbin/"
+      - "/usr/X11R6/"
+      - "/usr/pkg/bin/"
+      - "/usr/pkg/sbin/"
+      - "/usr/pkg/"
+      - "/opt/bin/"
+      - "/opt/sbin/"
+      - "/opt/"
+    searched_directories:
+      - "/home/kali/.local/bin/purify"
+      - "/usr/local/sbin/purify"
+      - "/usr/sbin/purify"
+      - "/sbin/purify"
+      - "/usr/local/bin/purify"
+      - "/usr/bin/purify"
+      - "/bin/purify"
+      - "/usr/local/games/purify"
+      - "/usr/games/purify"
+      - "/snap/bin/purify"
+      - "/home/kali/.dotnet/tools/purify"
+      - "/usr/local/bin/purify"
+      - "/usr/local/sbin/purify"
+      - "/usr/local/purify"
+      - "/usr/bin/purify"
+      - "/usr/sbin/purify"
+      - "/usr/purify"
+      - "/bin/purify"
+      - "/sbin/purify"
+      - "/usr/X11R6/bin/purify"
+      - "/usr/X11R6/sbin/purify"
+      - "/usr/X11R6/purify"
+      - "/usr/pkg/bin/purify"
+      - "/usr/pkg/sbin/purify"
+      - "/usr/pkg/purify"
+      - "/opt/bin/purify"
+      - "/opt/sbin/purify"
+      - "/opt/purify"
+      - "/home/kali/.local/bin/valgrind"
+      - "/usr/local/sbin/valgrind"
+      - "/usr/sbin/valgrind"
+      - "/sbin/valgrind"
+      - "/usr/local/bin/valgrind"
+      - "/usr/bin/valgrind"
+      - "/bin/valgrind"
+      - "/usr/local/games/valgrind"
+      - "/usr/games/valgrind"
+      - "/snap/bin/valgrind"
+      - "/home/kali/.dotnet/tools/valgrind"
+      - "/usr/local/bin/valgrind"
+      - "/usr/local/sbin/valgrind"
+      - "/usr/local/valgrind"
+      - "/usr/bin/valgrind"
+      - "/usr/sbin/valgrind"
+      - "/usr/valgrind"
+      - "/bin/valgrind"
+      - "/sbin/valgrind"
+      - "/usr/X11R6/bin/valgrind"
+      - "/usr/X11R6/sbin/valgrind"
+      - "/usr/X11R6/valgrind"
+      - "/usr/pkg/bin/valgrind"
+      - "/usr/pkg/sbin/valgrind"
+      - "/usr/pkg/valgrind"
+      - "/opt/bin/valgrind"
+      - "/opt/sbin/valgrind"
+      - "/opt/valgrind"
+      - "/home/kali/.local/bin/boundscheck"
+      - "/usr/local/sbin/boundscheck"
+      - "/usr/sbin/boundscheck"
+      - "/sbin/boundscheck"
+      - "/usr/local/bin/boundscheck"
+      - "/usr/bin/boundscheck"
+      - "/bin/boundscheck"
+      - "/usr/local/games/boundscheck"
+      - "/usr/games/boundscheck"
+      - "/snap/bin/boundscheck"
+      - "/home/kali/.dotnet/tools/boundscheck"
+      - "/usr/local/bin/boundscheck"
+      - "/usr/local/sbin/boundscheck"
+      - "/usr/local/boundscheck"
+      - "/usr/bin/boundscheck"
+      - "/usr/sbin/boundscheck"
+      - "/usr/boundscheck"
+      - "/bin/boundscheck"
+      - "/sbin/boundscheck"
+      - "/usr/X11R6/bin/boundscheck"
+      - "/usr/X11R6/sbin/boundscheck"
+      - "/usr/X11R6/boundscheck"
+      - "/usr/pkg/bin/boundscheck"
+      - "/usr/pkg/sbin/boundscheck"
+      - "/usr/pkg/boundscheck"
+      - "/opt/bin/boundscheck"
+      - "/opt/sbin/boundscheck"
+      - "/opt/boundscheck"
+      - "/home/kali/.local/bin/drmemory"
+      - "/usr/local/sbin/drmemory"
+      - "/usr/sbin/drmemory"
+      - "/sbin/drmemory"
+      - "/usr/local/bin/drmemory"
+      - "/usr/bin/drmemory"
+      - "/bin/drmemory"
+      - "/usr/local/games/drmemory"
+      - "/usr/games/drmemory"
+      - "/snap/bin/drmemory"
+      - "/home/kali/.dotnet/tools/drmemory"
+      - "/usr/local/bin/drmemory"
+      - "/usr/local/sbin/drmemory"
+      - "/usr/local/drmemory"
+      - "/usr/bin/drmemory"
+      - "/usr/sbin/drmemory"
+      - "/usr/drmemory"
+      - "/bin/drmemory"
+      - "/sbin/drmemory"
+      - "/usr/X11R6/bin/drmemory"
+      - "/usr/X11R6/sbin/drmemory"
+      - "/usr/X11R6/drmemory"
+      - "/usr/pkg/bin/drmemory"
+      - "/usr/pkg/sbin/drmemory"
+      - "/usr/pkg/drmemory"
+      - "/opt/bin/drmemory"
+      - "/opt/sbin/drmemory"
+      - "/opt/drmemory"
+      - "/home/kali/.local/bin/cuda-memcheck"
+      - "/usr/local/sbin/cuda-memcheck"
+      - "/usr/sbin/cuda-memcheck"
+      - "/sbin/cuda-memcheck"
+      - "/usr/local/bin/cuda-memcheck"
+      - "/usr/bin/cuda-memcheck"
+      - "/bin/cuda-memcheck"
+      - "/usr/local/games/cuda-memcheck"
+      - "/usr/games/cuda-memcheck"
+      - "/snap/bin/cuda-memcheck"
+      - "/home/kali/.dotnet/tools/cuda-memcheck"
+      - "/usr/local/bin/cuda-memcheck"
+      - "/usr/local/sbin/cuda-memcheck"
+      - "/usr/local/cuda-memcheck"
+      - "/usr/bin/cuda-memcheck"
+      - "/usr/sbin/cuda-memcheck"
+      - "/usr/cuda-memcheck"
+      - "/bin/cuda-memcheck"
+      - "/sbin/cuda-memcheck"
+      - "/usr/X11R6/bin/cuda-memcheck"
+      - "/usr/X11R6/sbin/cuda-memcheck"
+      - "/usr/X11R6/cuda-memcheck"
+      - "/usr/pkg/bin/cuda-memcheck"
+      - "/usr/pkg/sbin/cuda-memcheck"
+      - "/usr/pkg/cuda-memcheck"
+      - "/opt/bin/cuda-memcheck"
+      - "/opt/sbin/cuda-memcheck"
+      - "/opt/cuda-memcheck"
+      - "/home/kali/.local/bin/compute-sanitizer"
+      - "/usr/local/sbin/compute-sanitizer"
+      - "/usr/sbin/compute-sanitizer"
+      - "/sbin/compute-sanitizer"
+      - "/usr/local/bin/compute-sanitizer"
+      - "/usr/bin/compute-sanitizer"
+      - "/bin/compute-sanitizer"
+      - "/usr/local/games/compute-sanitizer"
+      - "/usr/games/compute-sanitizer"
+      - "/snap/bin/compute-sanitizer"
+      - "/home/kali/.dotnet/tools/compute-sanitizer"
+      - "/usr/local/bin/compute-sanitizer"
+      - "/usr/local/sbin/compute-sanitizer"
+      - "/usr/local/compute-sanitizer"
+      - "/usr/bin/compute-sanitizer"
+      - "/usr/sbin/compute-sanitizer"
+      - "/usr/compute-sanitizer"
+      - "/bin/compute-sanitizer"
+      - "/sbin/compute-sanitizer"
+      - "/usr/X11R6/bin/compute-sanitizer"
+      - "/usr/X11R6/sbin/compute-sanitizer"
+      - "/usr/X11R6/compute-sanitizer"
+      - "/usr/pkg/bin/compute-sanitizer"
+      - "/usr/pkg/sbin/compute-sanitizer"
+      - "/usr/pkg/compute-sanitizer"
+      - "/opt/bin/compute-sanitizer"
+      - "/opt/sbin/compute-sanitizer"
+      - "/opt/compute-sanitizer"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/local/games"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/kali/.dotnet/tools"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/usr"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.3/Modules/CTest.cmake:196 (find_program)"
+      - "CMakeLists.txt:5 (include)"
+    mode: "program"
+    variable: "COVERAGE_COMMAND"
+    description: "Path to the coverage program that CTest uses for performing coverage inspection"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "gcov"
+    candidate_directories:
+      - "/home/kali/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/bin/"
+      - "/usr/local/games/"
+      - "/usr/games/"
+      - "/snap/bin/"
+      - "/home/kali/.dotnet/tools/"
+      - "/usr/local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/"
+      - "/usr/bin/"
+      - "/usr/sbin/"
+      - "/usr/"
+      - "/bin/"
+      - "/sbin/"
+      - "/usr/X11R6/bin/"
+      - "/usr/X11R6/sbin/"
+      - "/usr/X11R6/"
+      - "/usr/pkg/bin/"
+      - "/usr/pkg/sbin/"
+      - "/usr/pkg/"
+      - "/opt/bin/"
+      - "/opt/sbin/"
+      - "/opt/"
+    searched_directories:
+      - "/home/kali/.local/bin/gcov"
+      - "/usr/local/sbin/gcov"
+      - "/usr/sbin/gcov"
+      - "/sbin/gcov"
+      - "/usr/local/bin/gcov"
+    found: "/usr/bin/gcov"
+    search_context:
+      ENV{PATH}:
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/local/games"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/kali/.dotnet/tools"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/usr"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+...
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.3/Modules/CTest.cmake:171 (find_program)"
+      - "CMakeLists.txt:5 (include)"
+    mode: "program"
+    variable: "GITCOMMAND"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "git"
+    candidate_directories:
+      - "/home/kali/.codex/packages/standalone/releases/0.151.0-x86_64-unknown-linux-musl/codex-path/"
+      - "/home/kali/.local/bin/"
+      - "/home/kali/.npm-global/bin/"
+      - "/opt/apache-maven-3.9.16/bin/"
+      - "/home/kali/.kimi-code/bin/"
+      - "/usr/lib/jvm/java-25-openjdk-amd64/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/"
+      - "/bin/"
+      - "/usr/local/games/"
+      - "/usr/games/"
+      - "/snap/bin/"
+      - "/home/kali/.dotnet/tools/"
+      - "/home/kali/go/bin/"
+      - "/usr/local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/"
+      - "/usr/bin/"
+      - "/usr/sbin/"
+      - "/usr/"
+      - "/bin/"
+      - "/sbin/"
+      - "/usr/X11R6/bin/"
+      - "/usr/X11R6/sbin/"
+      - "/usr/X11R6/"
+      - "/usr/pkg/bin/"
+      - "/usr/pkg/sbin/"
+      - "/usr/pkg/"
+      - "/opt/bin/"
+      - "/opt/sbin/"
+      - "/opt/"
+    searched_directories:
+      - "/home/kali/.codex/packages/standalone/releases/0.151.0-x86_64-unknown-linux-musl/codex-path/git"
+      - "/home/kali/.local/bin/git"
+      - "/home/kali/.npm-global/bin/git"
+      - "/opt/apache-maven-3.9.16/bin/git"
+      - "/home/kali/.kimi-code/bin/git"
+      - "/usr/lib/jvm/java-25-openjdk-amd64/bin/git"
+      - "/usr/local/sbin/git"
+      - "/usr/sbin/git"
+      - "/sbin/git"
+      - "/usr/local/bin/git"
+    found: "/usr/bin/git"
+    search_context:
+      ENV{PATH}:
+        - "/home/kali/.codex/packages/standalone/releases/0.151.0-x86_64-unknown-linux-musl/codex-path"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.npm-global/bin"
+        - "/opt/apache-maven-3.9.16/bin"
+        - "/home/kali/.kimi-code/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/lib/jvm/java-25-openjdk-amd64/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/home/kali/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/local/games"
+        - "/usr/games"
+        - "/snap/bin"
+        - "/home/kali/.dotnet/tools"
+        - "/home/kali/go/bin"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/usr"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+...
