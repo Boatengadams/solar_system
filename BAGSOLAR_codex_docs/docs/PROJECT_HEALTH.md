@@ -55,6 +55,11 @@ arbitrary frame rotations.
   its status, score, grade, and feedback.
 - Education unit tests and CTest integration.
 
+The main CMake application target links the evaluator implementation used by
+the education tests, so the running HUD path exercises the same API.
+Evaluator policy constants are shared and malformed numerical observations are
+rejected before scoring.
+
 ### Remaining
 
 - Broader interactive challenge catalog.

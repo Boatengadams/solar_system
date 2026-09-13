@@ -105,10 +105,14 @@ score, grade, pass/fail, feedback, explanation, and next step. Analytical
 comparisons use 1% full credit and 5% passing relative-error thresholds;
 timestep convergence uses 25% full-credit and 5% passing improvement;
 conservation uses 1% full-credit and 5% passing drift envelopes. These are
-explicit educational thresholds, not claims of universal physical accuracy.
+the shared `ExperimentEvaluationThresholds` policy: explicit educational
+thresholds, not claims of universal physical accuracy. Negative, non-finite,
+or physically unsafe inputs are rejected; missing metric sets remain
+`INSUFFICIENT_DATA` and are never converted into a zero score.
 
 Press `Y` in the experiment panel to evaluate the current simulation state.
-The HUD displays the result and valid results are recorded in
+The HUD displays the status, score/grade, and a concise measured/reference
+line when an analytical value exists. Valid results are recorded in
 `EducationProgress`. Some evaluations require caller-supplied benchmark or
 telemetry samples and therefore report insufficient data when the simulation
 does not contain those samples. The layer remains raylib-independent; the HUD

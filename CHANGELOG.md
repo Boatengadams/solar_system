@@ -17,6 +17,9 @@
   convergence, and conservation metrics.
 - Added experiment evaluation persistence and a minimal `Y`-key HUD result
   flow without changing the physics engine or adding UI dependencies.
+- Centralized experiment-evaluation thresholds, rejected unsafe/non-finite
+  numerical observations before scoring, and exposed concise measured/reference
+  output in the existing experiment panel.
 
 ## 0.10.0
 

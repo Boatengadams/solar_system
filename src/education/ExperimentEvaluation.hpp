@@ -23,6 +23,18 @@ enum class ExperimentEvaluationMode {
     NumericalComparison,
 };
 
+// Educational policy, not a claim of physical measurement uncertainty. All
+// relative errors and drift values are dimensionless; raw observations remain
+// in SI units.
+struct ExperimentEvaluationThresholds {
+    static constexpr double analyticalFullCreditRelativeError = 0.01;
+    static constexpr double analyticalPassingRelativeError = 0.05;
+    static constexpr double timestepFullCreditImprovement = 0.25;
+    static constexpr double timestepPassingImprovement = 0.05;
+    static constexpr double conservationFullCreditDrift = 0.01;
+    static constexpr double conservationPassingDrift = 0.05;
+};
+
 struct ExperimentObservation {
     // SI values unless a field name states otherwise. NaN means not supplied.
     double radiusM = std::numeric_limits<double>::quiet_NaN();

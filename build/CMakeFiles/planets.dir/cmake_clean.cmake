@@ -34,6 +34,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/planets.dir/src/education/EducationContent.cpp.o.d"
   "CMakeFiles/planets.dir/src/education/EducationProgress.cpp.o"
   "CMakeFiles/planets.dir/src/education/EducationProgress.cpp.o.d"
+  "CMakeFiles/planets.dir/src/education/ExperimentEvaluation.cpp.o"
+  "CMakeFiles/planets.dir/src/education/ExperimentEvaluation.cpp.o.d"
   "CMakeFiles/planets.dir/src/input/InputController.cpp.o"
   "CMakeFiles/planets.dir/src/input/InputController.cpp.o.d"
   "CMakeFiles/planets.dir/src/missions/Mission.cpp.o"

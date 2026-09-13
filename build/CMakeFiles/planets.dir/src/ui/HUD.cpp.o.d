@@ -231,6 +231,8 @@ CMakeFiles/planets.dir/src/ui/HUD.cpp.o: \
  /home/kali/Desktop/Cpp_Advance/src/ui/../simulation/../physics/PhysicsEngine.hpp \
  /home/kali/Desktop/Cpp_Advance/src/ui/../simulation/../telemetry/TelemetryTypes.hpp \
  /home/kali/Desktop/Cpp_Advance/src/ui/../simulation/../education/EducationChallenges.hpp \
+ /home/kali/Desktop/Cpp_Advance/src/ui/../simulation/../education/../physics/IntegratorBenchmark.hpp \
+ /home/kali/Desktop/Cpp_Advance/src/ui/../simulation/../education/ExperimentEvaluation.hpp \
  /home/kali/Desktop/Cpp_Advance/src/ui/../simulation/../education/EducationProgress.hpp \
  /home/kali/Desktop/Cpp_Advance/src/ui/../simulation/SimulationSettings.hpp \
  /usr/include/c++/15/algorithm /usr/include/c++/15/bits/stl_algo.h \

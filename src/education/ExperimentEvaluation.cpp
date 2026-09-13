@@ -10,10 +10,24 @@
 namespace bag {
 namespace {
 
-constexpr double SOLAR_RADIUS_M = 6.957e8;
-
 bool finite(double value) { return std::isfinite(value); }
 bool positive(double value) { return finite(value) && value > 0.0; }
+bool nonNegativeFinite(double value) { return finite(value) && value >= 0.0; }
+
+ChallengeScoringRules analyticalRules() {
+    ChallengeScoringRules rules;
+    rules.fullCreditRelativeError = ExperimentEvaluationThresholds::analyticalFullCreditRelativeError;
+    rules.passingRelativeError = ExperimentEvaluationThresholds::analyticalPassingRelativeError;
+    return rules;
+}
+
+bool validBenchmarkMetric(const IntegratorBenchmarkMetrics& metric) {
+    return metric.valid && nonNegativeFinite(metric.energyDrift) &&
+        nonNegativeFinite(metric.angularMomentumDrift) &&
+        nonNegativeFinite(metric.positionError) && nonNegativeFinite(metric.velocityError) &&
+        nonNegativeFinite(metric.orbitalPeriodError) && nonNegativeFinite(metric.timestep) &&
+        nonNegativeFinite(metric.elapsedSimulationTime);
+}
 
 const Experiment* definitionFor(const std::string& id) {
     for (int index = 0; index < experimentCount(); ++index) {
@@ -82,7 +96,8 @@ ExperimentEvaluation evaluateExperiment(const std::string& experimentId,
     if (!definitionFor(experimentId)) return invalid(experimentId, ExperimentEvaluationStatus::Unsupported, "This experiment has no evaluator yet.");
 
     if (experimentId == "escape-velocity") {
-        if (!positive(observation.radiusM) || !positive(observation.centralMassKg) ||
+        if (!positive(observation.radiusM) || observation.radiusM <= PhysicsEngine::MIN_PHYSICS_DISTANCE ||
+            !positive(observation.centralMassKg) ||
             observation.centralMassKg != PhysicsEngine::SOLAR_MASS) {
             return invalid(experimentId, ExperimentEvaluationStatus::InvalidInput,
                            "Escape-velocity evaluation currently requires a finite Sun-centered radius and solar mass.");
@@ -90,10 +105,7 @@ ExperimentEvaluation evaluateExperiment(const std::string& experimentId,
         Body body;
         body.position = {observation.radiusM, 0.0, 0.0};
         const double expected = PhysicsEngine::escapeVelocity(body);
-        ChallengeScoringRules rules;
-        rules.fullCreditRelativeError = 0.01;
-        rules.passingRelativeError = 0.05;
-        return analytical(experimentId, observation, expected, rules, "escape velocity in m/s",
+        return analytical(experimentId, observation, expected, analyticalRules(), "escape velocity in m/s",
                           "Escape velocity is the zero-specific-energy boundary in the Sun-centered Newtonian model.",
                           "Repeat just below and just above the reference and inspect the orbit classification.");
     }
@@ -109,10 +121,7 @@ ExperimentEvaluation evaluateExperiment(const std::string& experimentId,
         body.velocity = {0.0, PhysicsEngine::orbitalVelocity(body), 0.0};
         const OrbitalElements elements = PhysicsEngine::orbitalElements(body);
         if (!elements.valid || !positive(elements.period)) return invalid(experimentId, ExperimentEvaluationStatus::ScientificFailure, "The orbital reference could not be computed.");
-        ChallengeScoringRules rules;
-        rules.fullCreditRelativeError = 0.01;
-        rules.passingRelativeError = 0.05;
-        return analytical(experimentId, observation, elements.period, rules, "orbital period in seconds",
+        return analytical(experimentId, observation, elements.period, analyticalRules(), "orbital period in seconds",
                           "Kepler's period reference is computed from the existing circular-orbit orbital-elements implementation.",
                           "Repeat at another radius and compare the period ratio with the radius ratio.");
     }
@@ -132,10 +141,7 @@ ExperimentEvaluation evaluateExperiment(const std::string& experimentId,
         bool valid = false;
         const Vec3 acceleration = PhysicsEngine::acceleration(bodies, 1, {}, &valid);
         if (!valid || !finite(length(acceleration))) return invalid(experimentId, ExperimentEvaluationStatus::ScientificFailure, "The gravity reference could not be computed.");
-        ChallengeScoringRules rules;
-        rules.fullCreditRelativeError = 0.01;
-        rules.passingRelativeError = 0.05;
-        return analytical(experimentId, observation, length(acceleration), rules, "acceleration in m/s^2",
+        return analytical(experimentId, observation, length(acceleration), analyticalRules(), "acceleration in m/s^2",
                           "The reference acceleration is the existing N-body PhysicsEngine result for a unit probe.",
                           "Change the radius while keeping mass fixed and observe the inverse-distance behavior.");
     }
@@ -164,10 +170,7 @@ ExperimentEvaluation evaluateExperiment(const std::string& experimentId,
         }
         const HohmannTransfer transfer = PhysicsEngine::hohmannTransfer(observation.radiusM, observation.targetRadiusM, observation.centralMassKg);
         if (!transfer.valid) return invalid(experimentId, ExperimentEvaluationStatus::ScientificFailure, "The Hohmann reference could not be computed.");
-        ChallengeScoringRules rules;
-        rules.fullCreditRelativeError = 0.01;
-        rules.passingRelativeError = 0.05;
-        ExperimentEvaluation result = analytical(experimentId, observation, transfer.totalDeltaV, rules, "total delta-v in m/s",
+        ExperimentEvaluation result = analytical(experimentId, observation, transfer.totalDeltaV, analyticalRules(), "total delta-v in m/s",
             "The reference is the existing two-burn Hohmann calculation for coplanar circular point-mass orbits.",
             "Compare the departure and arrival burn components, not only their sum.");
         result.metrics.referenceSecondaryValue = transfer.arrivalDeltaV;
@@ -183,10 +186,7 @@ ExperimentEvaluation evaluateExperiment(const std::string& experimentId,
         const GravityAssistResult reference = gravityAssistTurn(PhysicsEngine::G * observation.centralMassKg,
                                                                  observation.periapsisRadiusM, observation.incomingSpeedMps);
         if (!reference.valid) return invalid(experimentId, ExperimentEvaluationStatus::ScientificFailure, "The gravity-assist reference could not be computed.");
-        ChallengeScoringRules rules;
-        rules.fullCreditRelativeError = 0.01;
-        rules.passingRelativeError = 0.05;
-        return analytical(experimentId, observation, reference.turnAngleRadians, rules, "turn angle in radians",
+        return analytical(experimentId, observation, reference.turnAngleRadians, analyticalRules(), "turn angle in radians",
                           "The reference uses the existing patched-conic gravity-assist turn-angle calculation.",
                           "Vary periapsis and incoming relative speed separately to see how the turn changes.");
     }
@@ -194,6 +194,9 @@ ExperimentEvaluation evaluateExperiment(const std::string& experimentId,
     if (experimentId == "numerical-methods") {
         const ChallengeDefinition* definition = findChallenge("integrator-comparison");
         if (!definition || observation.integratorMetrics.empty()) return invalid(experimentId, ExperimentEvaluationStatus::InsufficientData, "Integrator evaluation requires benchmark metrics for at least one method.");
+        if (!std::all_of(observation.integratorMetrics.begin(), observation.integratorMetrics.end(), validBenchmarkMetric)) {
+            return invalid(experimentId, ExperimentEvaluationStatus::InvalidInput, "Integrator benchmark metrics must be finite, non-negative, and physically tagged as valid.");
+        }
         const ChallengeResult benchmark = evaluateIntegratorMetrics(*definition, observation.integratorMetrics, observation.integrator);
         if (!benchmark.valid) return invalid(experimentId, ExperimentEvaluationStatus::ScientificFailure, "The supplied integrator benchmark contains no valid selected result.");
         ExperimentEvaluation result = base(experimentId, ExperimentEvaluationMode::NumericalComparison);
@@ -218,10 +221,10 @@ ExperimentEvaluation evaluateExperiment(const std::string& experimentId,
     if (experimentId == "timestep-sensitivity") {
         if (!finite(observation.measuredPrimaryValue) || !finite(observation.measuredSecondaryValue) ||
             observation.measuredPrimaryValue < 0.0 || observation.measuredSecondaryValue < 0.0 ||
-            observation.measuredPrimaryValue <= 0.0) return invalid(experimentId, ExperimentEvaluationStatus::InsufficientData, "Timestep evaluation requires non-negative coarse and fine errors with a positive coarse error.");
+            observation.measuredPrimaryValue <= 0.0) return invalid(experimentId, ExperimentEvaluationStatus::InvalidInput, "Timestep evaluation requires finite, non-negative coarse and fine errors with a positive coarse error.");
         const double improvement = (observation.measuredPrimaryValue - observation.measuredSecondaryValue) / observation.measuredPrimaryValue;
-        const double fullCreditImprovement = 0.25;
-        const double passingImprovement = 0.05;
+        const double fullCreditImprovement = ExperimentEvaluationThresholds::timestepFullCreditImprovement;
+        const double passingImprovement = ExperimentEvaluationThresholds::timestepPassingImprovement;
         const double score = improvement >= fullCreditImprovement ? 100.0
             : improvement <= passingImprovement ? 0.0
             : 100.0 * (improvement - passingImprovement) / (fullCreditImprovement - passingImprovement);
@@ -237,11 +240,11 @@ ExperimentEvaluation evaluateExperiment(const std::string& experimentId,
     }
 
     if (experimentId == "conservation") {
-        if (!finite(observation.energyDrift) || !finite(observation.angularMomentumDrift) ||
-            observation.energyDrift < 0.0 || observation.angularMomentumDrift < 0.0) return invalid(experimentId, ExperimentEvaluationStatus::InsufficientData, "Conservation evaluation requires finite non-negative energy and angular-momentum drift.");
+        if (!finite(observation.energyDrift) || !finite(observation.angularMomentumDrift)) return invalid(experimentId, ExperimentEvaluationStatus::InsufficientData, "Conservation evaluation requires both energy and angular-momentum drift metrics.");
+        if (observation.energyDrift < 0.0 || observation.angularMomentumDrift < 0.0) return invalid(experimentId, ExperimentEvaluationStatus::InvalidInput, "Conservation drift cannot be negative.");
         ChallengeScoringRules energyRules;
-        energyRules.fullCreditRelativeError = 0.01;
-        energyRules.passingRelativeError = 0.05;
+        energyRules.fullCreditRelativeError = ExperimentEvaluationThresholds::conservationFullCreditDrift;
+        energyRules.passingRelativeError = ExperimentEvaluationThresholds::conservationPassingDrift;
         ChallengeScoringRules momentumRules = energyRules;
         const double energyScore = scoreRelativeError(observation.energyDrift, energyRules);
         const double momentumScore = scoreRelativeError(observation.angularMomentumDrift, momentumRules);

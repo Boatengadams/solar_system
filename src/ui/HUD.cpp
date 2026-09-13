@@ -142,7 +142,13 @@ void HUD::experimentPanel(const Simulation& simulation) const {
         const ExperimentEvaluation& result = *simulation.lastExperimentEvaluation;
         text((std::string(experimentEvaluationStatusName(result.status)) + "  " + result.grade + "  " + format(result.score, 1) + "/100").c_str(),
              box.x + 18, box.y + 204, 12, result.passed ? Color{80, 235, 150, 255} : ORANGE);
-        DrawTextEx(GetFontDefault(), result.feedback.c_str(), {box.x + 18, box.y + 222}, 10, 1, alpha(RAYWHITE, 0.75f));
+        if (std::isfinite(result.metrics.measuredPrimaryValue)) {
+            const std::string measured = "Measured: " + format(result.metrics.measuredPrimaryValue, 2) +
+                (std::isfinite(result.metrics.referencePrimaryValue)
+                    ? "  Ref: " + format(result.metrics.referencePrimaryValue, 2) : "");
+            text(measured.c_str(), box.x + 18, box.y + 220, 10, alpha({190, 215, 235, 255}, 0.78f));
+        }
+        DrawTextEx(GetFontDefault(), result.feedback.c_str(), {box.x + 18, box.y + 236}, 10, 1, alpha(RAYWHITE, 0.75f));
     } else {
         text("P  launch probe at escape velocity", box.x + 18, box.y + 204, 11, alpha(RAYWHITE, 0.65f));
     }

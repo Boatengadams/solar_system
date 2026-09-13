@@ -111,3 +111,10 @@ It also covers version-1 education-progress JSON round trips, preservation of
 attempts/best scores/metrics, file save/load, malformed JSON, unsupported
 schema versions, missing fields, invalid metric values, and the requirement
 that failed imports do not mutate existing progress.
+
+The evaluator boundary also verifies unsafe radii, negative conservation
+drift, non-finite timestep answers, and malformed integrator benchmark fields.
+Missing benchmark collections and missing conservation metrics remain
+insufficient-data outcomes. Threshold constants are centralized in
+`ExperimentEvaluationThresholds` so boundary tests share the production
+policy.

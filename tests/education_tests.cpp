@@ -38,6 +38,9 @@ int main() {
     assert(!evaluateExperiment("escape-velocity", escapeObservation).passed);
     escapeObservation.measuredPrimaryValue = std::numeric_limits<double>::quiet_NaN();
     assert(evaluateExperiment("escape-velocity", escapeObservation).status == ExperimentEvaluationStatus::InvalidInput);
+    escapeObservation.radiusM = PhysicsEngine::MIN_PHYSICS_DISTANCE;
+    escapeObservation.measuredPrimaryValue = 1.0;
+    assert(evaluateExperiment("escape-velocity", escapeObservation).status == ExperimentEvaluationStatus::InvalidInput);
 
     ExperimentObservation keplerObservation;
     keplerObservation.radiusM = PhysicsEngine::AU;
@@ -99,6 +102,9 @@ int main() {
     assert(numericalEvaluation.valid && std::isfinite(numericalEvaluation.score));
     numericalObservation.integratorMetrics.clear();
     assert(evaluateExperiment("numerical-methods", numericalObservation).status == ExperimentEvaluationStatus::InsufficientData);
+    numericalObservation.integratorMetrics = compareIntegrators(benchmarkBodies, benchmarkConfig);
+    numericalObservation.integratorMetrics.front().positionError = std::numeric_limits<double>::infinity();
+    assert(evaluateExperiment("numerical-methods", numericalObservation).status == ExperimentEvaluationStatus::InvalidInput);
 
     ExperimentObservation timestepObservation;
     timestepObservation.measuredPrimaryValue = 1.0;
@@ -107,7 +113,7 @@ int main() {
     timestepObservation.measuredSecondaryValue = 0.99;
     assert(!evaluateExperiment("timestep-sensitivity", timestepObservation).passed);
     timestepObservation.measuredSecondaryValue = std::numeric_limits<double>::quiet_NaN();
-    assert(evaluateExperiment("timestep-sensitivity", timestepObservation).status == ExperimentEvaluationStatus::InsufficientData);
+    assert(evaluateExperiment("timestep-sensitivity", timestepObservation).status == ExperimentEvaluationStatus::InvalidInput);
 
     ExperimentObservation conservationObservation;
     conservationObservation.energyDrift = 0.01;
@@ -117,6 +123,9 @@ int main() {
     conservationObservation.energyDrift = 0.10;
     assert(!evaluateExperiment("conservation", conservationObservation).passed);
     conservationObservation.energyDrift = -1.0;
+    assert(evaluateExperiment("conservation", conservationObservation).status == ExperimentEvaluationStatus::InvalidInput);
+    conservationObservation.energyDrift = 0.01;
+    conservationObservation.angularMomentumDrift = std::numeric_limits<double>::quiet_NaN();
     assert(evaluateExperiment("conservation", conservationObservation).status == ExperimentEvaluationStatus::InsufficientData);
     const ExperimentEvaluation repeatEvaluation = evaluateExperiment("hohmann-lab", hohmannObservation);
     assert(repeatEvaluation.status == ExperimentEvaluationStatus::InvalidInput);

@@ -18,6 +18,7 @@ planets: \
   CMakeFiles/planets.dir/src/data/ScenarioSerializer.cpp.o \
   CMakeFiles/planets.dir/src/education/EducationContent.cpp.o \
   CMakeFiles/planets.dir/src/education/EducationChallenges.cpp.o \
+  CMakeFiles/planets.dir/src/education/ExperimentEvaluation.cpp.o \
   CMakeFiles/planets.dir/src/education/EducationProgress.cpp.o \
   CMakeFiles/planets.dir/src/input/InputController.cpp.o \
   CMakeFiles/planets.dir/src/physics/PhysicsEngine.cpp.o \
@@ -107,6 +108,8 @@ CMakeFiles/planets.dir/src/data/ScenarioSerializer.cpp.o:
 CMakeFiles/planets.dir/src/education/EducationContent.cpp.o:
 
 CMakeFiles/planets.dir/src/education/EducationChallenges.cpp.o:
+
+CMakeFiles/planets.dir/src/education/ExperimentEvaluation.cpp.o:
 
 CMakeFiles/planets.dir/src/education/EducationProgress.cpp.o:
 

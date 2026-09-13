@@ -50,8 +50,8 @@ HUD only presents simulation state and the latest result.
 ## Experiment evaluation flow
 
 The experiment panel uses the existing layout and adds `Y` to evaluate the
-current simulation state. It displays the evaluator status, grade, score, and
-short feedback. The evaluator remains raylib-independent and valid results
+current simulation state. It displays the evaluator status, grade, score, a
+concise measured/reference line when available, and short feedback. The evaluator remains raylib-independent and valid results
 are recorded through `EducationProgress`; no automatic filesystem writes are
 performed by the HUD.
 
