@@ -88,6 +88,7 @@ struct TelemetryEvent {
 };
 
 struct TelemetrySessionMetadata {
+    int schemaVersion = TELEMETRY_SCHEMA_VERSION;
     std::string sessionId;
     std::string scenarioId;
     std::string scenarioName;

@@ -84,9 +84,24 @@ event count, and numerical failures. Energy drift uses
 abs(E_final - E_initial) / max(abs(E_initial), 1)
 ```
 
-`compareTelemetry` compares two sessions for a selected body, including final
-position and velocity differences, duration, sample counts, timestep, and
-conservation-drift differences.
+`compareTelemetry` first validates the scientific compatibility of two sessions
+for a selected body. It requires matching schema version, body identity,
+reference frame, reference body/origin, units, epoch/reference context,
+scenario identity, ephemeris provenance when present, finite required sample
+values, monotonic sample times, and matching simulation start/end times. No
+frame or unit conversion is performed.
+
+Only compatible sessions produce final position and velocity differences,
+duration, sample counts, timestep, and conservation-drift differences. Final
+sample differences are compared only when the selected final samples have the
+same simulation time; no interpolation or resampling is performed. The
+result carries a structured status and deterministic message for compatible,
+insufficient, incompatible, or invalid input. Examples include
+`INCOMPATIBLE_FRAME`, `INCOMPATIBLE_ORIGIN`, `INCOMPATIBLE_UNITS`,
+`INCOMPATIBLE_EPOCH`, `INCOMPATIBLE_SCENARIO`, `INCOMPATIBLE_SCHEMA`,
+`INCOMPATIBLE_TIME`, `INVALID_METADATA`, and `INVALID_DATA`. Incompatible
+datasets retain undefined numerical metrics rather than displaying misleading
+differences.
 
 ## Limitations and future use
 

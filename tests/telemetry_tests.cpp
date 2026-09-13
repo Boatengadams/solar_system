@@ -140,8 +140,86 @@ int main() {
     second.samples.back().positionM.x += 100.0;
     const TelemetryComparison comparison = compareTelemetry(session, second, "earth");
     assert(comparison.valid);
+    assert(comparison.status == TelemetryComparison::Status::Compatible);
+    assert(std::string(telemetryComparisonStatusName(comparison.status)) == "COMPATIBLE");
     assert(comparison.finalPositionDifferenceM > 0.0);
     assert(comparison.firstSampleCount == comparison.secondSampleCount);
+
+    const TelemetrySession identical = session;
+    const TelemetryComparison identicalComparison = compareTelemetry(session, identical, "earth");
+    const TelemetryComparison repeatedComparison = compareTelemetry(session, identical, "earth");
+    assert(identicalComparison.valid);
+    assert(identicalComparison.finalPositionDifferenceM == 0.0);
+    assert(identicalComparison.finalVelocityDifferenceMps == 0.0);
+    assert(identicalComparison.message == repeatedComparison.message);
+    assert(identicalComparison.finalPositionDifferenceM == repeatedComparison.finalPositionDifferenceM);
+
+    const auto expectStatus = [&](TelemetrySession candidate, TelemetryComparison::Status expected) {
+        const TelemetryComparison rejected = compareTelemetry(session, candidate, "earth");
+        assert(!rejected.valid);
+        assert(rejected.status == expected);
+        assert(!rejected.message.empty());
+        assert(std::isnan(rejected.finalPositionDifferenceM));
+        assert(std::isnan(rejected.finalVelocityDifferenceMps));
+    };
+
+    TelemetrySession frameMismatch = identical;
+    frameMismatch.metadata.referenceFrame = "geocentric";
+    expectStatus(frameMismatch, TelemetryComparison::Status::IncompatibleFrame);
+
+    TelemetrySession originMismatch = identical;
+    originMismatch.metadata.referenceBodyId = "earth";
+    expectStatus(originMismatch, TelemetryComparison::Status::IncompatibleOrigin);
+
+    TelemetrySession unitsMismatch = identical;
+    unitsMismatch.metadata.ephemerisUnits = "km";
+    expectStatus(unitsMismatch, TelemetryComparison::Status::IncompatibleUnits);
+
+    TelemetrySession epochMismatch = identical;
+    epochMismatch.metadata.epoch = "J2000+1d";
+    expectStatus(epochMismatch, TelemetryComparison::Status::IncompatibleEpoch);
+
+    TelemetrySession referenceMismatch = identical;
+    referenceMismatch.metadata.ephemerisProvider = "LocalEphemerisProvider";
+    referenceMismatch.metadata.ephemerisSource = "deterministic-fixture";
+    expectStatus(referenceMismatch, TelemetryComparison::Status::IncompatibleReference);
+
+    TelemetrySession scenarioMismatch = identical;
+    scenarioMismatch.metadata.scenarioId = "default-solar-system";
+    expectStatus(scenarioMismatch, TelemetryComparison::Status::IncompatibleScenario);
+
+    TelemetrySession schemaMismatch = identical;
+    schemaMismatch.metadata.schemaVersion = TELEMETRY_SCHEMA_VERSION + 1;
+    expectStatus(schemaMismatch, TelemetryComparison::Status::IncompatibleSchema);
+
+    TelemetrySession timeMismatch = identical;
+    timeMismatch.metadata.simulationEndTimeSeconds += 1.0;
+    expectStatus(timeMismatch, TelemetryComparison::Status::IncompatibleTime);
+
+    TelemetrySession finalSampleTimeMismatch = identical;
+    finalSampleTimeMismatch.samples.back().simulationTimeSeconds += 1.0;
+    expectStatus(finalSampleTimeMismatch, TelemetryComparison::Status::IncompatibleTime);
+
+    TelemetrySession invalidTelemetrySession = identical;
+    invalidTelemetrySession.samples.back().positionM.x = std::numeric_limits<double>::quiet_NaN();
+    expectStatus(invalidTelemetrySession, TelemetryComparison::Status::InvalidData);
+
+    TelemetrySession malformedSamples = identical;
+    malformedSamples.samples.back().referenceFrame.clear();
+    expectStatus(malformedSamples, TelemetryComparison::Status::InvalidData);
+
+    TelemetrySession firstWrongBody = identical;
+    TelemetrySession secondWrongBody = identical;
+    for (TelemetrySample& sample : firstWrongBody.samples) sample.bodyId = "mars";
+    for (TelemetrySample& sample : secondWrongBody.samples) sample.bodyId = "mars";
+    const TelemetryComparison bodyMismatch = compareTelemetry(firstWrongBody, secondWrongBody, "earth");
+    assert(!bodyMismatch.valid);
+    assert(bodyMismatch.status == TelemetryComparison::Status::IncompatibleBody);
+
+    TelemetrySession emptyComparisonSession;
+    const TelemetryComparison insufficient = compareTelemetry(session, emptyComparisonSession, "earth");
+    assert(!insufficient.valid);
+    assert(insufficient.status == TelemetryComparison::Status::InsufficientData);
 
     session.clear();
     assert(session.samples.empty());

@@ -36,7 +36,25 @@ struct TelemetryAnalysis {
 TelemetryAnalysis analyzeTelemetry(const TelemetrySession& session, const std::string& bodyId = {});
 
 struct TelemetryComparison {
+    enum class Status {
+        Compatible,
+        InsufficientData,
+        IncompatibleBody,
+        IncompatibleFrame,
+        IncompatibleOrigin,
+        IncompatibleUnits,
+        IncompatibleEpoch,
+        IncompatibleReference,
+        IncompatibleScenario,
+        IncompatibleSchema,
+        IncompatibleTime,
+        InvalidMetadata,
+        InvalidData,
+    };
+
     bool valid = false;
+    Status status = Status::InsufficientData;
+    std::string message;
     std::string bodyId;
     double durationDifferenceSeconds = TELEMETRY_UNAVAILABLE;
     double finalPositionDifferenceM = TELEMETRY_UNAVAILABLE;
@@ -47,6 +65,8 @@ struct TelemetryComparison {
     std::size_t firstSampleCount = 0;
     std::size_t secondSampleCount = 0;
 };
+
+const char* telemetryComparisonStatusName(TelemetryComparison::Status status);
 
 TelemetryComparison compareTelemetry(const TelemetrySession& first, const TelemetrySession& second,
                                      const std::string& bodyId);

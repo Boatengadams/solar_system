@@ -1,5 +1,14 @@
 # Changelog
 
+## Phase 10.4 — Telemetry comparison compatibility
+
+- Added structured compatibility validation before telemetry differences are
+  calculated.
+- Rejected incompatible body, frame, origin, units, epoch, scenario, schema,
+  reference provenance, timing, and invalid-sample inputs without changing
+  the telemetry schema.
+- Added deterministic telemetry comparison regression coverage.
+
 ## Phase 10.3 — Install and package reproducibility
 
 - Added executable-relative runtime resource discovery for source-tree and
