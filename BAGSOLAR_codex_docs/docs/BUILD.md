@@ -62,6 +62,27 @@ ctest --preset debug
 cmake --build build --target package
 ```
 
+For a release-style offline smoke run from a checkout, use the deterministic
+helper from any working directory:
+
+```sh
+bash /path/to/BAGSOLAR/tools/release_smoke.sh
+```
+
+It archives the current committed checkout into a temporary directory, configures and
+builds with the existing warning flags, runs CTest plus the scientific,
+education, and local-ephemeris executables, then validates an install and an
+extracted TGZ package outside the source tree. It uses no network access,
+CSPICE installation, or external kernels.
+
+The individual validation executables are also available after a build:
+
+```sh
+./build/bagsolar_validation
+./build/bagsolar_education_tests
+./build/bagsolar_ephemeris --local earth 2451545.0 heliocentric
+```
+
 Install and validate from outside the source tree:
 
 ```sh
@@ -72,6 +93,11 @@ cmake --install build --prefix /tmp/bagsolar-install
 The CTest targets `bagsolar_resource_smoke`, `bagsolar_install_smoke`, and
 `bagsolar_package_smoke` exercise source-tree resolution, a temporary install,
 and an extracted TGZ package without requiring a display or network access.
+
+The development build uses `build/` and source-tree data discovery. The
+installed build uses `bin/` plus `${prefix}/share/bagsolar/data`; run it from
+an unrelated directory with `bagsolar_resource_smoke`. The packaged build has
+the same relocatable layout beneath its extracted package directory.
 
 To request the optional path, configure a separate build directory. CMake
 fails immediately if the requested CSPICE header or library is missing:

@@ -17,5 +17,15 @@ jobs:
         run: cmake --build --preset debug --parallel 2
       - name: Test
         run: ctest --preset debug --output-on-failure
+      - name: Scientific validation
+        run: ./build/bagsolar_validation
+      - name: Education validation
+        run: ./build/bagsolar_education_tests
+      - name: Offline local ephemeris validation
+        run: ./build/bagsolar_ephemeris --local earth 2451545.0 heliocentric
+      - name: Install smoke
+        run: ctest --test-dir build -R '^bagsolar_install_smoke$' --output-on-failure
       - name: Package
         run: cmake --build build --target package
+      - name: Package smoke
+        run: ctest --test-dir build -R '^bagsolar_package_smoke$' --output-on-failure

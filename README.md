@@ -59,6 +59,15 @@ Run the regression tests with:
 ctest --test-dir build --output-on-failure
 ```
 
+Run the deterministic scientific, education, and offline local-ephemeris
+checks explicitly with:
+
+```sh
+./build/bagsolar_validation
+./build/bagsolar_education_tests
+./build/bagsolar_ephemeris --local earth 2451545.0 heliocentric
+```
+
 If you do not have CMake, the equivalent is:
 
 ```sh
@@ -118,6 +127,13 @@ ctest --preset debug
 cmake --build build --target package
 ```
 
+For the complete fresh-checkout, install, and package validation sequence,
+run the small offline smoke script from any directory:
+
+```sh
+bash /path/to/BAGSOLAR/tools/release_smoke.sh
+```
+
 To verify an installed tree without opening the graphical window, run the
 installed headless resource check from outside the source tree:
 
@@ -128,6 +144,12 @@ cmake --install build --prefix /tmp/bagsolar-install
 
 The generated TGZ package contains the same data tree and resource check. The
 normal CTest suite runs both install and package smoke tests offline.
+
+The development build is under `build/`; an installed tree places executables
+under `bin/` and runtime data under `share/bagsolar/data`; a TGZ package
+recreates that installed layout after extraction. The smoke checks invoke
+headless binaries from unrelated working directories, so they do not require
+the source checkout or the caller's current directory.
 
 SPICE is not bundled. The optional provider boundary reports unavailable until
 CSPICE and compatible kernels are supplied. Enable it with

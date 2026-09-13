@@ -1,5 +1,14 @@
 # Changelog
 
+## Phase 10.5 — Release and CI validation
+
+- Added an offline fresh-checkout release smoke script covering configure,
+  warning-enabled build, CTest, scientific validation, education validation,
+  local ephemeris validation, install, and TGZ package execution.
+- Expanded Linux CI with explicit scientific, education, local-ephemeris,
+  install-smoke, and package-smoke stages.
+- Documented development, installed, and packaged validation paths.
+
 ## Phase 10.4 — Telemetry comparison compatibility
 
 - Added structured compatibility validation before telemetry differences are
