@@ -71,6 +71,12 @@ Result panels show only metrics available from the result: measured/reference
 values, normalized numerical error, or energy/angular-momentum drift as
 appropriate. Scoring and physics remain outside the UI.
 
+For Prediction vs Reference, the compact panel additionally shows the
+configured provider, body, Julian Date, frame/origin, integrator, timestep,
+sample count, position/velocity error, energy comparison when defined,
+comparison status, and education result. Provider failure is shown as a
+status/explanation; there is no silent provider fallback.
+
 ## Phase 9.5 Education screen
 
 `L` toggles a dedicated Education screen over the existing simulation view.
@@ -90,3 +96,8 @@ HUD remains available when the screen is closed.
 ## Suggested UI Technology
 raylib remains the renderer.
 Dear ImGui may be used for developer/scientific panels where appropriate.
+# Prediction/reference HUD
+
+Education mode labels Prediction vs Reference and reports provider/source,
+epoch, frame/origin, integrator, timestep, errors, status, and evaluation.
+Disagreement is not labeled as pure numerical error.

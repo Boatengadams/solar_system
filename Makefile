@@ -20,14 +20,14 @@ run: planets
 	./planets
 
 validation: $(SOURCES)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) src/validation/main.cpp src/validation/ValidationRunner.cpp src/physics/PhysicsEngine.cpp -o bagsolar_validation
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) src/validation/main.cpp src/validation/ValidationRunner.cpp src/validation/PredictionComparison.cpp src/astronomy/EphemerisTypes.cpp src/physics/PhysicsEngine.cpp -o bagsolar_validation
 	./bagsolar_validation
 
 ephemeris: $(SOURCES)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) src/astronomy/main.cpp src/astronomy/CurlHttpClient.cpp src/astronomy/EphemerisTypes.cpp src/astronomy/EphemerisComparison.cpp src/astronomy/HorizonsParser.cpp src/astronomy/HorizonsProvider.cpp src/astronomy/HorizonsRequest.cpp src/astronomy/JsonEphemerisProvider.cpp src/astronomy/LocalEphemerisProvider.cpp src/astronomy/SpiceProvider.cpp -o bagsolar_ephemeris
 
 education: $(SOURCES)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) tests/education_tests.cpp src/education/EducationChallenges.cpp src/education/ExperimentEvaluation.cpp src/education/EducationContent.cpp src/education/EducationCatalog.cpp src/education/EducationProgress.cpp src/education/EducationWorkflow.cpp src/education/LearnerReport.cpp src/missions/Mission.cpp src/spacecraft/Spacecraft.cpp src/physics/PhysicsEngine.cpp src/physics/IntegratorBenchmark.cpp -o bagsolar_education_tests
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) tests/education_tests.cpp src/astronomy/EphemerisTypes.cpp src/education/EducationChallenges.cpp src/education/ExperimentEvaluation.cpp src/education/EducationContent.cpp src/education/EducationCatalog.cpp src/education/EducationProgress.cpp src/education/EducationWorkflow.cpp src/education/LearnerReport.cpp src/missions/Mission.cpp src/spacecraft/Spacecraft.cpp src/physics/PhysicsEngine.cpp src/physics/IntegratorBenchmark.cpp src/validation/PredictionComparison.cpp -o bagsolar_education_tests
 	./bagsolar_education_tests
 
 test: planets

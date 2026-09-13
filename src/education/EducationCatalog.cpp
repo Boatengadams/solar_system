@@ -34,7 +34,7 @@ std::vector<AuthoredLesson> makeCatalog() {
         {"numerical-integration", "Numerical integration", "See how integration methods approximate continuous motion.",
          {"Compare endpoint error and conservation behavior.", "Treat a smaller-step numerical trajectory as a teaching reference."}, {"circular-orbits"},
          {"Continuous equations", "Compare integrators", "Inspect error and stability"},
-         {"numerical-methods"}, {"integrator-comparison"}, EducationDifficulty::Intermediate, 22},
+         {"numerical-methods", "prediction-reference"}, {"integrator-comparison"}, EducationDifficulty::Intermediate, 22},
         {"timestep-selection", "Timestep selection", "Study how step size affects accuracy, stability, and computational work.",
          {"Recognize convergence as a comparison between numerical runs.", "Choose a useful step without claiming one universal optimum."}, {"numerical-integration"},
          {"Coarse and refined runs", "Measure improvement", "Balance accuracy and work"},

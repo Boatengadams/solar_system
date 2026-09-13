@@ -203,3 +203,10 @@ Published binaries, media assets, and cross-platform CI remain outstanding.
 
 ## Priority Rule
 Do not start advanced features until the previous phase has tests and a stable interface.
+# Phase 9.6
+
+Prediction vs Reference comparison is implemented with explicit scientific
+contracts, deterministic multi-epoch propagation, education integration, and
+offline validation coverage. The learner-facing workflow uses Simulation's
+configured provider, with the deterministic local provider as its offline
+default.

@@ -78,6 +78,16 @@ automatic hidden save system. The application exposes explicit
 `Simulation::saveEducationProgress(path)` and
 `Simulation::loadEducationProgress(path)` calls.
 
+## Prediction vs Reference
+
+The `prediction-reference` experiment uses the provider configured on
+`Simulation`; it does not construct SPICE or Horizons inside education code.
+Simulation defaults to the deterministic offline `LocalEphemerisProvider` and
+runs the comparison during the existing select → start → observe → evaluate
+workflow. Provider failures remain visible comparison statuses and do not
+overwrite valid progress. Valid results use the existing schema-v1 persistence
+and learner-report paths.
+
 ## Hohmann challenge semantics
 
 The Hohmann challenge uses `PhysicsEngine::hohmannTransfer` as its analytical
@@ -163,3 +173,9 @@ learner report while leaving the simulation HUD and domain workflow intact.
 `A`/`D` select lessons, `Enter` starts, `B` begins observation, `Y` completes
 a lesson or evaluates an experiment, `N` follows the recommendation, and
 Backspace returns to simulation.
+# Prediction vs Reference experiment
+
+The `prediction-reference` experiment records comparison metrics while teaching
+that real ephemeris disagreement can include model mismatch, not just numerical
+integration error. Persistence remains schema version 1 and retries preserve
+the best result.

@@ -61,10 +61,13 @@ set(BAGSOLAR_SOURCES
     src/telemetry/TelemetryExporter.cpp
     src/telemetry/TelemetrySession.cpp
     src/ui/HUD.cpp
+    src/validation/PredictionComparison.cpp
 )
 
 set(BAGSOLAR_VALIDATION_SOURCES
     src/validation/ValidationRunner.cpp
+    src/validation/PredictionComparison.cpp
+    src/astronomy/EphemerisTypes.cpp
     src/physics/PhysicsEngine.cpp
 )
 
@@ -127,6 +130,7 @@ if(BUILD_TESTING)
         src/astronomy/EphemerisTypes.cpp
         src/astronomy/CurlHttpClient.cpp
         src/telemetry/TelemetryAnalyzer.cpp
+        src/astronomy/LocalEphemerisProvider.cpp
         src/telemetry/TelemetryCollector.cpp
         src/telemetry/TelemetryExporter.cpp
         src/telemetry/TelemetrySession.cpp
@@ -142,6 +146,7 @@ if(BUILD_TESTING)
         src/physics/PhysicsEngine.cpp
         src/physics/IntegratorBenchmark.cpp
         src/simulation/Simulation.cpp
+        src/validation/PredictionComparison.cpp
         src/data/BodyFactory.cpp
         src/data/ScenarioLoader.cpp
         src/data/ScenarioSerializer.cpp
@@ -179,6 +184,7 @@ if(BUILD_TESTING)
         src/physics/PhysicsEngine.cpp
         src/physics/IntegratorBenchmark.cpp
         src/simulation/Simulation.cpp
+        src/validation/PredictionComparison.cpp
         src/data/BodyFactory.cpp
         src/data/ScenarioLoader.cpp
         src/data/ScenarioSerializer.cpp
@@ -208,6 +214,7 @@ if(BUILD_TESTING)
 
     add_executable(bagsolar_education_tests
         tests/education_tests.cpp
+        src/astronomy/EphemerisTypes.cpp
         src/education/EducationChallenges.cpp
         src/education/ExperimentEvaluation.cpp
         src/education/EducationContent.cpp
@@ -219,6 +226,7 @@ if(BUILD_TESTING)
         src/spacecraft/Spacecraft.cpp
         src/physics/PhysicsEngine.cpp
         src/physics/IntegratorBenchmark.cpp
+        src/validation/PredictionComparison.cpp
     )
     target_include_directories(bagsolar_education_tests PRIVATE src third_party/nlohmann-json3-dev/usr/include)
     if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
@@ -269,6 +277,7 @@ if(BUILD_TESTING)
             src/spacecraft/Spacecraft.cpp
             src/physics/PhysicsEngine.cpp
             src/physics/IntegratorBenchmark.cpp
+            src/validation/PredictionComparison.cpp
             src/core/Logger.cpp
         )
         target_include_directories(bagsolar_spice_live_tests PRIVATE src third_party/nlohmann-json3-dev/usr/include "${CSPICE_INCLUDE_DIR}")

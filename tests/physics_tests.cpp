@@ -49,6 +49,11 @@ int main() {
     const double expectedOrbitalVelocity = 29785.142169221024;
     assert(closeEnough(PhysicsEngine::orbitalVelocity(earth), expectedOrbitalVelocity, 1.0e-12));
     assert(PhysicsEngine::specificEnergy(earth) < 0.0);
+    const double defaultEnergy = PhysicsEngine::specificEnergy(earth);
+    const double earthMassEnergy = 0.5 * dot(earth.velocity, earth.velocity) -
+        PhysicsEngine::G * PhysicsEngine::EARTH_MASS / PhysicsEngine::AU;
+    assert(closeEnough(PhysicsEngine::specificEnergy(earth, PhysicsEngine::EARTH_MASS), earthMassEnergy, 1.0e-12));
+    assert(PhysicsEngine::specificEnergy(earth) == defaultEnergy);
     assert(PhysicsEngine::escapeVelocity(earth) > PhysicsEngine::orbitalVelocity(earth));
     assert(closeEnough(PhysicsEngine::surfaceGravity(earth), 9.820302293385645, 1.0e-12));
 

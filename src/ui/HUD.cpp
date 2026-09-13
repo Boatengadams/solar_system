@@ -151,7 +151,7 @@ void HUD::bottom(const Simulation& simulation) const {
 
 void HUD::experimentPanel(const Simulation& simulation) const {
     if (!simulation.education) return;
-    const Rectangle box = panel(20, 345, 360, 285);
+    const Rectangle box = panel(20, 345, 360, 330);
     const Experiment& experiment = experimentAt(simulation.experiment);
     text("EXPERIMENT", box.x + 18, box.y + 16, 11, {100, 220, 255, 255});
     text(experiment.title, box.x + 18, box.y + 39, 19);
@@ -168,7 +168,28 @@ void HUD::experimentPanel(const Simulation& simulation) const {
         const ExperimentEvaluation& result = *simulation.lastExperimentEvaluation;
         text((std::string(experimentEvaluationStatusName(result.status)) + "  " + result.grade + "  " + format(result.score, 1) + "/100").c_str(),
              box.x + 18, box.y + 204, 12, result.passed ? Color{80, 235, 150, 255} : ORANGE);
-        if (std::isfinite(result.metrics.measuredPrimaryValue)) {
+        const bool predictionReference = std::string(experiment.id) == "prediction-reference" && simulation.lastPredictionComparison.has_value();
+        if (predictionReference) {
+            const PredictionComparisonResult& comparison = *simulation.lastPredictionComparison;
+            text(("Comparison " + std::string(predictionComparisonStatusName(comparison.status)) +
+                  "  " + comparison.referenceProvider).c_str(), box.x + 18, box.y + 220, 9, alpha(RAYWHITE, 0.78f));
+            text(("Body " + comparison.bodyId + "  Epoch JD " + format(comparison.finalEpoch.value, 6)).c_str(),
+                 box.x + 18, box.y + 234, 9, alpha(RAYWHITE, 0.72f));
+            text(("Frame " + std::string(referenceFrameName(comparison.frame.type)) + "/" + comparison.frame.originBodyId).c_str(),
+                 box.x + 18, box.y + 248, 9, alpha(RAYWHITE, 0.72f));
+            text((std::string("Integrator ") + integratorName(comparison.integrator) +
+                  "  dt " + format(comparison.requestedTimestepSeconds, 2) + " s  samples " +
+                  std::to_string(comparison.samples.size())).c_str(), box.x + 18, box.y + 262, 9, alpha(RAYWHITE, 0.72f));
+            if (comparison.success()) {
+                text(("Position " + format(comparison.positionErrorMagnitudeM, 3) + " m  Velocity " +
+                      format(comparison.velocityErrorMagnitudeMps, 3) + " m/s").c_str(), box.x + 18, box.y + 276, 9, alpha(RAYWHITE, 0.78f));
+                if (comparison.energyDefined) text(("Energy Δ " + format(comparison.absoluteEnergyDifferenceJPerKg, 3) +
+                    " J/kg  relative " + format(comparison.relativeEnergyDifference, 6)).c_str(),
+                    box.x + 18, box.y + 290, 9, alpha(RAYWHITE, 0.72f));
+            } else {
+                DrawTextEx(GetFontDefault(), comparison.explanation.c_str(), {box.x + 18, box.y + 276}, 9, 1, alpha(ORANGE, 0.82f));
+            }
+        } else if (std::isfinite(result.metrics.measuredPrimaryValue)) {
             const std::string measured = "Measured: " + format(result.metrics.measuredPrimaryValue, 2) +
                 (std::isfinite(result.metrics.referencePrimaryValue)
                     ? "  Ref: " + format(result.metrics.referencePrimaryValue, 2) : "");
@@ -181,9 +202,13 @@ void HUD::experimentPanel(const Simulation& simulation) const {
                   format(result.metrics.angularMomentumDrift, 4)).c_str(),
                  box.x + 18, box.y + 220, 10, alpha({190, 215, 235, 255}, 0.78f));
         }
-        DrawTextEx(GetFontDefault(), result.feedback.c_str(), {box.x + 18, box.y + 236}, 10, 1, alpha(RAYWHITE, 0.75f));
-        DrawTextEx(GetFontDefault(), ("Next: " + result.nextStep).c_str(), {box.x + 18, box.y + 251}, 9, 1, alpha({190, 215, 235, 255}, 0.72f));
-        DrawTextEx(GetFontDefault(), ("Why: " + result.explanation).c_str(), {box.x + 18, box.y + 266}, 9, 1, alpha({190, 215, 235, 255}, 0.68f));
+        if (predictionReference) {
+            DrawTextEx(GetFontDefault(), result.feedback.c_str(), {box.x + 18, static_cast<float>(box.y + 304)}, 9, 1, alpha(RAYWHITE, 0.75f));
+        } else {
+            DrawTextEx(GetFontDefault(), result.feedback.c_str(), {box.x + 18, box.y + 236}, 10, 1, alpha(RAYWHITE, 0.75f));
+            DrawTextEx(GetFontDefault(), ("Next: " + result.nextStep).c_str(), {box.x + 18, box.y + 251}, 9, 1, alpha({190, 215, 235, 255}, 0.72f));
+            DrawTextEx(GetFontDefault(), ("Why: " + result.explanation).c_str(), {box.x + 18, box.y + 266}, 9, 1, alpha({190, 215, 235, 255}, 0.68f));
+        }
     } else {
         text("P  launch probe at escape velocity", box.x + 18, box.y + 204, 11, alpha(RAYWHITE, 0.65f));
     }

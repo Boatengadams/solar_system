@@ -1,5 +1,10 @@
 # Changelog
 
+## Phase 9.6
+
+- Added deterministic Prediction vs Reference propagation, metrics, education evaluation, and offline validation coverage.
+- Completed learner-facing provider injection and end-to-end Prediction vs Reference education execution.
+
 ## Unreleased
 
 - Added versioned offline JSON persistence for education progress with safe

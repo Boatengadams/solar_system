@@ -52,6 +52,12 @@ struct ExperimentObservation {
     double orbitalPeriodError = std::numeric_limits<double>::quiet_NaN();
     double timestepSeconds = std::numeric_limits<double>::quiet_NaN();
     double durationSeconds = std::numeric_limits<double>::quiet_NaN();
+    double comparisonPositionErrorM = std::numeric_limits<double>::quiet_NaN();
+    double comparisonVelocityErrorMps = std::numeric_limits<double>::quiet_NaN();
+    double comparisonRelativePositionError = std::numeric_limits<double>::quiet_NaN();
+    double comparisonRelativeVelocityError = std::numeric_limits<double>::quiet_NaN();
+    double comparisonRelativeEnergyDifference = std::numeric_limits<double>::quiet_NaN();
+    bool comparisonAvailable = false;
     bool stable = false;
     Integrator integrator = Integrator::VelocityVerlet;
     std::vector<IntegratorBenchmarkMetrics> integratorMetrics;

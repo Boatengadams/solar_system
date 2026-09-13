@@ -115,7 +115,7 @@ public:
     static Vec3 totalMomentum(const std::vector<Body>& bodies);
 
     static double distanceFromSun(const Body& body);
-    static double specificEnergy(const Body& body);
+    static double specificEnergy(const Body& body, double centralMass = SOLAR_MASS);
     static double escapeVelocity(const Body& body);
     static double orbitalVelocity(const Body& body);
     static double surfaceGravity(const Body& body);

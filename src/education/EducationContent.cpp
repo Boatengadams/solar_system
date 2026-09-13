@@ -25,6 +25,7 @@ constexpr Experiment EXPERIMENTS[] = {
     {"numerical-methods", "NUMERICAL METHODS", "Compare integrators using energy, endpoint, and stability metrics.", "error = reference − propagated state"},
     {"timestep-sensitivity", "TIMESTEP TEST", "Halve the timestep and inspect convergence of the propagated orbit.", "error decreases as Δt decreases"},
     {"conservation", "CONSERVATION TEST", "Inspect energy and angular-momentum drift in an isolated orbit.", "ΔE/E and ΔL/L"},
+    {"prediction-reference", "PREDICTION VS REFERENCE", "Compare a BAGSOLAR numerical prediction with a selected reference ephemeris.", "prediction error = prediction − reference"},
 };
 
 } // namespace

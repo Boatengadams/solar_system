@@ -261,6 +261,29 @@ ExperimentEvaluation evaluateExperiment(const std::string& experimentId,
         return result;
     }
 
+    if (experimentId == "prediction-reference") {
+        ExperimentEvaluation result = base(experimentId, ExperimentEvaluationMode::NumericalComparison);
+        if (!observation.comparisonAvailable || !finite(observation.comparisonPositionErrorM) ||
+            !finite(observation.comparisonVelocityErrorMps) || observation.comparisonPositionErrorM < 0.0 ||
+            observation.comparisonVelocityErrorMps < 0.0) {
+            return invalid(experimentId, ExperimentEvaluationStatus::InsufficientData,
+                           "Run a valid reference comparison before evaluating this activity.");
+        }
+        result.metrics.positionErrorM = observation.comparisonPositionErrorM;
+        result.metrics.velocityErrorMps = observation.comparisonVelocityErrorMps;
+        result.metrics.primaryRelativeError = observation.comparisonRelativePositionError;
+        result.metrics.secondaryRelativeError = observation.comparisonRelativeVelocityError;
+        result.metrics.normalizedError = observation.comparisonRelativePositionError;
+        result.metrics.energyDrift = observation.comparisonRelativeEnergyDifference;
+        result.metrics.numericallyStable = finite(observation.comparisonRelativePositionError) &&
+            finite(observation.comparisonRelativeVelocityError);
+        complete(result, result.metrics.numericallyStable ? 100.0 : 0.0, result.metrics.numericallyStable,
+                 "The numerical prediction was compared with the selected reference state; inspect the raw errors before changing the model.",
+                 "This activity measures agreement with a selected reference ephemeris. It does not establish that either trajectory is physical reality.",
+                 "Repeat with another integrator or timestep and compare position, velocity, and energy differences.");
+        return result;
+    }
+
     return invalid(experimentId, ExperimentEvaluationStatus::Unsupported, "This experiment has no evaluator yet.");
 }
 

@@ -362,8 +362,8 @@ double PhysicsEngine::distanceFromSun(const Body& body) {
     return length(body.position);
 }
 
-double PhysicsEngine::specificEnergy(const Body& body) {
-    return 0.5 * dot(body.velocity, body.velocity) - G * SOLAR_MASS / std::max(distanceFromSun(body), 1.0);
+double PhysicsEngine::specificEnergy(const Body& body, double centralMass) {
+    return 0.5 * dot(body.velocity, body.velocity) - G * centralMass / std::max(distanceFromSun(body), 1.0);
 }
 
 double PhysicsEngine::escapeVelocity(const Body& body) {

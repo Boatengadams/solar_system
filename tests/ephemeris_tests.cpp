@@ -1,4 +1,5 @@
 #include <cassert>
+#include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <memory>
@@ -9,6 +10,8 @@
 #include "astronomy/HorizonsProvider.hpp"
 #include "astronomy/JsonEphemerisProvider.hpp"
 #include "astronomy/LocalEphemerisProvider.hpp"
+#include "education/EducationContent.hpp"
+#include "education/LearnerReport.hpp"
 #include "simulation/Simulation.hpp"
 
 namespace {
@@ -81,6 +84,64 @@ void testSimulationInitialization() {
     assert(simulation.telemetry.metadata.ephemerisProvider == "LocalEphemerisProvider");
     simulation.stopTelemetry();
 }
+
+void testLearnerPredictionReferenceWorkflow() {
+    int predictionIndex = -1;
+    for (int index = 0; index < experimentCount(); ++index) {
+        if (std::string(experimentAt(index).id) == "prediction-reference") predictionIndex = index;
+    }
+    assert(predictionIndex >= 0);
+
+    Simulation simulation("data");
+    assert(simulation.selectEducationActivity(EducationActivityType::Experiment, predictionIndex));
+    assert(simulation.startEducationActivity());
+    assert(simulation.beginEducationObservation());
+    assert(simulation.educationWorkflow.state() == EducationWorkflowState::Observing);
+    assert(simulation.lastPredictionComparison.has_value());
+    assert(simulation.lastPredictionComparison->success());
+    assert(simulation.lastPredictionComparison->referenceProvider == "LocalEphemerisProvider");
+    assert(simulation.lastPredictionComparison->samples.size() == 2);
+    assert(simulation.readyEducationForEvaluation());
+    assert(simulation.evaluateCurrentExperiment());
+    assert(simulation.educationWorkflow.state() == EducationWorkflowState::Evaluated);
+    const ExperimentProgress* progress = simulation.educationProgress.experimentProgress(predictionIndex);
+    assert(progress && progress->attempts == 1 && progress->completed && progress->bestScore == 100.0);
+
+    const std::filesystem::path path = std::filesystem::temp_directory_path() / "bagsolar-prediction-reference-progress.json";
+    assert(simulation.saveEducationProgress(path));
+    Simulation restored("data");
+    assert(restored.loadEducationProgress(path));
+    const LearnerReport report = buildLearnerReport(restored.educationProgress);
+    const auto learnerActivity = std::find_if(report.activities.begin(), report.activities.end(), [](const LearnerActivityReport& activity) {
+        return activity.id == "prediction-reference";
+    });
+    assert(learnerActivity != report.activities.end());
+    assert(learnerActivity->outcome == LearnerActivityOutcome::Passed && learnerActivity->bestScore == 100.0);
+    std::filesystem::remove(path);
+
+    assert(simulation.retryEducationActivity());
+    assert(simulation.lastPredictionComparison.has_value() == false);
+    assert(simulation.startEducationActivity() && simulation.beginEducationObservation());
+    assert(simulation.lastPredictionComparison && simulation.lastPredictionComparison->success());
+    assert(simulation.readyEducationForEvaluation() && simulation.evaluateCurrentExperiment());
+    progress = simulation.educationProgress.experimentProgress(predictionIndex);
+    assert(progress && progress->attempts == 2 && progress->bestScore == 100.0);
+}
+
+void testLearnerPredictionReferenceProviderFailure() {
+    int predictionIndex = -1;
+    for (int index = 0; index < experimentCount(); ++index) {
+        if (std::string(experimentAt(index).id) == "prediction-reference") predictionIndex = index;
+    }
+    Simulation simulation("data");
+    simulation.setEphemerisProvider(nullptr);
+    assert(simulation.selectEducationActivity(EducationActivityType::Experiment, predictionIndex));
+    assert(simulation.startEducationActivity() && simulation.beginEducationObservation());
+    assert(simulation.lastPredictionComparison);
+    assert(simulation.lastPredictionComparison->status == PredictionComparisonStatus::ProviderUnavailable);
+    assert(simulation.readyEducationForEvaluation() && simulation.evaluateCurrentExperiment());
+    assert(simulation.educationProgress.experimentProgress(predictionIndex)->attempts == 0);
+}
 }
 
 int main() {
@@ -88,5 +149,7 @@ int main() {
     testJsonProvider();
     testHorizonsProviderAndParser();
     testSimulationInitialization();
+    testLearnerPredictionReferenceWorkflow();
+    testLearnerPredictionReferenceProviderFailure();
     return 0;
 }

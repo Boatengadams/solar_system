@@ -26,10 +26,18 @@
  SPICE / Custom
         |
         v
-     Renderer
+      Renderer
         |
       raylib
 ```
+
+Prediction vs Reference provider ownership follows the application boundary:
+`Simulation` owns a deterministic offline local provider by default and may be
+configured with a non-owning `EphemerisProvider` supplied by the application.
+Education invokes the existing comparison API through `Simulation`; physics
+and education do not depend on SPICE, Horizons, networking, or provider-
+specific types. A configured provider failure is preserved as a structured
+result rather than replaced by the local provider.
 
 ## Directory Structure
 

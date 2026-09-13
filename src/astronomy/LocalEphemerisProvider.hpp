@@ -1,6 +1,6 @@
 #pragma once
 
-#include <map>
+#include <vector>
 
 #include "EphemerisProvider.hpp"
 
@@ -15,7 +15,7 @@ public:
     static LocalEphemerisProvider deterministicFixture();
 
 private:
-    std::map<std::string, EphemerisState> states;
+    std::vector<EphemerisState> states;
 };
 
 } // namespace bag

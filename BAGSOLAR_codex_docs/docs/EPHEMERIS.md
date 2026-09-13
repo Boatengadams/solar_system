@@ -69,8 +69,10 @@ Horizons and the optional SPICE provider supply external reference states; they
 do not make BAGSOLAR's Newtonian model NASA-accurate. Simplified perturbations,
 frame limitations, and numerical integration error remain. Real SPICE
 execution still requires a local CSPICE installation and compatible user-owned
-kernels. TLE/SGP4, interpolation, spacecraft dynamics, and
-prediction-vs-reality analysis are future work.
+kernels. TLE/SGP4, interpolation, and spacecraft dynamics are future work. A
+real SPICE/Horizons comparison is Prediction vs Reference: disagreement may
+include numerical integration error, dynamical/model mismatch, and reference
+model differences; it is not a literal truth comparison.
 
 ## Optional CSPICE integration
 
@@ -113,3 +115,8 @@ scale, J2000 orientation, Sun origin, and SPICE telemetry provenance.
 The optional `bagsolar_spice_live_tests` target is compiled only in a
 CSPICE-enabled build. Set `BAGSOLAR_SPICE_TEST_MANIFEST` to a user-owned
 manifest before running it; without that variable the test is skipped.
+# Prediction/reference contract
+
+Ephemeris comparisons require matching Julian Date, explicit frame and origin,
+J2000 orientation, and SI units. Local fixtures are deterministic and offline;
+Horizons and SPICE remain provider adapters.

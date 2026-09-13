@@ -127,6 +127,22 @@ int main() {
     numericalObservation.integratorMetrics.front().positionError = std::numeric_limits<double>::infinity();
     assert(evaluateExperiment("numerical-methods", numericalObservation).status == ExperimentEvaluationStatus::InvalidInput);
 
+    bool foundPredictionReference = false;
+    for (int index = 0; index < experimentCount(); ++index) foundPredictionReference = foundPredictionReference || std::string(experimentAt(index).id) == "prediction-reference";
+    assert(foundPredictionReference);
+    ExperimentObservation predictionObservation;
+    predictionObservation.comparisonAvailable = true;
+    predictionObservation.comparisonPositionErrorM = 12.0;
+    predictionObservation.comparisonVelocityErrorMps = 0.25;
+    predictionObservation.comparisonRelativePositionError = 1.0e-9;
+    predictionObservation.comparisonRelativeVelocityError = 2.0e-5;
+    predictionObservation.comparisonRelativeEnergyDifference = 3.0e-6;
+    const ExperimentEvaluation predictionEvaluation = evaluateExperiment("prediction-reference", predictionObservation);
+    assert(predictionEvaluation.valid && predictionEvaluation.passed);
+    assert(predictionEvaluation.mode == ExperimentEvaluationMode::NumericalComparison);
+    assert(predictionEvaluation.metrics.positionErrorM == 12.0);
+    assert(evaluateExperiment("prediction-reference", ExperimentObservation{}).status == ExperimentEvaluationStatus::InsufficientData);
+
     ExperimentObservation timestepObservation;
     timestepObservation.measuredPrimaryValue = 1.0;
     timestepObservation.measuredSecondaryValue = 0.5;

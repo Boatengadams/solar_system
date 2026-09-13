@@ -27,6 +27,7 @@ Simulation::Simulation(std::filesystem::path root)
 
 int Simulation::addBody(const Body& body) {
     bodies.push_back(body);
+    lastPredictionComparison.reset();
     return static_cast<int>(bodies.size()) - 1;
 }
 
@@ -62,12 +63,14 @@ bool Simulation::loadScenario(const std::string& id) {
     ephemerisSource.clear();
     ephemerisProvider.clear();
     ephemerisUnits = "SI";
+    lastPredictionComparison.reset();
     initialEnergy = 0.0;
     refreshScientificState();
     paused = false;
     challengeScore = 0.0;
     lastChallengeResult.reset();
     lastExperimentEvaluation.reset();
+    lastPredictionComparison.reset();
     educationWorkflow.resetToSelection();
     return true;
 }
@@ -138,6 +141,7 @@ void Simulation::integrate(double realDeltaSeconds) {
             break;
         }
         actualTimestep = lastStepResult.timestepUsed;
+        lastPredictionComparison.reset();
         nextTimestep = settings.adaptiveTimestep ? lastStepResult.suggestedTimestep : settings.timestepSeconds;
         timestepHistory.push_back(actualTimestep);
         simTime += lastStepResult.timestepUsed;
@@ -181,6 +185,7 @@ void Simulation::launchProbe(double delta) {
     probe->position = earth->position + Vec3{0, 4.2e8, 0};
     probe->velocity = earth->velocity + Vec3{-delta, 0, 0};
     probe->trail.clear();
+    lastPredictionComparison.reset();
 }
 
 bool Simulation::addCustomBody(const CustomBodyData& data) {
@@ -244,6 +249,7 @@ bool Simulation::loadSnapshot(const std::filesystem::path& path) {
     timestepHistory.clear();
     lastStepResult = {};
     initialEnergy = 0.0;
+    lastPredictionComparison.reset();
     refreshScientificState();
     selected = -1;
     telemetry.clear();
@@ -326,27 +332,38 @@ bool Simulation::evaluateCurrentExperiment() {
     if (educationWorkflow.state() != EducationWorkflowState::ReadyForEvaluation ||
         educationWorkflow.activity().type != EducationActivityType::Experiment ||
         educationWorkflow.activity().index != experiment) return false;
+    const std::string id = experimentAt(experiment).id;
     ExperimentObservation observation;
     int bodyIndex = selected;
-    if (bodyIndex < 0 || bodyIndex >= static_cast<int>(bodies.size()) || !bodies[static_cast<std::size_t>(bodyIndex)].active) {
-        const auto found = std::find_if(bodies.begin(), bodies.end(), [](const Body& body) {
-            return body.active && body.mass > 0.0 && body.id != "sun";
-        });
-        if (found == bodies.end()) return false;
-        bodyIndex = static_cast<int>(std::distance(bodies.begin(), found));
+    const Body* observedBody = nullptr;
+    if (id != "prediction-reference") {
+        if (bodyIndex < 0 || bodyIndex >= static_cast<int>(bodies.size()) || !bodies[static_cast<std::size_t>(bodyIndex)].active) {
+            const auto found = std::find_if(bodies.begin(), bodies.end(), [](const Body& body) {
+                return body.active && body.mass > 0.0 && body.id != "sun";
+            });
+            if (found == bodies.end()) return false;
+            bodyIndex = static_cast<int>(std::distance(bodies.begin(), found));
+        }
+        observedBody = &bodies[static_cast<std::size_t>(bodyIndex)];
+        observation.radiusM = distanceFromSun(*observedBody);
     }
-    const Body& body = bodies[static_cast<std::size_t>(bodyIndex)];
-    observation.radiusM = distanceFromSun(body);
-
-    const std::string id = experimentAt(experiment).id;
-    if (id == "escape-velocity") observation.measuredPrimaryValue = length(body.velocity);
+    if (id == "prediction-reference") {
+        if (lastPredictionComparison && lastPredictionComparison->success()) {
+            observation.comparisonAvailable = true;
+            observation.comparisonPositionErrorM = lastPredictionComparison->positionErrorMagnitudeM;
+            observation.comparisonVelocityErrorMps = lastPredictionComparison->velocityErrorMagnitudeMps;
+            observation.comparisonRelativePositionError = lastPredictionComparison->relativePositionError;
+            observation.comparisonRelativeVelocityError = lastPredictionComparison->relativeVelocityError;
+            observation.comparisonRelativeEnergyDifference = lastPredictionComparison->relativeEnergyDifference;
+        }
+    } else if (id == "escape-velocity") observation.measuredPrimaryValue = length(observedBody->velocity);
     else if (id == "kepler-test") {
-        observation.measuredPrimaryValue = orbitalElements(body).period;
+        observation.measuredPrimaryValue = orbitalElements(*observedBody).period;
     } else if (id == "gravity-lab") {
         bool valid = false;
         observation.measuredPrimaryValue = length(PhysicsEngine::acceleration(bodies, bodyIndex, {}, &valid));
         if (!valid) observation.measuredPrimaryValue = std::numeric_limits<double>::quiet_NaN();
-    } else if (id == "orbit-energy") observation.measuredPrimaryValue = specificEnergy(body);
+    } else if (id == "orbit-energy") observation.measuredPrimaryValue = specificEnergy(*observedBody);
     else if (id == "hohmann-lab") {
         const HohmannTransfer reference = PhysicsEngine::hohmannTransfer(
             PhysicsEngine::AU, 1.524 * PhysicsEngine::AU, PhysicsEngine::SOLAR_MASS);
@@ -355,7 +372,7 @@ bool Simulation::evaluateCurrentExperiment() {
         observation.measuredPrimaryValue = reference.valid ? reference.totalDeltaV : std::numeric_limits<double>::quiet_NaN();
     } else if (id == "numerical-methods") {
         if (bodyIndex == 0) return false;
-        std::vector<Body> fixture{bodies.front(), body};
+        std::vector<Body> fixture{bodies.front(), *observedBody};
         IntegratorBenchmarkConfig config;
         config.timestep = 6.0 * 3600.0;
         config.duration = 10.0 * PhysicsEngine::DAY;
@@ -369,6 +386,37 @@ bool Simulation::evaluateCurrentExperiment() {
     lastExperimentEvaluation = evaluateExperiment(id, observation);
     educationWorkflow.submitExperiment(*lastExperimentEvaluation);
     return true;
+}
+
+bool Simulation::runPredictionComparison(EphemerisProvider& provider, PredictionComparisonRequest request) {
+    request.referenceProvider = &provider;
+    lastPredictionComparison = comparePredictionToReference(request);
+    return lastPredictionComparison->success();
+}
+
+void Simulation::setEphemerisProvider(EphemerisProvider* provider) {
+    comparisonProvider = provider;
+    lastPredictionComparison.reset();
+}
+
+bool Simulation::runConfiguredPredictionComparison() {
+    PredictionComparisonRequest request;
+    request.bodyId = "earth";
+    request.initialEpoch = Epoch::julianDate(2451545.0);
+    request.finalEpoch = Epoch::julianDate(2451545.0 + 1.0);
+    request.frame = Frame::heliocentric();
+    request.durationSeconds = PhysicsEngine::DAY;
+    request.requestedTimestepSeconds = settings.timestepSeconds;
+    request.centralMassKg = PhysicsEngine::SOLAR_MASS;
+    request.referenceSource = "configured application ephemeris provider";
+    Integrator integrator = Integrator::VelocityVerlet;
+    if (parseIntegrator(settings.integrator, integrator)) request.integrator = integrator;
+    else request.integrator = static_cast<Integrator>(-1);
+    if (!comparisonProvider) {
+        lastPredictionComparison = comparePredictionToReference(request);
+        return false;
+    }
+    return runPredictionComparison(*comparisonProvider, request);
 }
 
 bool Simulation::submitChallenge() {
@@ -391,6 +439,7 @@ bool Simulation::selectEducationActivity(EducationActivityType type, int index) 
     if (type == EducationActivityType::Experiment) {
         experiment = educationWorkflow.activity().index;
         lastExperimentEvaluation.reset();
+        lastPredictionComparison.reset();
     } else if (type == EducationActivityType::Challenge) {
         challenge = educationWorkflow.activity().index;
         const ChallengeDefinition& definition = challengeAt(challenge);
@@ -404,14 +453,25 @@ bool Simulation::selectEducationActivity(EducationActivityType type, int index) 
     return true;
 }
 
-bool Simulation::startEducationActivity() { return educationWorkflow.start(); }
-bool Simulation::beginEducationObservation() { return educationWorkflow.beginObservation(); }
+bool Simulation::startEducationActivity() {
+    lastPredictionComparison.reset();
+    lastExperimentEvaluation.reset();
+    return educationWorkflow.start();
+}
+
+bool Simulation::beginEducationObservation() {
+    if (!educationWorkflow.beginObservation()) return false;
+    if (educationWorkflow.activity().type == EducationActivityType::Experiment &&
+        educationWorkflow.activity().id == "prediction-reference") runConfiguredPredictionComparison();
+    return true;
+}
 bool Simulation::readyEducationForEvaluation() { return educationWorkflow.readyForEvaluation(); }
 bool Simulation::retryEducationActivity() {
     const bool result = educationWorkflow.retry();
     if (result) {
         lastExperimentEvaluation.reset();
         lastChallengeResult.reset();
+        lastPredictionComparison.reset();
     }
     return result;
 }
@@ -424,6 +484,7 @@ bool Simulation::continueEducationActivity() {
         else lesson = next.index;
         lastExperimentEvaluation.reset();
         lastChallengeResult.reset();
+        lastPredictionComparison.reset();
     }
     return result;
 }

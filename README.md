@@ -9,6 +9,16 @@ physics/simulation modules and raylib-facing rendering, UI, and input modules.
 Project specifications and the Phase 0/1 implementation plan are in
 `BAGSOLAR_codex_docs/`.
 
+Validation uses an offline-capable [Prediction vs Reference](docs/PREDICTION_VS_REFERENCE.md)
+comparison with explicit Julian Date, frame/origin, SI-unit, provider, integrator,
+and timestep contracts. Reference disagreement is not treated as observational truth
+or automatically attributed solely to numerical integration.
+
+The education workflow uses an application-configured `EphemerisProvider` and
+defaults offline to the deterministic local fixture. The comparison runs during
+the normal select/start/observe/evaluate sequence; optional SPICE/Horizons
+providers use the same interface and are never silently substituted.
+
 ## Build and run
 
 Install the system dependency once by using the following command in your terminal :

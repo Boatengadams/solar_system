@@ -93,8 +93,12 @@ conservation-drift differences.
 The Phase 5 telemetry layer contains no provider-specific networking,
 spacecraft propulsion, or external reference-data dependency. The telemetry
 schema is intentionally general so
-future ephemeris and prediction-vs-reality datasets can add reference states
+future ephemeris and Prediction vs Reference datasets can add reference states
 without changing the simulation or renderer contracts.
+
+Phase 9.6 does not add comparison samples to telemetry. Comparison results use
+the validation API and HUD directly; the existing telemetry schema remains
+unchanged and no second telemetry architecture is introduced.
 
 ## Ephemeris provenance
 

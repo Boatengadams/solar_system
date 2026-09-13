@@ -18,6 +18,15 @@ Measure:
 - velocity error
 - timestep sensitivity
 
+### Prediction vs Reference
+
+The raylib-free comparison layer records Julian Date, frame/origin, SI units,
+provider, integrator, timestep, initial state, and sample epochs. Controlled
+analytical/two-body comparisons can measure numerical integration accuracy. A
+SPICE/Horizons comparison measures prediction/reference disagreement and may
+also contain dynamical/model mismatch; it is not automatically pure numerical
+error or observational truth. See `docs/PREDICTION_VS_REFERENCE.md`.
+
 ## Example Report
 
 ```text

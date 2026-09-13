@@ -8,8 +8,11 @@
 
 #include "../core/Star.hpp"
 #include "../astronomy/EphemerisTypes.hpp"
+#include "../astronomy/EphemerisProvider.hpp"
+#include "../astronomy/LocalEphemerisProvider.hpp"
 #include "../physics/Body.hpp"
 #include "../physics/PhysicsEngine.hpp"
+#include "../validation/PredictionComparison.hpp"
 #include "../telemetry/TelemetryTypes.hpp"
 #include "../education/EducationChallenges.hpp"
 #include "../education/ExperimentEvaluation.hpp"
@@ -57,6 +60,7 @@ public:
     EducationWorkflow educationWorkflow;
     std::optional<ChallengeResult> lastChallengeResult;
     std::optional<ExperimentEvaluation> lastExperimentEvaluation;
+    std::optional<PredictionComparisonResult> lastPredictionComparison;
     std::optional<Epoch> ephemerisEpoch;
     Frame ephemerisFrame = Frame::heliocentric();
     std::string ephemerisSource;
@@ -87,6 +91,9 @@ public:
     void cycleChallengeIntegrator(int direction = 1);
     bool submitChallenge();
     bool evaluateCurrentExperiment();
+    bool runPredictionComparison(EphemerisProvider& provider, PredictionComparisonRequest request);
+    void setEphemerisProvider(EphemerisProvider* provider);
+    const EphemerisProvider* predictionReferenceProvider() const { return comparisonProvider; }
     bool selectEducationActivity(EducationActivityType type, int index);
     bool startEducationActivity();
     bool beginEducationObservation();
@@ -112,7 +119,10 @@ private:
     PhysicsEngine physics;
     double nextTimestep = 0.0;
     double initialEnergy = 0.0;
+    LocalEphemerisProvider offlineReferenceProvider = LocalEphemerisProvider::deterministicFixture();
+    EphemerisProvider* comparisonProvider = &offlineReferenceProvider;
     void refreshScientificState();
+    bool runConfiguredPredictionComparison();
 };
 
 } // namespace bag
