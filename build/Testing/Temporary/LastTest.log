@@ -1,17 +1,17 @@
-Start testing: Sep 13 00:06 EDT
+Start testing: Sep 13 00:32 EDT
 ----------------------------------------------------------
 1/8 Testing: bagsolar_physics_tests
 1/8 Test: bagsolar_physics_tests
 Command: "/home/kali/Desktop/Cpp_Advance/build/bagsolar_physics_tests"
 Directory: /home/kali/Desktop/Cpp_Advance/build
-"bagsolar_physics_tests" start time: Sep 13 00:06 EDT
+"bagsolar_physics_tests" start time: Sep 13 00:32 EDT
 Output:
 ----------------------------------------------------------
 <end of output>
-Test time =   0.02 sec
+Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"bagsolar_physics_tests" end time: Sep 13 00:06 EDT
+"bagsolar_physics_tests" end time: Sep 13 00:32 EDT
 "bagsolar_physics_tests" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -19,14 +19,14 @@ Test Passed.
 2/8 Test: bagsolar_data_tests
 Command: "/home/kali/Desktop/Cpp_Advance/build/bagsolar_data_tests"
 Directory: /home/kali/Desktop/Cpp_Advance
-"bagsolar_data_tests" start time: Sep 13 00:06 EDT
+"bagsolar_data_tests" start time: Sep 13 00:32 EDT
 Output:
 ----------------------------------------------------------
 <end of output>
-Test time =   0.03 sec
+Test time =   0.05 sec
 ----------------------------------------------------------
 Test Passed.
-"bagsolar_data_tests" end time: Sep 13 00:06 EDT
+"bagsolar_data_tests" end time: Sep 13 00:32 EDT
 "bagsolar_data_tests" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -34,7 +34,7 @@ Test Passed.
 3/8 Test: bagsolar_validation_tests
 Command: "/home/kali/Desktop/Cpp_Advance/build/bagsolar_validation_tests"
 Directory: /home/kali/Desktop/Cpp_Advance/build
-"bagsolar_validation_tests" start time: Sep 13 00:06 EDT
+"bagsolar_validation_tests" start time: Sep 13 00:32 EDT
 Output:
 ----------------------------------------------------------
 case,initial_state,integrator,status,passed,timestep_s,duration_s,steps,tolerance,absolute_error,relative_error,maximum_error,rms_error,energy_drift,angular_momentum_drift,position_error_m,velocity_error_mps,period_error,analytical_period_s,measured_period_s,message
@@ -47,25 +47,25 @@ circular-two-body-bounded-orbit,circular-two-body,rk4,PASS,true,21600,37869205.7
 elliptical-two-body-bounded-orbit,elliptical-two-body,velocity_verlet,PASS,true,10800,62730427.959357798,5809,0.20000000000000001,7.2856217763284366e-17,0.55763252399297125,3.4445871180303578e-06,0,1.3251222073637867e-06,4.2627182819571287e-15,3432535.5400983994,0.45163701768050474,0.00014238768860287148,52275356.632798165,52282800,bounded orbit remained finite; periapsis_error=7.28562e-17; apoapsis_error=3.44459e-06; semi_major_axis_error=1.30385e-06; eccentricity_error=1.63446e-06; speed_drift=0.51852
 velocity-verlet-timestep-convergence,circular-two-body,velocity_verlet,PASS,true,10800,31557671.482614253,2923,0.050000000000000003,3.8735875913982107e-05,9.6840202264940814e-06,0,0,0,0,0,0,0,0,0,halving timestep reduced endpoint radius error
 <end of output>
-Test time =   3.66 sec
+Test time =   2.32 sec
 ----------------------------------------------------------
 Test Passed.
-"bagsolar_validation_tests" end time: Sep 13 00:06 EDT
-"bagsolar_validation_tests" time elapsed: 00:00:03
+"bagsolar_validation_tests" end time: Sep 13 00:32 EDT
+"bagsolar_validation_tests" time elapsed: 00:00:02
 ----------------------------------------------------------
 
 4/8 Testing: bagsolar_telemetry_tests
 4/8 Test: bagsolar_telemetry_tests
 Command: "/home/kali/Desktop/Cpp_Advance/build/bagsolar_telemetry_tests"
 Directory: /home/kali/Desktop/Cpp_Advance
-"bagsolar_telemetry_tests" start time: Sep 13 00:06 EDT
+"bagsolar_telemetry_tests" start time: Sep 13 00:32 EDT
 Output:
 ----------------------------------------------------------
 <end of output>
-Test time =   0.08 sec
+Test time =   0.02 sec
 ----------------------------------------------------------
 Test Passed.
-"bagsolar_telemetry_tests" end time: Sep 13 00:06 EDT
+"bagsolar_telemetry_tests" end time: Sep 13 00:32 EDT
 "bagsolar_telemetry_tests" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -73,14 +73,14 @@ Test Passed.
 5/8 Test: bagsolar_ephemeris_tests
 Command: "/home/kali/Desktop/Cpp_Advance/build/bagsolar_ephemeris_tests"
 Directory: /home/kali/Desktop/Cpp_Advance
-"bagsolar_ephemeris_tests" start time: Sep 13 00:06 EDT
+"bagsolar_ephemeris_tests" start time: Sep 13 00:32 EDT
 Output:
 ----------------------------------------------------------
 <end of output>
-Test time =   0.05 sec
+Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"bagsolar_ephemeris_tests" end time: Sep 13 00:06 EDT
+"bagsolar_ephemeris_tests" end time: Sep 13 00:32 EDT
 "bagsolar_ephemeris_tests" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -88,14 +88,14 @@ Test Passed.
 6/8 Test: bagsolar_spacecraft_tests
 Command: "/home/kali/Desktop/Cpp_Advance/build/bagsolar_spacecraft_tests"
 Directory: /home/kali/Desktop/Cpp_Advance/build
-"bagsolar_spacecraft_tests" start time: Sep 13 00:06 EDT
+"bagsolar_spacecraft_tests" start time: Sep 13 00:32 EDT
 Output:
 ----------------------------------------------------------
 <end of output>
 Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"bagsolar_spacecraft_tests" end time: Sep 13 00:06 EDT
+"bagsolar_spacecraft_tests" end time: Sep 13 00:32 EDT
 "bagsolar_spacecraft_tests" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -103,14 +103,14 @@ Test Passed.
 7/8 Test: bagsolar_education_tests
 Command: "/home/kali/Desktop/Cpp_Advance/build/bagsolar_education_tests"
 Directory: /home/kali/Desktop/Cpp_Advance/build
-"bagsolar_education_tests" start time: Sep 13 00:06 EDT
+"bagsolar_education_tests" start time: Sep 13 00:32 EDT
 Output:
 ----------------------------------------------------------
 <end of output>
-Test time =   0.01 sec
+Test time =   0.02 sec
 ----------------------------------------------------------
 Test Passed.
-"bagsolar_education_tests" end time: Sep 13 00:06 EDT
+"bagsolar_education_tests" end time: Sep 13 00:32 EDT
 "bagsolar_education_tests" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -118,38 +118,38 @@ Test Passed.
 8/8 Test: bagsolar_advanced_data_tests
 Command: "/home/kali/Desktop/Cpp_Advance/build/bagsolar_advanced_data_tests"
 Directory: /home/kali/Desktop/Cpp_Advance/build
-"bagsolar_advanced_data_tests" start time: Sep 13 00:06 EDT
+"bagsolar_advanced_data_tests" start time: Sep 13 00:32 EDT
 Output:
 ----------------------------------------------------------
 <end of output>
-Test time =   0.02 sec
+Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"bagsolar_advanced_data_tests" end time: Sep 13 00:06 EDT
+"bagsolar_advanced_data_tests" end time: Sep 13 00:32 EDT
 "bagsolar_advanced_data_tests" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-End testing: Sep 13 00:06 EDT
+End testing: Sep 13 00:32 EDT
 
-astronomy =   0.07 sec*proc
+astronomy =   0.01 sec*proc
 
-education =   0.01 sec*proc
+education =   0.02 sec*proc
 
-ephemeris =   0.05 sec*proc
+ephemeris =   0.01 sec*proc
 
-integration =   0.03 sec*proc
+integration =   0.05 sec*proc
 
 mission =   0.01 sec*proc
 
-regression =   0.22 sec*proc
+regression =   0.11 sec*proc
 
 spacecraft =   0.01 sec*proc
 
-spice =   0.02 sec*proc
+spice =   0.00 sec*proc
 
-telemetry =   0.08 sec*proc
+telemetry =   0.02 sec*proc
 
-unit =   0.02 sec*proc
+unit =   0.01 sec*proc
 
-validation =   3.66 sec*proc
+validation =   2.32 sec*proc
 

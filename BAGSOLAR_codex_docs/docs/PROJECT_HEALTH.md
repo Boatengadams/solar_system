@@ -40,17 +40,23 @@ arbitrary frame rotations.
 - Lesson and experiment completion state.
 - Student observation recording.
 - Deterministic completion reports.
+- Four deterministic interactive challenge definitions.
+- Analytical escape-velocity and circular-orbit scoring.
+- Integrator and timestep comparison/scoring using existing benchmark metrics.
+- Learner-facing challenge results in the raylib HUD.
+- Challenge attempts, best/latest scores, metrics, and deterministic export.
 - Education unit tests and CTest integration.
 
 ### Remaining
 
-- Interactive challenge workflows.
-- Numerical-method comparison lessons and scoring.
-- Richer education UI integration.
-- Persistence/export of learner progress.
+- Broader interactive challenge catalog.
 - Broader lesson-specific experiment result evaluation.
+- Richer education UI integration.
+- Durable persistence of learner progress beyond the deterministic export boundary.
 
-Estimated Phase 9 completion: 67% of the roadmap checklist.
+Phase 9 remains partial: the roadmap checklist items for challenges and
+numerical-method comparisons are complete, while broader education scope
+remains.
 
 ## Current Phase 10 status
 

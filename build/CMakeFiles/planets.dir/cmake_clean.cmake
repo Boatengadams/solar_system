@@ -28,6 +28,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/planets.dir/src/data/ScenarioLoader.cpp.o.d"
   "CMakeFiles/planets.dir/src/data/ScenarioSerializer.cpp.o"
   "CMakeFiles/planets.dir/src/data/ScenarioSerializer.cpp.o.d"
+  "CMakeFiles/planets.dir/src/education/EducationChallenges.cpp.o"
+  "CMakeFiles/planets.dir/src/education/EducationChallenges.cpp.o.d"
   "CMakeFiles/planets.dir/src/education/EducationContent.cpp.o"
   "CMakeFiles/planets.dir/src/education/EducationContent.cpp.o.d"
   "CMakeFiles/planets.dir/src/education/EducationProgress.cpp.o"

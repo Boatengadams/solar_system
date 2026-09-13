@@ -22,6 +22,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/kali/Desktop/Cpp_Advance/src/data/BodyFactory.cpp" "CMakeFiles/planets.dir/src/data/BodyFactory.cpp.o" "gcc" "CMakeFiles/planets.dir/src/data/BodyFactory.cpp.o.d"
   "/home/kali/Desktop/Cpp_Advance/src/data/ScenarioLoader.cpp" "CMakeFiles/planets.dir/src/data/ScenarioLoader.cpp.o" "gcc" "CMakeFiles/planets.dir/src/data/ScenarioLoader.cpp.o.d"
   "/home/kali/Desktop/Cpp_Advance/src/data/ScenarioSerializer.cpp" "CMakeFiles/planets.dir/src/data/ScenarioSerializer.cpp.o" "gcc" "CMakeFiles/planets.dir/src/data/ScenarioSerializer.cpp.o.d"
+  "/home/kali/Desktop/Cpp_Advance/src/education/EducationChallenges.cpp" "CMakeFiles/planets.dir/src/education/EducationChallenges.cpp.o" "gcc" "CMakeFiles/planets.dir/src/education/EducationChallenges.cpp.o.d"
   "/home/kali/Desktop/Cpp_Advance/src/education/EducationContent.cpp" "CMakeFiles/planets.dir/src/education/EducationContent.cpp.o" "gcc" "CMakeFiles/planets.dir/src/education/EducationContent.cpp.o.d"
   "/home/kali/Desktop/Cpp_Advance/src/education/EducationProgress.cpp" "CMakeFiles/planets.dir/src/education/EducationProgress.cpp.o" "gcc" "CMakeFiles/planets.dir/src/education/EducationProgress.cpp.o.d"
   "/home/kali/Desktop/Cpp_Advance/src/input/InputController.cpp" "CMakeFiles/planets.dir/src/input/InputController.cpp.o" "gcc" "CMakeFiles/planets.dir/src/input/InputController.cpp.o.d"

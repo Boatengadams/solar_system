@@ -11,6 +11,8 @@
 #include "../physics/Body.hpp"
 #include "../physics/PhysicsEngine.hpp"
 #include "../telemetry/TelemetryTypes.hpp"
+#include "../education/EducationChallenges.hpp"
+#include "../education/EducationProgress.hpp"
 #include "SimulationSettings.hpp"
 
 namespace bag {
@@ -46,6 +48,10 @@ public:
     int experiment = 0;
     int challenge = 0;
     double challengeScore = 0.0;
+    double challengeAnswer = 0.0;
+    Integrator challengeIntegrator = Integrator::VelocityVerlet;
+    EducationProgress educationProgress;
+    std::optional<ChallengeResult> lastChallengeResult;
     std::optional<Epoch> ephemerisEpoch;
     Frame ephemerisFrame = Frame::heliocentric();
     std::string ephemerisSource;
@@ -70,6 +76,11 @@ public:
     bool telemetryEnabled() const { return telemetry.active; }
     bool exportTelemetryCsv(const std::filesystem::path& path) const;
     bool exportTelemetryJson(const std::filesystem::path& path) const;
+
+    void setChallenge(int index);
+    void adjustChallengeAnswer(double relativeChange);
+    void cycleChallengeIntegrator(int direction = 1);
+    bool submitChallenge();
 
     double distanceFromSun(const Body& body) const;
     double specificEnergy(const Body& body) const;

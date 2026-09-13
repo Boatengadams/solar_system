@@ -282,10 +282,24 @@ CMakeFiles/planets.dir/src/education/EducationContent.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/planets.dir/src/education/EducationContent.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/kali/Desktop/Cpp_Advance/src/education/EducationContent.cpp -o CMakeFiles/planets.dir/src/education/EducationContent.cpp.s
 
+CMakeFiles/planets.dir/src/education/EducationChallenges.cpp.o: CMakeFiles/planets.dir/flags.make
+CMakeFiles/planets.dir/src/education/EducationChallenges.cpp.o: /home/kali/Desktop/Cpp_Advance/src/education/EducationChallenges.cpp
+CMakeFiles/planets.dir/src/education/EducationChallenges.cpp.o: CMakeFiles/planets.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/planets.dir/src/education/EducationChallenges.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/planets.dir/src/education/EducationChallenges.cpp.o -MF CMakeFiles/planets.dir/src/education/EducationChallenges.cpp.o.d -o CMakeFiles/planets.dir/src/education/EducationChallenges.cpp.o -c /home/kali/Desktop/Cpp_Advance/src/education/EducationChallenges.cpp
+
+CMakeFiles/planets.dir/src/education/EducationChallenges.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/planets.dir/src/education/EducationChallenges.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/kali/Desktop/Cpp_Advance/src/education/EducationChallenges.cpp > CMakeFiles/planets.dir/src/education/EducationChallenges.cpp.i
+
+CMakeFiles/planets.dir/src/education/EducationChallenges.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/planets.dir/src/education/EducationChallenges.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/kali/Desktop/Cpp_Advance/src/education/EducationChallenges.cpp -o CMakeFiles/planets.dir/src/education/EducationChallenges.cpp.s
+
 CMakeFiles/planets.dir/src/education/EducationProgress.cpp.o: CMakeFiles/planets.dir/flags.make
 CMakeFiles/planets.dir/src/education/EducationProgress.cpp.o: /home/kali/Desktop/Cpp_Advance/src/education/EducationProgress.cpp
 CMakeFiles/planets.dir/src/education/EducationProgress.cpp.o: CMakeFiles/planets.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/planets.dir/src/education/EducationProgress.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object CMakeFiles/planets.dir/src/education/EducationProgress.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/planets.dir/src/education/EducationProgress.cpp.o -MF CMakeFiles/planets.dir/src/education/EducationProgress.cpp.o.d -o CMakeFiles/planets.dir/src/education/EducationProgress.cpp.o -c /home/kali/Desktop/Cpp_Advance/src/education/EducationProgress.cpp
 
 CMakeFiles/planets.dir/src/education/EducationProgress.cpp.i: cmake_force
@@ -299,7 +313,7 @@ CMakeFiles/planets.dir/src/education/EducationProgress.cpp.s: cmake_force
 CMakeFiles/planets.dir/src/input/InputController.cpp.o: CMakeFiles/planets.dir/flags.make
 CMakeFiles/planets.dir/src/input/InputController.cpp.o: /home/kali/Desktop/Cpp_Advance/src/input/InputController.cpp
 CMakeFiles/planets.dir/src/input/InputController.cpp.o: CMakeFiles/planets.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object CMakeFiles/planets.dir/src/input/InputController.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object CMakeFiles/planets.dir/src/input/InputController.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/planets.dir/src/input/InputController.cpp.o -MF CMakeFiles/planets.dir/src/input/InputController.cpp.o.d -o CMakeFiles/planets.dir/src/input/InputController.cpp.o -c /home/kali/Desktop/Cpp_Advance/src/input/InputController.cpp
 
 CMakeFiles/planets.dir/src/input/InputController.cpp.i: cmake_force
@@ -313,7 +327,7 @@ CMakeFiles/planets.dir/src/input/InputController.cpp.s: cmake_force
 CMakeFiles/planets.dir/src/physics/PhysicsEngine.cpp.o: CMakeFiles/planets.dir/flags.make
 CMakeFiles/planets.dir/src/physics/PhysicsEngine.cpp.o: /home/kali/Desktop/Cpp_Advance/src/physics/PhysicsEngine.cpp
 CMakeFiles/planets.dir/src/physics/PhysicsEngine.cpp.o: CMakeFiles/planets.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object CMakeFiles/planets.dir/src/physics/PhysicsEngine.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object CMakeFiles/planets.dir/src/physics/PhysicsEngine.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/planets.dir/src/physics/PhysicsEngine.cpp.o -MF CMakeFiles/planets.dir/src/physics/PhysicsEngine.cpp.o.d -o CMakeFiles/planets.dir/src/physics/PhysicsEngine.cpp.o -c /home/kali/Desktop/Cpp_Advance/src/physics/PhysicsEngine.cpp
 
 CMakeFiles/planets.dir/src/physics/PhysicsEngine.cpp.i: cmake_force
@@ -327,7 +341,7 @@ CMakeFiles/planets.dir/src/physics/PhysicsEngine.cpp.s: cmake_force
 CMakeFiles/planets.dir/src/physics/IntegratorBenchmark.cpp.o: CMakeFiles/planets.dir/flags.make
 CMakeFiles/planets.dir/src/physics/IntegratorBenchmark.cpp.o: /home/kali/Desktop/Cpp_Advance/src/physics/IntegratorBenchmark.cpp
 CMakeFiles/planets.dir/src/physics/IntegratorBenchmark.cpp.o: CMakeFiles/planets.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object CMakeFiles/planets.dir/src/physics/IntegratorBenchmark.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object CMakeFiles/planets.dir/src/physics/IntegratorBenchmark.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/planets.dir/src/physics/IntegratorBenchmark.cpp.o -MF CMakeFiles/planets.dir/src/physics/IntegratorBenchmark.cpp.o.d -o CMakeFiles/planets.dir/src/physics/IntegratorBenchmark.cpp.o -c /home/kali/Desktop/Cpp_Advance/src/physics/IntegratorBenchmark.cpp
 
 CMakeFiles/planets.dir/src/physics/IntegratorBenchmark.cpp.i: cmake_force
@@ -341,7 +355,7 @@ CMakeFiles/planets.dir/src/physics/IntegratorBenchmark.cpp.s: cmake_force
 CMakeFiles/planets.dir/src/rendering/Renderer.cpp.o: CMakeFiles/planets.dir/flags.make
 CMakeFiles/planets.dir/src/rendering/Renderer.cpp.o: /home/kali/Desktop/Cpp_Advance/src/rendering/Renderer.cpp
 CMakeFiles/planets.dir/src/rendering/Renderer.cpp.o: CMakeFiles/planets.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object CMakeFiles/planets.dir/src/rendering/Renderer.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object CMakeFiles/planets.dir/src/rendering/Renderer.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/planets.dir/src/rendering/Renderer.cpp.o -MF CMakeFiles/planets.dir/src/rendering/Renderer.cpp.o.d -o CMakeFiles/planets.dir/src/rendering/Renderer.cpp.o -c /home/kali/Desktop/Cpp_Advance/src/rendering/Renderer.cpp
 
 CMakeFiles/planets.dir/src/rendering/Renderer.cpp.i: cmake_force
@@ -355,7 +369,7 @@ CMakeFiles/planets.dir/src/rendering/Renderer.cpp.s: cmake_force
 CMakeFiles/planets.dir/src/simulation/Simulation.cpp.o: CMakeFiles/planets.dir/flags.make
 CMakeFiles/planets.dir/src/simulation/Simulation.cpp.o: /home/kali/Desktop/Cpp_Advance/src/simulation/Simulation.cpp
 CMakeFiles/planets.dir/src/simulation/Simulation.cpp.o: CMakeFiles/planets.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object CMakeFiles/planets.dir/src/simulation/Simulation.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Building CXX object CMakeFiles/planets.dir/src/simulation/Simulation.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/planets.dir/src/simulation/Simulation.cpp.o -MF CMakeFiles/planets.dir/src/simulation/Simulation.cpp.o.d -o CMakeFiles/planets.dir/src/simulation/Simulation.cpp.o -c /home/kali/Desktop/Cpp_Advance/src/simulation/Simulation.cpp
 
 CMakeFiles/planets.dir/src/simulation/Simulation.cpp.i: cmake_force
@@ -369,7 +383,7 @@ CMakeFiles/planets.dir/src/simulation/Simulation.cpp.s: cmake_force
 CMakeFiles/planets.dir/src/spacecraft/Spacecraft.cpp.o: CMakeFiles/planets.dir/flags.make
 CMakeFiles/planets.dir/src/spacecraft/Spacecraft.cpp.o: /home/kali/Desktop/Cpp_Advance/src/spacecraft/Spacecraft.cpp
 CMakeFiles/planets.dir/src/spacecraft/Spacecraft.cpp.o: CMakeFiles/planets.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Building CXX object CMakeFiles/planets.dir/src/spacecraft/Spacecraft.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Building CXX object CMakeFiles/planets.dir/src/spacecraft/Spacecraft.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/planets.dir/src/spacecraft/Spacecraft.cpp.o -MF CMakeFiles/planets.dir/src/spacecraft/Spacecraft.cpp.o.d -o CMakeFiles/planets.dir/src/spacecraft/Spacecraft.cpp.o -c /home/kali/Desktop/Cpp_Advance/src/spacecraft/Spacecraft.cpp
 
 CMakeFiles/planets.dir/src/spacecraft/Spacecraft.cpp.i: cmake_force
@@ -383,7 +397,7 @@ CMakeFiles/planets.dir/src/spacecraft/Spacecraft.cpp.s: cmake_force
 CMakeFiles/planets.dir/src/missions/Mission.cpp.o: CMakeFiles/planets.dir/flags.make
 CMakeFiles/planets.dir/src/missions/Mission.cpp.o: /home/kali/Desktop/Cpp_Advance/src/missions/Mission.cpp
 CMakeFiles/planets.dir/src/missions/Mission.cpp.o: CMakeFiles/planets.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Building CXX object CMakeFiles/planets.dir/src/missions/Mission.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building CXX object CMakeFiles/planets.dir/src/missions/Mission.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/planets.dir/src/missions/Mission.cpp.o -MF CMakeFiles/planets.dir/src/missions/Mission.cpp.o.d -o CMakeFiles/planets.dir/src/missions/Mission.cpp.o -c /home/kali/Desktop/Cpp_Advance/src/missions/Mission.cpp
 
 CMakeFiles/planets.dir/src/missions/Mission.cpp.i: cmake_force
@@ -397,7 +411,7 @@ CMakeFiles/planets.dir/src/missions/Mission.cpp.s: cmake_force
 CMakeFiles/planets.dir/src/missions/TrajectoryPrediction.cpp.o: CMakeFiles/planets.dir/flags.make
 CMakeFiles/planets.dir/src/missions/TrajectoryPrediction.cpp.o: /home/kali/Desktop/Cpp_Advance/src/missions/TrajectoryPrediction.cpp
 CMakeFiles/planets.dir/src/missions/TrajectoryPrediction.cpp.o: CMakeFiles/planets.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building CXX object CMakeFiles/planets.dir/src/missions/TrajectoryPrediction.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Building CXX object CMakeFiles/planets.dir/src/missions/TrajectoryPrediction.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/planets.dir/src/missions/TrajectoryPrediction.cpp.o -MF CMakeFiles/planets.dir/src/missions/TrajectoryPrediction.cpp.o.d -o CMakeFiles/planets.dir/src/missions/TrajectoryPrediction.cpp.o -c /home/kali/Desktop/Cpp_Advance/src/missions/TrajectoryPrediction.cpp
 
 CMakeFiles/planets.dir/src/missions/TrajectoryPrediction.cpp.i: cmake_force
@@ -411,7 +425,7 @@ CMakeFiles/planets.dir/src/missions/TrajectoryPrediction.cpp.s: cmake_force
 CMakeFiles/planets.dir/src/telemetry/TelemetryAnalyzer.cpp.o: CMakeFiles/planets.dir/flags.make
 CMakeFiles/planets.dir/src/telemetry/TelemetryAnalyzer.cpp.o: /home/kali/Desktop/Cpp_Advance/src/telemetry/TelemetryAnalyzer.cpp
 CMakeFiles/planets.dir/src/telemetry/TelemetryAnalyzer.cpp.o: CMakeFiles/planets.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Building CXX object CMakeFiles/planets.dir/src/telemetry/TelemetryAnalyzer.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_26) "Building CXX object CMakeFiles/planets.dir/src/telemetry/TelemetryAnalyzer.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/planets.dir/src/telemetry/TelemetryAnalyzer.cpp.o -MF CMakeFiles/planets.dir/src/telemetry/TelemetryAnalyzer.cpp.o.d -o CMakeFiles/planets.dir/src/telemetry/TelemetryAnalyzer.cpp.o -c /home/kali/Desktop/Cpp_Advance/src/telemetry/TelemetryAnalyzer.cpp
 
 CMakeFiles/planets.dir/src/telemetry/TelemetryAnalyzer.cpp.i: cmake_force
@@ -425,7 +439,7 @@ CMakeFiles/planets.dir/src/telemetry/TelemetryAnalyzer.cpp.s: cmake_force
 CMakeFiles/planets.dir/src/telemetry/TelemetryCollector.cpp.o: CMakeFiles/planets.dir/flags.make
 CMakeFiles/planets.dir/src/telemetry/TelemetryCollector.cpp.o: /home/kali/Desktop/Cpp_Advance/src/telemetry/TelemetryCollector.cpp
 CMakeFiles/planets.dir/src/telemetry/TelemetryCollector.cpp.o: CMakeFiles/planets.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_26) "Building CXX object CMakeFiles/planets.dir/src/telemetry/TelemetryCollector.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_27) "Building CXX object CMakeFiles/planets.dir/src/telemetry/TelemetryCollector.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/planets.dir/src/telemetry/TelemetryCollector.cpp.o -MF CMakeFiles/planets.dir/src/telemetry/TelemetryCollector.cpp.o.d -o CMakeFiles/planets.dir/src/telemetry/TelemetryCollector.cpp.o -c /home/kali/Desktop/Cpp_Advance/src/telemetry/TelemetryCollector.cpp
 
 CMakeFiles/planets.dir/src/telemetry/TelemetryCollector.cpp.i: cmake_force
@@ -439,7 +453,7 @@ CMakeFiles/planets.dir/src/telemetry/TelemetryCollector.cpp.s: cmake_force
 CMakeFiles/planets.dir/src/telemetry/TelemetryExporter.cpp.o: CMakeFiles/planets.dir/flags.make
 CMakeFiles/planets.dir/src/telemetry/TelemetryExporter.cpp.o: /home/kali/Desktop/Cpp_Advance/src/telemetry/TelemetryExporter.cpp
 CMakeFiles/planets.dir/src/telemetry/TelemetryExporter.cpp.o: CMakeFiles/planets.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_27) "Building CXX object CMakeFiles/planets.dir/src/telemetry/TelemetryExporter.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_28) "Building CXX object CMakeFiles/planets.dir/src/telemetry/TelemetryExporter.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/planets.dir/src/telemetry/TelemetryExporter.cpp.o -MF CMakeFiles/planets.dir/src/telemetry/TelemetryExporter.cpp.o.d -o CMakeFiles/planets.dir/src/telemetry/TelemetryExporter.cpp.o -c /home/kali/Desktop/Cpp_Advance/src/telemetry/TelemetryExporter.cpp
 
 CMakeFiles/planets.dir/src/telemetry/TelemetryExporter.cpp.i: cmake_force
@@ -453,7 +467,7 @@ CMakeFiles/planets.dir/src/telemetry/TelemetryExporter.cpp.s: cmake_force
 CMakeFiles/planets.dir/src/telemetry/TelemetrySession.cpp.o: CMakeFiles/planets.dir/flags.make
 CMakeFiles/planets.dir/src/telemetry/TelemetrySession.cpp.o: /home/kali/Desktop/Cpp_Advance/src/telemetry/TelemetrySession.cpp
 CMakeFiles/planets.dir/src/telemetry/TelemetrySession.cpp.o: CMakeFiles/planets.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_28) "Building CXX object CMakeFiles/planets.dir/src/telemetry/TelemetrySession.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_29) "Building CXX object CMakeFiles/planets.dir/src/telemetry/TelemetrySession.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/planets.dir/src/telemetry/TelemetrySession.cpp.o -MF CMakeFiles/planets.dir/src/telemetry/TelemetrySession.cpp.o.d -o CMakeFiles/planets.dir/src/telemetry/TelemetrySession.cpp.o -c /home/kali/Desktop/Cpp_Advance/src/telemetry/TelemetrySession.cpp
 
 CMakeFiles/planets.dir/src/telemetry/TelemetrySession.cpp.i: cmake_force
@@ -467,7 +481,7 @@ CMakeFiles/planets.dir/src/telemetry/TelemetrySession.cpp.s: cmake_force
 CMakeFiles/planets.dir/src/ui/HUD.cpp.o: CMakeFiles/planets.dir/flags.make
 CMakeFiles/planets.dir/src/ui/HUD.cpp.o: /home/kali/Desktop/Cpp_Advance/src/ui/HUD.cpp
 CMakeFiles/planets.dir/src/ui/HUD.cpp.o: CMakeFiles/planets.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_29) "Building CXX object CMakeFiles/planets.dir/src/ui/HUD.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_30) "Building CXX object CMakeFiles/planets.dir/src/ui/HUD.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/planets.dir/src/ui/HUD.cpp.o -MF CMakeFiles/planets.dir/src/ui/HUD.cpp.o.d -o CMakeFiles/planets.dir/src/ui/HUD.cpp.o -c /home/kali/Desktop/Cpp_Advance/src/ui/HUD.cpp
 
 CMakeFiles/planets.dir/src/ui/HUD.cpp.i: cmake_force
@@ -495,6 +509,7 @@ planets_OBJECTS = \
 "CMakeFiles/planets.dir/src/data/ScenarioLoader.cpp.o" \
 "CMakeFiles/planets.dir/src/data/ScenarioSerializer.cpp.o" \
 "CMakeFiles/planets.dir/src/education/EducationContent.cpp.o" \
+"CMakeFiles/planets.dir/src/education/EducationChallenges.cpp.o" \
 "CMakeFiles/planets.dir/src/education/EducationProgress.cpp.o" \
 "CMakeFiles/planets.dir/src/input/InputController.cpp.o" \
 "CMakeFiles/planets.dir/src/physics/PhysicsEngine.cpp.o" \
@@ -528,6 +543,7 @@ planets: CMakeFiles/planets.dir/src/data/BodyFactory.cpp.o
 planets: CMakeFiles/planets.dir/src/data/ScenarioLoader.cpp.o
 planets: CMakeFiles/planets.dir/src/data/ScenarioSerializer.cpp.o
 planets: CMakeFiles/planets.dir/src/education/EducationContent.cpp.o
+planets: CMakeFiles/planets.dir/src/education/EducationChallenges.cpp.o
 planets: CMakeFiles/planets.dir/src/education/EducationProgress.cpp.o
 planets: CMakeFiles/planets.dir/src/input/InputController.cpp.o
 planets: CMakeFiles/planets.dir/src/physics/PhysicsEngine.cpp.o
@@ -546,7 +562,7 @@ planets: CMakeFiles/planets.dir/build.make
 planets: CMakeFiles/planets.dir/compiler_depend.ts
 planets: /usr/lib/x86_64-linux-gnu/libraylib.so
 planets: CMakeFiles/planets.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_30) "Linking CXX executable planets"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/kali/Desktop/Cpp_Advance/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_31) "Linking CXX executable planets"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/planets.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

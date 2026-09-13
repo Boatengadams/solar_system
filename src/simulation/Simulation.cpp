@@ -7,6 +7,7 @@
 #include "../data/BodyFactory.hpp"
 #include "../data/ScenarioLoader.hpp"
 #include "../data/ScenarioSerializer.hpp"
+#include "../education/EducationContent.hpp"
 #include "../telemetry/TelemetryExporter.hpp"
 
 namespace bag {
@@ -14,7 +15,11 @@ namespace {
 constexpr double MAX_FRAME_DELTA = 1.0 / 30.0;
 }
 
-Simulation::Simulation(std::filesystem::path root) : dataRoot(std::move(root)) { reset(); }
+Simulation::Simulation(std::filesystem::path root)
+    : educationProgress(lessonCount(), experimentCount(), challengeCount()), dataRoot(std::move(root)) {
+    reset();
+    setChallenge(0);
+}
 
 int Simulation::addBody(const Body& body) {
     bodies.push_back(body);
@@ -57,6 +62,7 @@ bool Simulation::loadScenario(const std::string& id) {
     refreshScientificState();
     paused = false;
     challengeScore = 0.0;
+    lastChallengeResult.reset();
     return true;
 }
 
@@ -279,6 +285,45 @@ void Simulation::stopTelemetry(TelemetryStatus status) {
 void Simulation::clearTelemetry() { telemetry.clear(); }
 bool Simulation::exportTelemetryCsv(const std::filesystem::path& path) const { return writeTelemetryCsv(path, telemetry); }
 bool Simulation::exportTelemetryJson(const std::filesystem::path& path) const { return writeTelemetryJson(path, telemetry); }
+
+void Simulation::setChallenge(int index) {
+    if (challengeCount() == 0) return;
+    challenge = ((index % challengeCount()) + challengeCount()) % challengeCount();
+    const ChallengeDefinition& definition = challengeAt(challenge);
+    challengeAnswer = definition.defaultAnswer;
+    challengeIntegrator = definition.defaultIntegrator;
+    lastChallengeResult.reset();
+    challengeScore = 0.0;
+}
+
+void Simulation::adjustChallengeAnswer(double relativeChange) {
+    if (!std::isfinite(relativeChange) || relativeChange <= -1.0) return;
+    challengeAnswer = std::max(0.0, challengeAnswer * (1.0 + relativeChange));
+}
+
+void Simulation::cycleChallengeIntegrator(int direction) {
+    constexpr Integrator integrators[] = {Integrator::Euler, Integrator::SemiImplicitEuler,
+                                          Integrator::VelocityVerlet, Integrator::RK4};
+    int current = 0;
+    for (int index = 0; index < 4; ++index) if (integrators[index] == challengeIntegrator) current = index;
+    current = (current + (direction >= 0 ? 1 : -1) + 4) % 4;
+    challengeIntegrator = integrators[current];
+    lastChallengeResult.reset();
+}
+
+bool Simulation::submitChallenge() {
+    if (challengeCount() == 0) return false;
+    const ChallengeDefinition& definition = challengeAt(challenge);
+    ChallengeAnswer answer;
+    answer.primaryValue = challengeAnswer;
+    answer.timestepSeconds = challengeAnswer;
+    answer.integrator = challengeIntegrator;
+    lastChallengeResult = evaluateChallenge(definition, answer);
+    if (!lastChallengeResult->valid) return false;
+    challengeScore = lastChallengeResult->score;
+    educationProgress.recordChallengeResult(challenge, *lastChallengeResult);
+    return true;
+}
 
 void Simulation::setSpeed(double value) {
     speed = std::max(0.01, std::min(100000.0, value));

@@ -234,5 +234,7 @@ CMakeFiles/planets.dir/src/app/main.cpp.o: \
  /home/kali/Desktop/Cpp_Advance/src/app/../input/../rendering/../simulation/../physics/../core/Color.hpp \
  /home/kali/Desktop/Cpp_Advance/src/app/../input/../rendering/../simulation/../physics/PhysicsEngine.hpp \
  /home/kali/Desktop/Cpp_Advance/src/app/../input/../rendering/../simulation/../telemetry/TelemetryTypes.hpp \
+ /home/kali/Desktop/Cpp_Advance/src/app/../input/../rendering/../simulation/../education/EducationChallenges.hpp \
+ /home/kali/Desktop/Cpp_Advance/src/app/../input/../rendering/../simulation/../education/EducationProgress.hpp \
  /home/kali/Desktop/Cpp_Advance/src/app/../input/../rendering/../simulation/SimulationSettings.hpp \
  /home/kali/Desktop/Cpp_Advance/src/app/../ui/HUD.hpp

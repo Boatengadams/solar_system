@@ -153,14 +153,15 @@ work.
 ## Phase 9 — Educational Platform
 - Lessons. [x]
 - Guided experiments. [x]
-- Challenges. [ ]
-- Numerical-method comparisons. [ ]
+- Challenges. [x]
+- Numerical-method comparisons. [x]
 - Student experiment reports. [x]
 - Progress tracking. [x]
 
-Status: education catalog and deterministic progress/report foundations are
-implemented. Challenge workflows and numerical-method comparison lessons
-remain future work.
+Status: deterministic challenge workflows, numerical-method scoring, learner
+results, and challenge progress tracking are implemented. Broader challenge
+content, richer experiment evaluation, full progress persistence, and a more
+complete education UI remain future work.
 
 ## Phase 10 — Professional Release
 - Cross-platform build presets. [x]

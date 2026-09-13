@@ -230,6 +230,8 @@ CMakeFiles/planets.dir/src/simulation/Simulation.cpp.o: \
  /home/kali/Desktop/Cpp_Advance/src/simulation/../physics/../core/Color.hpp \
  /home/kali/Desktop/Cpp_Advance/src/simulation/../physics/PhysicsEngine.hpp \
  /home/kali/Desktop/Cpp_Advance/src/simulation/../telemetry/TelemetryTypes.hpp \
+ /home/kali/Desktop/Cpp_Advance/src/simulation/../education/EducationChallenges.hpp \
+ /home/kali/Desktop/Cpp_Advance/src/simulation/../education/EducationProgress.hpp \
  /home/kali/Desktop/Cpp_Advance/src/simulation/SimulationSettings.hpp \
  /usr/include/c++/15/algorithm /usr/include/c++/15/bits/stl_algo.h \
  /usr/include/c++/15/bits/algorithmfwd.h \
@@ -242,4 +244,5 @@ CMakeFiles/planets.dir/src/simulation/Simulation.cpp.o: \
  /usr/include/c++/15/utility /usr/include/c++/15/bits/stl_relops.h \
  /home/kali/Desktop/Cpp_Advance/src/simulation/../data/ScenarioLoader.hpp \
  /home/kali/Desktop/Cpp_Advance/src/simulation/../data/ScenarioSerializer.hpp \
+ /home/kali/Desktop/Cpp_Advance/src/simulation/../education/EducationContent.hpp \
  /home/kali/Desktop/Cpp_Advance/src/simulation/../telemetry/TelemetryExporter.hpp

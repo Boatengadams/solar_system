@@ -231,6 +231,8 @@ CMakeFiles/planets.dir/src/rendering/Renderer.cpp.o: \
  /home/kali/Desktop/Cpp_Advance/src/rendering/../simulation/../physics/../core/Color.hpp \
  /home/kali/Desktop/Cpp_Advance/src/rendering/../simulation/../physics/PhysicsEngine.hpp \
  /home/kali/Desktop/Cpp_Advance/src/rendering/../simulation/../telemetry/TelemetryTypes.hpp \
+ /home/kali/Desktop/Cpp_Advance/src/rendering/../simulation/../education/EducationChallenges.hpp \
+ /home/kali/Desktop/Cpp_Advance/src/rendering/../simulation/../education/EducationProgress.hpp \
  /home/kali/Desktop/Cpp_Advance/src/rendering/../simulation/SimulationSettings.hpp \
  /usr/include/raymath.h /usr/include/c++/15/math.h \
  /usr/include/c++/15/algorithm /usr/include/c++/15/bits/stl_algo.h \

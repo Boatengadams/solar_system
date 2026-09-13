@@ -6,6 +6,7 @@
 #include <sstream>
 
 #include "../education/EducationContent.hpp"
+#include "../education/EducationChallenges.hpp"
 #include "../physics/PhysicsEngine.hpp"
 
 namespace bag {
@@ -140,10 +141,34 @@ void HUD::experimentPanel(const Simulation& simulation) const {
     text("P  launch probe at escape velocity", box.x + 18, box.y + 204, 11, alpha(RAYWHITE, 0.65f));
 }
 
+void HUD::challengePanel(const Simulation& simulation) const {
+    if (!simulation.education) return;
+    const ChallengeDefinition& challenge = challengeAt(simulation.challenge);
+    const Rectangle box = panel(400, 76, 420, 250);
+    text("CHALLENGE", box.x + 18, box.y + 16, 11, {255, 205, 105, 255});
+    text(challenge.title.c_str(), box.x + 18, box.y + 39, 19);
+    DrawTextEx(GetFontDefault(), challenge.description.c_str(), {box.x + 18, box.y + 73}, 14, 2, alpha(RAYWHITE, 0.82f));
+    text(("Objective: " + challenge.learningObjective).c_str(), box.x + 18, box.y + 125, 11, alpha({190, 215, 235, 255}, 0.82f));
+    if (challenge.kind == ChallengeKind::IntegratorComparison) {
+        text(("Method: " + std::string(integratorName(simulation.challengeIntegrator))).c_str(), box.x + 18, box.y + 150, 14, {150, 225, 255, 255});
+    } else {
+        text(("Answer: " + format(simulation.challengeAnswer, 2) + " SI").c_str(), box.x + 18, box.y + 150, 14, {150, 225, 255, 255});
+    }
+    if (simulation.lastChallengeResult) {
+        const ChallengeResult& result = *simulation.lastChallengeResult;
+        text((result.grade + "  " + format(result.score, 1) + "/100").c_str(), box.x + 18, box.y + 177, 15,
+             result.passed ? Color{80, 235, 150, 255} : ORANGE);
+        DrawTextEx(GetFontDefault(), result.feedback.c_str(), {box.x + 18, box.y + 201}, 12, 2, alpha(RAYWHITE, 0.75f));
+    } else {
+        text("Z / X challenge   [ / ] adjust   I method   C submit", box.x + 18, box.y + 188, 11, alpha(RAYWHITE, 0.58f));
+    }
+}
+
 void HUD::draw(const Simulation& simulation) const {
     top(simulation);
     lessonPanel(simulation);
     experimentPanel(simulation);
+    challengePanel(simulation);
     selectedInfo(simulation);
     bottom(simulation);
 }

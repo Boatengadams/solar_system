@@ -232,9 +232,12 @@ CMakeFiles/planets.dir/src/input/InputController.cpp.o: \
  /home/kali/Desktop/Cpp_Advance/src/input/../rendering/../simulation/../physics/../core/Color.hpp \
  /home/kali/Desktop/Cpp_Advance/src/input/../rendering/../simulation/../physics/PhysicsEngine.hpp \
  /home/kali/Desktop/Cpp_Advance/src/input/../rendering/../simulation/../telemetry/TelemetryTypes.hpp \
+ /home/kali/Desktop/Cpp_Advance/src/input/../rendering/../simulation/../education/EducationChallenges.hpp \
+ /home/kali/Desktop/Cpp_Advance/src/input/../rendering/../simulation/../education/EducationProgress.hpp \
  /home/kali/Desktop/Cpp_Advance/src/input/../rendering/../simulation/SimulationSettings.hpp \
  /usr/include/c++/15/algorithm /usr/include/c++/15/bits/stl_algo.h \
  /usr/include/c++/15/bits/algorithmfwd.h \
  /usr/include/c++/15/bits/stl_heap.h \
  /usr/include/c++/15/bits/stl_tempbuf.h \
- /usr/include/c++/15/pstl/glue_algorithm_defs.h
+ /usr/include/c++/15/pstl/glue_algorithm_defs.h \
+ /home/kali/Desktop/Cpp_Advance/src/input/../education/EducationContent.hpp
