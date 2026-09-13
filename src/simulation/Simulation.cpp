@@ -6,6 +6,7 @@
 
 #include "../core/Logger.hpp"
 #include "../data/BodyFactory.hpp"
+#include "../data/ResourceRoot.hpp"
 #include "../data/ScenarioLoader.hpp"
 #include "../data/ScenarioSerializer.hpp"
 #include "../education/EducationContent.hpp"
@@ -34,6 +35,14 @@ Simulation::Simulation(std::filesystem::path root)
     : educationProgress(lessonCount(), experimentCount(), challengeCount()),
       educationWorkflow(educationProgress, lessonCount(), experimentCount(), challengeCount()),
       dataRoot(std::move(root)) {
+    if (dataRoot.empty()) {
+        const auto resources = ResourceRoot::resolve();
+        if (resources) {
+            dataRoot = resources.dataRoot;
+        } else {
+            logError(resources.error);
+        }
+    }
     reset();
     setChallenge(0);
 }

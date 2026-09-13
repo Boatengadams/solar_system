@@ -1,0 +1,51 @@
+set(build_dir "@CMAKE_BINARY_DIR@")
+set(cmake_command "@CMAKE_COMMAND@")
+set(install_bindir "@CMAKE_INSTALL_BINDIR@")
+set(smoke_name "bagsolar_resource_smoke")
+
+if(DEFINED ENV{TMPDIR})
+    set(temp_root "$ENV{TMPDIR}")
+elseif(DEFINED ENV{TEMP})
+    set(temp_root "$ENV{TEMP}")
+elseif(DEFINED ENV{TMP})
+    set(temp_root "$ENV{TMP}")
+else()
+    set(temp_root "/tmp")
+endif()
+
+string(MD5 build_id "${build_dir}")
+set(smoke_root "${temp_root}/bagsolar-install-smoke-${build_id}")
+set(prefix "${smoke_root}/prefix")
+set(work_dir "${smoke_root}/work")
+file(REMOVE_RECURSE "${smoke_root}")
+file(MAKE_DIRECTORY "${work_dir}")
+
+execute_process(
+    COMMAND "${cmake_command}" --install "${build_dir}" --prefix "${prefix}"
+    RESULT_VARIABLE install_result
+    OUTPUT_VARIABLE install_output
+    ERROR_VARIABLE install_error)
+if(NOT install_result EQUAL 0)
+    message(FATAL_ERROR "install failed (${install_result})\n${install_output}\n${install_error}")
+endif()
+
+set(smoke_executable "${prefix}/${install_bindir}/${smoke_name}")
+if(NOT EXISTS "${smoke_executable}")
+    message(FATAL_ERROR "installed resource smoke executable is missing: ${smoke_executable}")
+endif()
+
+execute_process(
+    COMMAND "${smoke_executable}"
+    WORKING_DIRECTORY "${work_dir}"
+    RESULT_VARIABLE smoke_result
+    OUTPUT_VARIABLE smoke_output
+    ERROR_VARIABLE smoke_error)
+if(NOT smoke_result EQUAL 0)
+    message(FATAL_ERROR "installed resource smoke failed (${smoke_result})\n${smoke_output}\n${smoke_error}")
+endif()
+
+if(NOT smoke_output MATCHES "BAGSOLAR runtime data:")
+    message(FATAL_ERROR "installed smoke did not report resolved runtime data\n${smoke_output}")
+endif()
+
+message(STATUS "${smoke_output}")

@@ -1,6 +1,7 @@
 #include <raylib.h>
 
 #include "../core/Logger.hpp"
+#include "../data/ResourceRoot.hpp"
 #include "../input/InputController.hpp"
 #include "../rendering/Renderer.hpp"
 #include "../simulation/Simulation.hpp"
@@ -8,6 +9,12 @@
 
 int main() {
     using namespace bag;
+
+    const auto resources = ResourceRoot::resolve();
+    if (!resources) {
+        logError(resources.error);
+        return 1;
+    }
 
     SetConfigFlags(FLAG_WINDOW_HIGHDPI | FLAG_MSAA_4X_HINT | FLAG_VSYNC_HINT);
     InitWindow(Renderer::SCREEN_W, Renderer::SCREEN_H, "BAGSOLAR — Astronomical Laboratory");
@@ -18,7 +25,7 @@ int main() {
     logInfo("BAGSOLAR initialized");
     SetTargetFPS(60);
 
-    Simulation simulation;
+    Simulation simulation(resources.dataRoot);
     Renderer renderer;
     HUD hud;
     InputController input;

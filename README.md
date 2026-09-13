@@ -71,6 +71,11 @@ Run it with:
 ./build/planets
 ```
 
+The application resolves runtime data relative to the executable, so the
+source-tree build can be launched from another working directory when given
+its path. Required resources are `data/bodies/` and `data/scenarios/`; a
+missing resource is reported as an initialization error.
+
 For the Makefile build, run `./planets` instead.
 
 ## Source layout
@@ -112,6 +117,17 @@ cmake --build --preset debug --parallel 2
 ctest --preset debug
 cmake --build build --target package
 ```
+
+To verify an installed tree without opening the graphical window, run the
+installed headless resource check from outside the source tree:
+
+```sh
+cmake --install build --prefix /tmp/bagsolar-install
+(cd /tmp && /tmp/bagsolar-install/bin/bagsolar_resource_smoke)
+```
+
+The generated TGZ package contains the same data tree and resource check. The
+normal CTest suite runs both install and package smoke tests offline.
 
 SPICE is not bundled. The optional provider boundary reports unavailable until
 CSPICE and compatible kernels are supplied. Enable it with

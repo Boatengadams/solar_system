@@ -5,6 +5,7 @@ project(planets LANGUAGES CXX)
 set(BAGSOLAR_VERSION 0.10.0)
 
 include(CTest)
+include(GNUInstallDirs)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -39,6 +40,7 @@ set(BAGSOLAR_SOURCES
     src/astronomy/SpiceProvider.cpp
     src/core/Logger.cpp
     src/data/BodyFactory.cpp
+    src/data/ResourceRoot.cpp
     src/data/ScenarioLoader.cpp
     src/data/ScenarioSerializer.cpp
     src/education/EducationContent.cpp
@@ -76,6 +78,7 @@ target_include_directories(planets PRIVATE src)
 target_include_directories(planets PRIVATE third_party/nlohmann-json3-dev/usr/include)
 target_link_libraries(planets PRIVATE PkgConfig::RAYLIB)
 target_compile_definitions(planets PRIVATE BAGSOLAR_ENABLE_SPICE=$<BOOL:${BAGSOLAR_ENABLE_SPICE}>)
+target_compile_definitions(planets PRIVATE BAGSOLAR_INSTALL_DATA_SUBDIR="${CMAKE_INSTALL_DATADIR}/bagsolar/data")
 if(BAGSOLAR_ENABLE_SPICE)
     target_include_directories(planets PRIVATE "${CSPICE_INCLUDE_DIR}")
     target_link_libraries(planets PRIVATE "${CSPICE_LIBRARY}")
@@ -146,6 +149,7 @@ if(BUILD_TESTING)
         src/physics/PhysicsEngine.cpp
         src/physics/IntegratorBenchmark.cpp
         src/simulation/Simulation.cpp
+        src/data/ResourceRoot.cpp
         src/validation/PredictionComparison.cpp
         src/data/BodyFactory.cpp
         src/data/ScenarioLoader.cpp
@@ -184,6 +188,7 @@ if(BUILD_TESTING)
         src/physics/PhysicsEngine.cpp
         src/physics/IntegratorBenchmark.cpp
         src/simulation/Simulation.cpp
+        src/data/ResourceRoot.cpp
         src/validation/PredictionComparison.cpp
         src/data/BodyFactory.cpp
         src/data/ScenarioLoader.cpp
@@ -263,6 +268,7 @@ if(BUILD_TESTING)
             src/telemetry/TelemetryExporter.cpp
             src/telemetry/TelemetrySession.cpp
             src/simulation/Simulation.cpp
+            src/data/ResourceRoot.cpp
             src/data/BodyFactory.cpp
             src/data/ScenarioLoader.cpp
             src/data/ScenarioSerializer.cpp
@@ -289,6 +295,49 @@ if(BUILD_TESTING)
         add_test(NAME bagsolar_spice_live_tests COMMAND bagsolar_spice_live_tests)
         set_tests_properties(bagsolar_spice_live_tests PROPERTIES LABELS "spice;live" SKIP_RETURN_CODE 77 WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
     endif()
+endif()
+
+add_executable(bagsolar_resource_smoke
+    tests/resource_smoke.cpp
+    src/data/BodyFactory.cpp
+    src/data/ResourceRoot.cpp
+    src/data/ScenarioLoader.cpp
+    src/data/ScenarioSerializer.cpp
+    src/physics/PhysicsEngine.cpp
+)
+target_include_directories(bagsolar_resource_smoke PRIVATE src third_party/nlohmann-json3-dev/usr/include)
+target_compile_definitions(bagsolar_resource_smoke PRIVATE BAGSOLAR_INSTALL_DATA_SUBDIR="${CMAKE_INSTALL_DATADIR}/bagsolar/data")
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(bagsolar_resource_smoke PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
+if(BUILD_TESTING)
+    add_executable(bagsolar_resource_root_tests
+        tests/resource_root_tests.cpp
+        src/data/ResourceRoot.cpp
+    )
+    target_include_directories(bagsolar_resource_root_tests PRIVATE src)
+    target_compile_definitions(bagsolar_resource_root_tests PRIVATE BAGSOLAR_INSTALL_DATA_SUBDIR="${CMAKE_INSTALL_DATADIR}/bagsolar/data")
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        target_compile_options(bagsolar_resource_root_tests PRIVATE -Wall -Wextra -Wpedantic)
+    endif()
+    add_test(NAME bagsolar_resource_root_tests COMMAND bagsolar_resource_root_tests)
+    set_tests_properties(bagsolar_resource_root_tests PROPERTIES LABELS "unit;resources")
+
+    add_test(NAME bagsolar_resource_smoke COMMAND bagsolar_resource_smoke)
+    set_tests_properties(bagsolar_resource_smoke PROPERTIES LABELS "integration;resources")
+
+    configure_file(${CMAKE_SOURCE_DIR}/tests/install_smoke.cmake.in
+                   ${CMAKE_CURRENT_BINARY_DIR}/bagsolar_install_smoke.cmake @ONLY)
+    add_test(NAME bagsolar_install_smoke
+             COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/bagsolar_install_smoke.cmake)
+    set_tests_properties(bagsolar_install_smoke PROPERTIES LABELS "integration;install")
+
+    configure_file(${CMAKE_SOURCE_DIR}/tests/package_smoke.cmake.in
+                   ${CMAKE_CURRENT_BINARY_DIR}/bagsolar_package_smoke.cmake @ONLY)
+    add_test(NAME bagsolar_package_smoke
+             COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/bagsolar_package_smoke.cmake)
+    set_tests_properties(bagsolar_package_smoke PROPERTIES LABELS "integration;package")
 endif()
 
 add_executable(bagsolar_validation
@@ -321,11 +370,11 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(bagsolar_ephemeris PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 
-include(GNUInstallDirs)
-install(TARGETS planets bagsolar_validation bagsolar_ephemeris
+install(TARGETS planets bagsolar_validation bagsolar_ephemeris bagsolar_resource_smoke
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 install(DIRECTORY data/ DESTINATION ${CMAKE_INSTALL_DATADIR}/bagsolar/data)
 install(DIRECTORY BAGSOLAR_codex_docs/ DESTINATION ${CMAKE_INSTALL_DATADIR}/bagsolar/docs)
+install(FILES LICENSE DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/bagsolar)
 
 set(CPACK_PACKAGE_NAME "BAGSOLAR")
 set(CPACK_PACKAGE_VENDOR "BAGSOLAR Project")

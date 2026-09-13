@@ -41,7 +41,9 @@ the local provider.
 The `CurlHttpClient` is a small isolated command transport with a bounded
 timeout. It is used only when explicitly selected, including by the
 `bagsolar_ephemeris --horizons ...` CLI path. Standard builds and tests do not
-perform network requests.
+perform network requests, and curl is not required for local or JSON provider
+operation. If the curl executable is unavailable, the Horizons request fails
+with an explicit network/error status; no local-provider substitution occurs.
 
 ## Snapshots and simulation initialization
 

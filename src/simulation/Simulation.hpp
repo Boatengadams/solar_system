@@ -81,7 +81,7 @@ public:
     std::string ephemerisProvider;
     std::string ephemerisUnits = "SI";
 
-    explicit Simulation(std::filesystem::path dataRoot = "data");
+    explicit Simulation(std::filesystem::path dataRoot = {});
 
     void reset();
     bool loadScenario(const std::string& id);

@@ -214,5 +214,10 @@ Status: release infrastructure is implemented for Linux CI, CMake presets,
 CPack TGZ packaging, installation rules, and changelog/version metadata.
 Published binaries, media assets, and cross-platform CI remain outstanding.
 
+Phase 10.3 adds executable-relative resource discovery and offline install and
+package smoke tests. Installed execution is now covered for the documented
+Linux layout; published binaries, media assets, and cross-platform CI remain
+outstanding.
+
 ## Priority Rule
 Do not start advanced features until the previous phase has tests and a stable interface.

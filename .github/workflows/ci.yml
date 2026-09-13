@@ -16,6 +16,6 @@ jobs:
       - name: Build
         run: cmake --build --preset debug --parallel 2
       - name: Test
-        run: ctest --preset debug
+        run: ctest --preset debug --output-on-failure
       - name: Package
         run: cmake --build build --target package

@@ -30,15 +30,19 @@ ctest --test-dir build --output-on-failure
 The Makefile remains available as a second Linux build path and compiles the
 same `src/` sources.
 
-The application expects the external data tree relative to the working
-directory:
+The application requires this runtime data tree:
 
 ```text
 data/bodies/*.json
 data/scenarios/*.json
 ```
 
-Run from the project root so the default `data` path resolves correctly.
+For a source-tree build, the resolver finds `data/` beside the source checkout
+when the executable is under `build/` or at the repository root. For an
+installed build, it finds `${prefix}/share/bagsolar/data` relative to the
+installed executable in `${prefix}/bin`, independent of the caller's working
+directory. Missing required resources produce an explicit initialization
+failure.
 
 Phase 6 also builds `bagsolar_ephemeris`. It has no mandatory HTTP library;
 the explicit Horizons transport invokes the local `curl` executable when the
@@ -57,6 +61,17 @@ cmake --build --preset debug --parallel 2
 ctest --preset debug
 cmake --build build --target package
 ```
+
+Install and validate from outside the source tree:
+
+```sh
+cmake --install build --prefix /tmp/bagsolar-install
+(cd /tmp && /tmp/bagsolar-install/bin/bagsolar_resource_smoke)
+```
+
+The CTest targets `bagsolar_resource_smoke`, `bagsolar_install_smoke`, and
+`bagsolar_package_smoke` exercise source-tree resolution, a temporary install,
+and an extracted TGZ package without requiring a display or network access.
 
 To request the optional path, configure a separate build directory. CMake
 fails immediately if the requested CSPICE header or library is missing:

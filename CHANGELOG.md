@@ -1,5 +1,12 @@
 # Changelog
 
+## Phase 10.3 — Install and package reproducibility
+
+- Added executable-relative runtime resource discovery for source-tree and
+  installed layouts.
+- Added headless source, install, and CPack package smoke tests.
+- Documented installed execution and the optional curl-backed Horizons path.
+
 ## Phase 10.2 — Repository and licensing hygiene
 
 - Removed tracked generated build outputs and the tracked development binary.

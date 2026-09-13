@@ -1,0 +1,79 @@
+set(build_dir "@CMAKE_BINARY_DIR@")
+set(cmake_command "@CMAKE_COMMAND@")
+set(install_bindir "@CMAKE_INSTALL_BINDIR@")
+set(smoke_name "bagsolar_resource_smoke")
+
+if(DEFINED ENV{TMPDIR})
+    set(temp_root "$ENV{TMPDIR}")
+elseif(DEFINED ENV{TEMP})
+    set(temp_root "$ENV{TEMP}")
+elseif(DEFINED ENV{TMP})
+    set(temp_root "$ENV{TMP}")
+else()
+    set(temp_root "/tmp")
+endif()
+
+string(MD5 build_id "${build_dir}")
+set(smoke_root "${temp_root}/bagsolar-package-smoke-${build_id}")
+set(package_extract "${smoke_root}/extract")
+set(work_dir "${smoke_root}/work")
+file(REMOVE_RECURSE "${smoke_root}")
+file(MAKE_DIRECTORY "${package_extract}" "${work_dir}")
+
+file(GLOB old_packages "${build_dir}/BAGSOLAR-*.tar.gz")
+if(old_packages)
+    file(REMOVE ${old_packages})
+endif()
+
+execute_process(
+    COMMAND "${cmake_command}" --build "${build_dir}" --target package --parallel 2
+    RESULT_VARIABLE package_result
+    OUTPUT_VARIABLE package_output
+    ERROR_VARIABLE package_error)
+if(NOT package_result EQUAL 0)
+    message(FATAL_ERROR "package build failed (${package_result})\n${package_output}\n${package_error}")
+endif()
+
+file(GLOB packages "${build_dir}/BAGSOLAR-*.tar.gz")
+list(LENGTH packages package_count)
+if(NOT package_count EQUAL 1)
+    message(FATAL_ERROR "expected exactly one generated BAGSOLAR package, found ${package_count}")
+endif()
+list(GET packages 0 package_file)
+
+execute_process(
+    COMMAND "${cmake_command}" -E tar xzf "${package_file}"
+    WORKING_DIRECTORY "${package_extract}"
+    RESULT_VARIABLE extract_result
+    OUTPUT_VARIABLE extract_output
+    ERROR_VARIABLE extract_error)
+if(NOT extract_result EQUAL 0)
+    message(FATAL_ERROR "package extraction failed (${extract_result})\n${extract_output}\n${extract_error}")
+endif()
+
+file(GLOB extracted_roots LIST_DIRECTORIES true "${package_extract}/BAGSOLAR-*")
+list(LENGTH extracted_roots extracted_count)
+if(NOT extracted_count EQUAL 1)
+    message(FATAL_ERROR "package extraction produced no top-level BAGSOLAR directory")
+endif()
+list(GET extracted_roots 0 package_root)
+set(smoke_executable "${package_root}/${install_bindir}/${smoke_name}")
+if(NOT EXISTS "${smoke_executable}")
+    message(FATAL_ERROR "packaged resource smoke executable is missing: ${smoke_executable}")
+endif()
+
+execute_process(
+    COMMAND "${smoke_executable}"
+    WORKING_DIRECTORY "${work_dir}"
+    RESULT_VARIABLE smoke_result
+    OUTPUT_VARIABLE smoke_output
+    ERROR_VARIABLE smoke_error)
+if(NOT smoke_result EQUAL 0)
+    message(FATAL_ERROR "packaged resource smoke failed (${smoke_result})\n${smoke_output}\n${smoke_error}")
+endif()
+
+if(NOT smoke_output MATCHES "BAGSOLAR runtime data:")
+    message(FATAL_ERROR "packaged smoke did not report resolved runtime data\n${smoke_output}")
+endif()
+
+message(STATUS "${smoke_output}")
