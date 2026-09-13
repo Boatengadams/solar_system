@@ -100,6 +100,13 @@ escape/circular/integrator/timestep scoring, Hohmann transfer scoring against
 the existing analytical physics reference, invalid radii and non-finite
 answers, pass/fail boundaries, and repeated-result determinism.
 
+It also evaluates the experiment catalog: analytical escape velocity, Kepler
+period, gravity, Hohmann, and gravity-assist references; bounded orbital
+energy and conservation behavior; IntegratorBenchmark comparison; and
+timestep convergence. Tests cover insufficient data, invalid/non-finite
+measurements, scoring thresholds, deterministic feedback, and recording
+evaluation attempts/results in durable progress.
+
 It also covers version-1 education-progress JSON round trips, preservation of
 attempts/best scores/metrics, file save/load, malformed JSON, unsupported
 schema versions, missing fields, invalid metric values, and the requirement

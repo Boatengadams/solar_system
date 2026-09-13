@@ -2,12 +2,14 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 
 #include "../core/Logger.hpp"
 #include "../data/BodyFactory.hpp"
 #include "../data/ScenarioLoader.hpp"
 #include "../data/ScenarioSerializer.hpp"
 #include "../education/EducationContent.hpp"
+#include "../missions/Mission.hpp"
 #include "../telemetry/TelemetryExporter.hpp"
 
 namespace bag {
@@ -63,6 +65,7 @@ bool Simulation::loadScenario(const std::string& id) {
     paused = false;
     challengeScore = 0.0;
     lastChallengeResult.reset();
+    lastExperimentEvaluation.reset();
     return true;
 }
 
@@ -309,6 +312,53 @@ void Simulation::cycleChallengeIntegrator(int direction) {
     current = (current + (direction >= 0 ? 1 : -1) + 4) % 4;
     challengeIntegrator = integrators[current];
     lastChallengeResult.reset();
+}
+
+bool Simulation::evaluateCurrentExperiment() {
+    if (experiment < 0 || experiment >= experimentCount()) return false;
+    ExperimentObservation observation;
+    int bodyIndex = selected;
+    if (bodyIndex < 0 || bodyIndex >= static_cast<int>(bodies.size()) || !bodies[static_cast<std::size_t>(bodyIndex)].active) {
+        const auto found = std::find_if(bodies.begin(), bodies.end(), [](const Body& body) {
+            return body.active && body.mass > 0.0 && body.id != "sun";
+        });
+        if (found == bodies.end()) return false;
+        bodyIndex = static_cast<int>(std::distance(bodies.begin(), found));
+    }
+    const Body& body = bodies[static_cast<std::size_t>(bodyIndex)];
+    observation.radiusM = distanceFromSun(body);
+
+    const std::string id = experimentAt(experiment).id;
+    if (id == "escape-velocity") observation.measuredPrimaryValue = length(body.velocity);
+    else if (id == "kepler-test") {
+        observation.measuredPrimaryValue = orbitalElements(body).period;
+    } else if (id == "gravity-lab") {
+        bool valid = false;
+        observation.measuredPrimaryValue = length(PhysicsEngine::acceleration(bodies, bodyIndex, {}, &valid));
+        if (!valid) observation.measuredPrimaryValue = std::numeric_limits<double>::quiet_NaN();
+    } else if (id == "orbit-energy") observation.measuredPrimaryValue = specificEnergy(body);
+    else if (id == "hohmann-lab") {
+        const HohmannTransfer reference = PhysicsEngine::hohmannTransfer(
+            PhysicsEngine::AU, 1.524 * PhysicsEngine::AU, PhysicsEngine::SOLAR_MASS);
+        observation.radiusM = PhysicsEngine::AU;
+        observation.targetRadiusM = 1.524 * PhysicsEngine::AU;
+        observation.measuredPrimaryValue = reference.valid ? reference.totalDeltaV : std::numeric_limits<double>::quiet_NaN();
+    } else if (id == "numerical-methods") {
+        if (bodyIndex == 0) return false;
+        std::vector<Body> fixture{bodies.front(), body};
+        IntegratorBenchmarkConfig config;
+        config.timestep = 6.0 * 3600.0;
+        config.duration = 10.0 * PhysicsEngine::DAY;
+        config.referenceTimestep = 3.0 * 3600.0;
+        observation.integratorMetrics = compareIntegrators(fixture, config);
+    } else {
+        lastExperimentEvaluation = evaluateExperiment(id, observation);
+        if (lastExperimentEvaluation->valid) educationProgress.recordExperimentEvaluation(experiment, *lastExperimentEvaluation);
+        return true;
+    }
+    lastExperimentEvaluation = evaluateExperiment(id, observation);
+    if (lastExperimentEvaluation->valid) educationProgress.recordExperimentEvaluation(experiment, *lastExperimentEvaluation);
+    return true;
 }
 
 bool Simulation::submitChallenge() {

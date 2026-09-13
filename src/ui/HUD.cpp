@@ -137,8 +137,15 @@ void HUD::experimentPanel(const Simulation& simulation) const {
     text(experiment.title, box.x + 18, box.y + 39, 19);
     DrawTextEx(GetFontDefault(), experiment.prompt, {box.x + 18, box.y + 74}, 15, 2, alpha(RAYWHITE, 0.82f));
     text(experiment.equation, box.x + 18, box.y + 137, 21, {150, 225, 255, 255});
-    text("↑ / ↓  change experiment", box.x + 18, box.y + 184, 11, alpha(RAYWHITE, 0.48f));
-    text("P  launch probe at escape velocity", box.x + 18, box.y + 204, 11, alpha(RAYWHITE, 0.65f));
+    text("↑ / ↓  change   Y  evaluate", box.x + 18, box.y + 184, 11, alpha(RAYWHITE, 0.48f));
+    if (simulation.lastExperimentEvaluation) {
+        const ExperimentEvaluation& result = *simulation.lastExperimentEvaluation;
+        text((std::string(experimentEvaluationStatusName(result.status)) + "  " + result.grade + "  " + format(result.score, 1) + "/100").c_str(),
+             box.x + 18, box.y + 204, 12, result.passed ? Color{80, 235, 150, 255} : ORANGE);
+        DrawTextEx(GetFontDefault(), result.feedback.c_str(), {box.x + 18, box.y + 222}, 10, 1, alpha(RAYWHITE, 0.75f));
+    } else {
+        text("P  launch probe at escape velocity", box.x + 18, box.y + 204, 11, alpha(RAYWHITE, 0.65f));
+    }
 }
 
 void HUD::challengePanel(const Simulation& simulation) const {

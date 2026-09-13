@@ -12,9 +12,10 @@ void InputController::update(Simulation& simulation, Renderer& renderer) const {
     if (IsKeyPressed(KEY_L)) simulation.education = !simulation.education;
     if (IsKeyPressed(KEY_A)) simulation.lesson = (simulation.lesson + lessonCount() - 1) % lessonCount();
     if (IsKeyPressed(KEY_D)) simulation.lesson = (simulation.lesson + 1) % lessonCount();
-    if (IsKeyPressed(KEY_E)) simulation.experiment = (simulation.experiment + 1) % experimentCount();
-    if (IsKeyPressed(KEY_UP)) simulation.experiment = (simulation.experiment + experimentCount() - 1) % experimentCount();
-    if (IsKeyPressed(KEY_DOWN)) simulation.experiment = (simulation.experiment + 1) % experimentCount();
+    if (IsKeyPressed(KEY_E)) { simulation.experiment = (simulation.experiment + 1) % experimentCount(); simulation.lastExperimentEvaluation.reset(); }
+    if (IsKeyPressed(KEY_UP)) { simulation.experiment = (simulation.experiment + experimentCount() - 1) % experimentCount(); simulation.lastExperimentEvaluation.reset(); }
+    if (IsKeyPressed(KEY_DOWN)) { simulation.experiment = (simulation.experiment + 1) % experimentCount(); simulation.lastExperimentEvaluation.reset(); }
+    if (IsKeyPressed(KEY_Y)) simulation.evaluateCurrentExperiment();
     if (IsKeyPressed(KEY_Z)) simulation.setChallenge(simulation.challenge - 1);
     if (IsKeyPressed(KEY_X)) simulation.setChallenge(simulation.challenge + 1);
     if (IsKeyPressed(KEY_LEFT_BRACKET)) simulation.adjustChallengeAnswer(-0.05);

@@ -12,6 +12,11 @@
   a minimal raylib challenge panel/input flow.
 - Added education challenge regression coverage and deterministic progress
   export.
+- Added deterministic experiment-result evaluators for analytical references,
+  bounded physical behavior, numerical-method comparison, timestep
+  convergence, and conservation metrics.
+- Added experiment evaluation persistence and a minimal `Y`-key HUD result
+  flow without changing the physics engine or adding UI dependencies.
 
 ## 0.10.0
 

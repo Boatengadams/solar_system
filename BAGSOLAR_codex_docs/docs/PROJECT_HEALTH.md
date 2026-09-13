@@ -35,28 +35,35 @@ arbitrary frame rotations.
 ### Implemented
 
 - Nine-lesson deterministic catalog.
-- Six guided experiment definitions.
+- Nine guided experiment definitions.
 - Raylib-independent progress tracking.
 - Lesson and experiment completion state.
 - Student observation recording.
 - Deterministic completion reports.
-- Four deterministic interactive challenge definitions.
+- Five deterministic interactive challenge definitions.
 - Analytical escape-velocity and circular-orbit scoring.
 - Integrator and timestep comparison/scoring using existing benchmark metrics.
 - Hohmann transfer scoring using the existing analytical physics reference.
 - Learner-facing challenge results in the raylib HUD.
 - Challenge attempts, best/latest scores, metrics, versioned JSON persistence,
   and parse-validate-commit import.
+- Deterministic experiment-result evaluators for all nine catalog experiments,
+  reusing PhysicsEngine, mission, and IntegratorBenchmark references.
+- Experiment evaluation attempts, completion, scores, grades, metrics, and
+  backward-compatible schema-1 persistence.
+- Minimal HUD evaluation flow: `Y` evaluates the current experiment and shows
+  its status, score, grade, and feedback.
 - Education unit tests and CTest integration.
 
 ### Remaining
 
 - Broader interactive challenge catalog.
-- Broader lesson-specific experiment result evaluation.
-- Richer education UI integration.
+- Broader learner-facing experiment workflows and richer evaluation display.
+- Additional challenge/content authoring and progress views.
 
-Phase 9 remains partial: challenge/scoring and durable progress checklist work
-is complete, while broader education scope remains.
+Phase 9 remains partial: challenge/scoring, durable progress, and structured
+experiment evaluation are implemented, while broader education UI/catalog
+scope remains.
 
 ## Current Phase 10 status
 
@@ -112,12 +119,12 @@ loading, `spkezr_c` extraction, finite state values, SI-scale conversion,
 frame/origin metadata, simulation initialization, and telemetry provenance.
 
 The Makefile targets `make`, `make test`, `make validation`, `make education`,
-and `make ephemeris` pass. The Makefile compiles with
-`-Wall -Wextra -Wpedantic`; its validation, education, and ephemeris
-compilations completed without warnings. A separate clean CMake warning build
-was started but did not finish within its bounded window. Exact `git diff
---check` currently reports trailing whitespace/new-blank-line errors in
-generated, historically tracked `build/` files.
+and `make ephemeris` pass. The CMake and Make builds compile with
+`-Wall -Wextra -Wpedantic` and completed without new warnings. The SPICE build
+and live test also pass with the same warning flags. `git diff --check` passes
+for the current source and documentation changes. Historically tracked
+generated build files remain in the repository, while `.gitignore` prevents
+future build artifacts from being added.
 
 ## Release blockers
 

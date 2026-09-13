@@ -4,6 +4,7 @@
 #include <cmath>
 #include <fstream>
 #include <iomanip>
+#include <limits>
 #include <sstream>
 
 #include <nlohmann/json.hpp>
@@ -19,6 +20,19 @@ bool finiteScore(double value) {
 }
 
 bool finiteMetric(double value) { return std::isfinite(value); }
+
+Json optionalNumber(double value) { return finiteMetric(value) ? Json(value) : Json(nullptr); }
+
+bool optionalNumberFromJson(const Json& object, const char* name, double& output) {
+    if (!object.contains(name)) return false;
+    if (object[name].is_null()) {
+        output = std::numeric_limits<double>::quiet_NaN();
+        return true;
+    }
+    if (!object[name].is_number()) return false;
+    output = object[name].get<double>();
+    return finiteMetric(output);
+}
 
 Json metricsToJson(const ChallengeMetrics& metrics) {
     return {
@@ -112,12 +126,83 @@ bool stringVectorFromJson(const Json& value, std::size_t expected, std::vector<s
     return true;
 }
 
+Json experimentMetricsToJson(const ExperimentEvaluationMetrics& metrics) {
+    return {
+        {"measured_primary_value", optionalNumber(metrics.measuredPrimaryValue)},
+        {"measured_secondary_value", optionalNumber(metrics.measuredSecondaryValue)},
+        {"reference_primary_value", optionalNumber(metrics.referencePrimaryValue)},
+        {"reference_secondary_value", optionalNumber(metrics.referenceSecondaryValue)},
+        {"absolute_primary_error", optionalNumber(metrics.absolutePrimaryError)},
+        {"absolute_secondary_error", optionalNumber(metrics.absoluteSecondaryError)},
+        {"primary_relative_error", optionalNumber(metrics.primaryRelativeError)},
+        {"secondary_relative_error", optionalNumber(metrics.secondaryRelativeError)},
+        {"energy_drift", optionalNumber(metrics.energyDrift)},
+        {"angular_momentum_drift", optionalNumber(metrics.angularMomentumDrift)},
+        {"position_error", optionalNumber(metrics.positionErrorM)},
+        {"velocity_error", optionalNumber(metrics.velocityErrorMps)},
+        {"orbital_period_error", optionalNumber(metrics.orbitalPeriodError)},
+        {"normalized_error", optionalNumber(metrics.normalizedError)},
+        {"improvement_ratio", optionalNumber(metrics.improvementRatio)},
+        {"numerically_stable", metrics.numericallyStable},
+    };
+}
+
+bool experimentMetricsFromJson(const Json& value, ExperimentEvaluationMetrics& metrics) {
+    if (!value.is_object() || !value.contains("numerically_stable") || !value["numerically_stable"].is_boolean()) return false;
+    struct Field { const char* name; double* target; } fields[] = {
+        {"measured_primary_value", &metrics.measuredPrimaryValue},
+        {"measured_secondary_value", &metrics.measuredSecondaryValue},
+        {"reference_primary_value", &metrics.referencePrimaryValue},
+        {"reference_secondary_value", &metrics.referenceSecondaryValue},
+        {"absolute_primary_error", &metrics.absolutePrimaryError},
+        {"absolute_secondary_error", &metrics.absoluteSecondaryError},
+        {"primary_relative_error", &metrics.primaryRelativeError},
+        {"secondary_relative_error", &metrics.secondaryRelativeError},
+        {"energy_drift", &metrics.energyDrift},
+        {"angular_momentum_drift", &metrics.angularMomentumDrift},
+        {"position_error", &metrics.positionErrorM},
+        {"velocity_error", &metrics.velocityErrorMps},
+        {"orbital_period_error", &metrics.orbitalPeriodError},
+        {"normalized_error", &metrics.normalizedError},
+        {"improvement_ratio", &metrics.improvementRatio},
+    };
+    for (const Field& field : fields) if (!optionalNumberFromJson(value, field.name, *field.target)) return false;
+    metrics.numericallyStable = value["numerically_stable"].get<bool>();
+    return true;
+}
+
+bool experimentProgressFromJson(const Json& value, ExperimentProgress& progress) {
+    if (!value.is_object() || !value.contains("attempts") || !value["attempts"].is_number_integer() ||
+        !value.contains("completed") || !value["completed"].is_boolean() ||
+        !value.contains("best_score") || !value["best_score"].is_number() ||
+        !value.contains("latest_score") || !value["latest_score"].is_number() ||
+        !value.contains("latest_grade") || !value["latest_grade"].is_string() ||
+        !value.contains("latest_status") || !value["latest_status"].is_number_integer() ||
+        !value.contains("latest_mode") || !value["latest_mode"].is_number_integer() ||
+        !value.contains("latest_metrics")) return false;
+    const int attempts = value["attempts"].get<int>();
+    const int status = value["latest_status"].get<int>();
+    const int mode = value["latest_mode"].get<int>();
+    const double best = value["best_score"].get<double>();
+    const double latest = value["latest_score"].get<double>();
+    if (attempts < 0 || !finiteScore(best) || !finiteScore(latest) || status < 0 || status > static_cast<int>(ExperimentEvaluationStatus::Unsupported) || mode < 0 || mode > static_cast<int>(ExperimentEvaluationMode::NumericalComparison) || !experimentMetricsFromJson(value["latest_metrics"], progress.latestMetrics)) return false;
+    progress.attempts = attempts;
+    progress.completed = value["completed"].get<bool>();
+    progress.bestScore = best;
+    progress.latestScore = latest;
+    progress.latestGrade = value["latest_grade"].get<std::string>();
+    progress.latestStatus = static_cast<ExperimentEvaluationStatus>(status);
+    progress.latestMode = static_cast<ExperimentEvaluationMode>(mode);
+    return true;
+}
+
 } // namespace
 
 EducationProgress::EducationProgress(int lessonCount, int experimentCount, int challengeCount)
     : lessons(static_cast<std::size_t>(std::max(0, lessonCount)), false),
       experiments(static_cast<std::size_t>(std::max(0, experimentCount)), false),
       experimentObservations(static_cast<std::size_t>(std::max(0, experimentCount))),
+      experimentEvaluations(static_cast<std::size_t>(std::max(0, experimentCount))),
       challenges(static_cast<std::size_t>(std::max(0, challengeCount))) {}
 
 bool EducationProgress::completeLesson(int index) {
@@ -151,6 +236,22 @@ bool EducationProgress::recordChallengeResult(int challengeIndex, const Challeng
     return true;
 }
 
+bool EducationProgress::recordExperimentEvaluation(int experimentIndex, const ExperimentEvaluation& result) {
+    if (experimentIndex < 0 || experimentIndex >= static_cast<int>(experimentEvaluations.size()) ||
+        !experimentEvaluationIsPersistable(result)) return false;
+    ExperimentProgress& progress = experimentEvaluations[static_cast<std::size_t>(experimentIndex)];
+    ++progress.attempts;
+    progress.latestScore = result.score;
+    progress.bestScore = std::max(progress.bestScore, result.score);
+    progress.completed = progress.completed || result.passed;
+    progress.latestGrade = result.grade;
+    progress.latestStatus = result.status;
+    progress.latestMode = result.mode;
+    progress.latestMetrics = result.metrics;
+    if (result.passed) experiments[static_cast<std::size_t>(experimentIndex)] = true;
+    return true;
+}
+
 bool EducationProgress::lessonComplete(int index) const { return index >= 0 && index < static_cast<int>(lessons.size()) && lessons[static_cast<std::size_t>(index)]; }
 bool EducationProgress::experimentComplete(int index) const { return index >= 0 && index < static_cast<int>(experiments.size()) && experiments[static_cast<std::size_t>(index)]; }
 bool EducationProgress::challengeComplete(int index) const { return index >= 0 && index < static_cast<int>(challenges.size()) && challenges[static_cast<std::size_t>(index)].completed; }
@@ -158,11 +259,16 @@ const ChallengeProgress* EducationProgress::challengeProgress(int index) const {
     if (index < 0 || index >= static_cast<int>(challenges.size())) return nullptr;
     return &challenges[static_cast<std::size_t>(index)];
 }
+const ExperimentProgress* EducationProgress::experimentProgress(int index) const {
+    if (index < 0 || index >= static_cast<int>(experimentEvaluations.size())) return nullptr;
+    return &experimentEvaluations[static_cast<std::size_t>(index)];
+}
 
 void EducationProgress::reset() {
     std::fill(lessons.begin(), lessons.end(), false);
     std::fill(experiments.begin(), experiments.end(), false);
     std::fill(experimentObservations.begin(), experimentObservations.end(), std::string{});
+    experimentEvaluations.assign(experimentEvaluations.size(), ExperimentProgress{});
     challenges.assign(challenges.size(), ChallengeProgress{});
 }
 
@@ -186,6 +292,17 @@ std::string EducationProgress::serialize() const {
     root["lessons"] = lessons;
     root["experiments"] = experiments;
     root["observations"] = experimentObservations;
+    root["experiment_evaluations"] = Json::array();
+    for (const ExperimentProgress& progress : experimentEvaluations) {
+        root["experiment_evaluations"].push_back({
+            {"attempts", progress.attempts}, {"completed", progress.completed},
+            {"best_score", progress.bestScore}, {"latest_score", progress.latestScore},
+            {"latest_grade", progress.latestGrade},
+            {"latest_status", static_cast<int>(progress.latestStatus)},
+            {"latest_mode", static_cast<int>(progress.latestMode)},
+            {"latest_metrics", experimentMetricsToJson(progress.latestMetrics)},
+        });
+    }
     root["challenges"] = Json::array();
     for (const ChallengeProgress& progress : challenges) {
         root["challenges"].push_back({
@@ -216,10 +333,18 @@ bool EducationProgress::deserialize(const std::string& serialized) {
     std::vector<bool> parsedLessons;
     std::vector<bool> parsedExperiments;
     std::vector<std::string> parsedObservations;
+    std::vector<ExperimentProgress> parsedExperimentEvaluations(experimentEvaluations.size());
     std::vector<ChallengeProgress> parsedChallenges(challenges.size());
     if (!boolVectorFromJson(root["lessons"], lessons.size(), parsedLessons) ||
         !boolVectorFromJson(root["experiments"], experiments.size(), parsedExperiments) ||
         !stringVectorFromJson(root["observations"], experimentObservations.size(), parsedObservations)) return false;
+
+    if (root.contains("experiment_evaluations")) {
+        if (!root["experiment_evaluations"].is_array() || root["experiment_evaluations"].size() != parsedExperimentEvaluations.size()) return false;
+        for (std::size_t index = 0; index < parsedExperimentEvaluations.size(); ++index) {
+            if (!experimentProgressFromJson(root["experiment_evaluations"][index], parsedExperimentEvaluations[index])) return false;
+        }
+    }
 
     for (std::size_t index = 0; index < parsedChallenges.size(); ++index) {
         const Json& item = root["challenges"][index];
@@ -242,6 +367,7 @@ bool EducationProgress::deserialize(const std::string& serialized) {
     lessons = std::move(parsedLessons);
     experiments = std::move(parsedExperiments);
     experimentObservations = std::move(parsedObservations);
+    experimentEvaluations = std::move(parsedExperimentEvaluations);
     challenges = std::move(parsedChallenges);
     return true;
 }
@@ -268,6 +394,12 @@ std::string EducationProgress::exportText() const {
     output << "lessons," << lessons.size() << "\n";
     output << "experiments," << experiments.size() << "\n";
     output << "challenges," << challenges.size() << "\n";
+    output << "evaluated_experiments," << experimentEvaluations.size() << "\n";
+    for (std::size_t index = 0; index < experimentEvaluations.size(); ++index) {
+        const ExperimentProgress& progress = experimentEvaluations[index];
+        output << "experiment," << index << ',' << progress.attempts << ',' << (progress.completed ? 1 : 0)
+               << ',' << std::fixed << std::setprecision(6) << progress.bestScore << ',' << progress.latestScore << ',' << progress.latestGrade << "\n";
+    }
     for (std::size_t index = 0; index < challenges.size(); ++index) {
         const ChallengeProgress& progress = challenges[index];
         output << "challenge," << index << ',' << progress.attempts << ',' << (progress.completed ? 1 : 0)

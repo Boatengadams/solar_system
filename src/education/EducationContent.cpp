@@ -16,12 +16,15 @@ constexpr Lesson LESSONS[] = {
 };
 
 constexpr Experiment EXPERIMENTS[] = {
-    {"ESCAPE VELOCITY", "How fast must BAGSOLAR-1 travel to escape the Sun from its current distance?", "vₑ = √(2GM/r)"},
-    {"KEPLER TEST", "Move through the planets and compare distance with orbital period.", "T² ∝ a³"},
-    {"GRAVITY LAB", "Change mass and distance mentally, then observe the acceleration.", "F = Gm₁m₂/r²"},
-    {"ORBIT ENERGY", "A negative specific orbital energy means the object is gravitationally bound.", "ε = v²/2 − GM/r"},
-    {"HOHMANN LAB", "Compare the departure and arrival burns required for two circular orbits.", "Δv = v_transfer − v_circular"},
-    {"ASSIST LAB", "Vary periapsis and incoming hyperbolic excess speed to inspect turn angle.", "δ = 2 asin(1/e)"},
+    {"escape-velocity", "ESCAPE VELOCITY", "How fast must BAGSOLAR-1 travel to escape the Sun from its current distance?", "vₑ = √(2GM/r)"},
+    {"kepler-test", "KEPLER TEST", "Move through the planets and compare distance with orbital period.", "T² ∝ a³"},
+    {"gravity-lab", "GRAVITY LAB", "Change mass and distance mentally, then observe the acceleration.", "F = Gm₁m₂/r²"},
+    {"orbit-energy", "ORBIT ENERGY", "A negative specific orbital energy means the object is gravitationally bound.", "ε = v²/2 − GM/r"},
+    {"hohmann-lab", "HOHMANN LAB", "Compare the departure and arrival burns required for two circular orbits.", "Δv = v_transfer − v_circular"},
+    {"assist-lab", "ASSIST LAB", "Vary periapsis and incoming hyperbolic excess speed to inspect turn angle.", "δ = 2 asin(1/e)"},
+    {"numerical-methods", "NUMERICAL METHODS", "Compare integrators using energy, endpoint, and stability metrics.", "error = reference − propagated state"},
+    {"timestep-sensitivity", "TIMESTEP TEST", "Halve the timestep and inspect convergence of the propagated orbit.", "error decreases as Δt decreases"},
+    {"conservation", "CONSERVATION TEST", "Inspect energy and angular-momentum drift in an isolated orbit.", "ΔE/E and ΔL/L"},
 };
 
 } // namespace

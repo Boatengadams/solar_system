@@ -43,6 +43,7 @@ set(BAGSOLAR_SOURCES
     src/data/ScenarioSerializer.cpp
     src/education/EducationContent.cpp
     src/education/EducationChallenges.cpp
+    src/education/ExperimentEvaluation.cpp
     src/education/EducationProgress.cpp
     src/input/InputController.cpp
     src/physics/PhysicsEngine.cpp
@@ -127,8 +128,11 @@ if(BUILD_TESTING)
         src/telemetry/TelemetryExporter.cpp
         src/telemetry/TelemetrySession.cpp
         src/education/EducationChallenges.cpp
+        src/education/ExperimentEvaluation.cpp
         src/education/EducationContent.cpp
         src/education/EducationProgress.cpp
+        src/missions/Mission.cpp
+        src/spacecraft/Spacecraft.cpp
         src/physics/PhysicsEngine.cpp
         src/physics/IntegratorBenchmark.cpp
         src/simulation/Simulation.cpp
@@ -158,8 +162,11 @@ if(BUILD_TESTING)
         src/telemetry/TelemetryExporter.cpp
         src/telemetry/TelemetrySession.cpp
         src/education/EducationChallenges.cpp
+        src/education/ExperimentEvaluation.cpp
         src/education/EducationContent.cpp
         src/education/EducationProgress.cpp
+        src/missions/Mission.cpp
+        src/spacecraft/Spacecraft.cpp
         src/physics/PhysicsEngine.cpp
         src/physics/IntegratorBenchmark.cpp
         src/simulation/Simulation.cpp
@@ -193,8 +200,11 @@ if(BUILD_TESTING)
     add_executable(bagsolar_education_tests
         tests/education_tests.cpp
         src/education/EducationChallenges.cpp
+        src/education/ExperimentEvaluation.cpp
         src/education/EducationContent.cpp
         src/education/EducationProgress.cpp
+        src/missions/Mission.cpp
+        src/spacecraft/Spacecraft.cpp
         src/physics/PhysicsEngine.cpp
         src/physics/IntegratorBenchmark.cpp
     )
@@ -236,7 +246,14 @@ if(BUILD_TESTING)
             src/data/BodyFactory.cpp
             src/data/ScenarioLoader.cpp
             src/data/ScenarioSerializer.cpp
+            src/education/EducationContent.cpp
+            src/education/EducationChallenges.cpp
+            src/education/ExperimentEvaluation.cpp
+            src/education/EducationProgress.cpp
+            src/missions/Mission.cpp
+            src/spacecraft/Spacecraft.cpp
             src/physics/PhysicsEngine.cpp
+            src/physics/IntegratorBenchmark.cpp
             src/core/Logger.cpp
         )
         target_include_directories(bagsolar_spice_live_tests PRIVATE src third_party/nlohmann-json3-dev/usr/include "${CSPICE_INCLUDE_DIR}")

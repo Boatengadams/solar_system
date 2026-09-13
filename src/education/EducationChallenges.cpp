@@ -22,7 +22,7 @@ double relativeError(double actual, double expected) {
     return std::abs(actual - expected) / std::max(std::abs(expected), 1.0e-12);
 }
 
-double scoreFromError(double error, const ChallengeScoringRules& rules) {
+double scoreRelativeErrorInternal(double error, const ChallengeScoringRules& rules) {
     if (!std::isfinite(error) || rules.fullCreditRelativeError < 0.0 ||
         rules.passingRelativeError < rules.fullCreditRelativeError) return 0.0;
     if (error <= rules.fullCreditRelativeError) return 100.0;
@@ -189,7 +189,7 @@ ChallengeResult evaluateScalar(const ChallengeDefinition& challenge, const Chall
     result.metrics.absolutePrimaryError = std::abs(actual - expected);
     if (secondary) result.metrics.secondaryRelativeError = error;
     else result.metrics.primaryRelativeError = error;
-    result.score = scoreFromError(error, challenge.scoring);
+    result.score = scoreRelativeError(error, challenge.scoring);
     result.passed = result.valid && error <= challenge.scoring.passingRelativeError;
     result.objectiveResult = name + (result.passed ? " is within the documented tolerance." : " is outside the documented tolerance.");
     result.feedback = result.passed ? "Good: the answer respects the analytical reference." : "Compare the answer with the analytical reference and inspect the hint.";
@@ -211,7 +211,7 @@ ChallengeResult evaluateHohmann(const ChallengeDefinition& challenge, const Chal
     result.metrics.referenceDepartureDeltaV = reference.departureDeltaV;
     result.metrics.referenceArrivalDeltaV = reference.arrivalDeltaV;
     result.metrics.referenceTotalDeltaV = reference.totalDeltaV;
-    result.score = scoreFromError(result.metrics.primaryRelativeError, challenge.scoring);
+    result.score = scoreRelativeError(result.metrics.primaryRelativeError, challenge.scoring);
     result.passed = result.metrics.primaryRelativeError <= challenge.scoring.passingRelativeError;
     result.objectiveResult = result.passed ? "Total delta-v is within the documented Hohmann reference tolerance."
                                            : "Total delta-v is outside the documented Hohmann reference tolerance.";
@@ -221,16 +221,11 @@ ChallengeResult evaluateHohmann(const ChallengeDefinition& challenge, const Chal
     return result;
 }
 
-ChallengeResult evaluateNumerical(const ChallengeDefinition& challenge, const ChallengeAnswer& answer) {
+ChallengeResult scoreNumericalMetrics(const ChallengeDefinition& challenge,
+                                      const std::vector<IntegratorBenchmarkMetrics>& metrics,
+                                      Integrator selectedIntegrator) {
     ChallengeResult result;
     if (!validChallengeDefinition(challenge)) return result;
-    const std::vector<Body> bodies = orbitFixture();
-    IntegratorBenchmarkConfig config;
-    config.timestep = challenge.kind == ChallengeKind::TimestepSelection && answer.timestepSeconds > 0.0
-        ? answer.timestepSeconds : challenge.defaultTimestepSeconds;
-    config.duration = challenge.durationSeconds;
-    config.referenceTimestep = challenge.referenceTimestepSeconds;
-    const auto metrics = compareIntegrators(bodies, config);
     if (metrics.empty()) return result;
 
     const auto makeAssessment = [&](const IntegratorBenchmarkMetrics& metric) {
@@ -245,13 +240,13 @@ ChallengeResult evaluateNumerical(const ChallengeDefinition& challenge, const Ch
             challenge.scoring.velocityWeight * metric.velocityError / velocityScale +
             challenge.scoring.stabilityWeight * (assessment.numericallyStable ? 0.0 : challenge.scoring.stabilityThreshold);
         assessment.normalizedError = assessment.valid ? normalized : std::numeric_limits<double>::infinity();
-        assessment.score = scoreFromError(assessment.normalizedError, challenge.scoring);
+        assessment.score = scoreRelativeError(assessment.normalizedError, challenge.scoring);
         return assessment;
     };
 
     for (const auto& metric : metrics) result.comparison.push_back(makeAssessment(metric));
     const auto selected = std::find_if(metrics.begin(), metrics.end(), [&](const IntegratorBenchmarkMetrics& metric) {
-        return metric.integrator == answer.integrator;
+        return metric.integrator == selectedIntegrator;
     });
     if (selected == metrics.end()) return result;
     const IntegratorAssessment assessment = makeAssessment(*selected);
@@ -265,14 +260,30 @@ ChallengeResult evaluateNumerical(const ChallengeDefinition& challenge, const Ch
     result.metrics.orbitalPeriodError = selected->orbitalPeriodError;
     result.metrics.normalizedNumericalError = assessment.normalizedError;
     result.metrics.numericallyStable = assessment.numericallyStable;
-    result.objectiveResult = std::string(integratorName(answer.integrator)) +
+    result.objectiveResult = std::string(integratorName(selectedIntegrator)) +
         (result.passed ? " stays within the challenge error envelope." : " exceeds the challenge error envelope.");
     result.feedback = result.passed ? "This method is a defensible choice for this timestep and orbit." : "Try another method or reduce the timestep; inspect energy and endpoint errors.";
     finishText(result, challenge);
     return result;
 }
 
+ChallengeResult evaluateNumerical(const ChallengeDefinition& challenge, const ChallengeAnswer& answer) {
+    if (!validChallengeDefinition(challenge)) return {};
+    const std::vector<Body> bodies = orbitFixture();
+    IntegratorBenchmarkConfig config;
+    config.timestep = challenge.kind == ChallengeKind::TimestepSelection && answer.timestepSeconds > 0.0
+        ? answer.timestepSeconds : challenge.defaultTimestepSeconds;
+    config.duration = challenge.durationSeconds;
+    config.referenceTimestep = challenge.referenceTimestepSeconds;
+    const auto metrics = compareIntegrators(bodies, config);
+    return scoreNumericalMetrics(challenge, metrics, answer.integrator);
+}
+
 } // namespace
+
+double scoreRelativeError(double error, const ChallengeScoringRules& rules) {
+    return scoreRelativeErrorInternal(error, rules);
+}
 
 const ChallengeDefinition& challengeAt(int index) {
     const auto& challenges = catalog();
@@ -314,6 +325,12 @@ ChallengeResult evaluateChallenge(const ChallengeDefinition& challenge, const Ch
         return evaluateHohmann(challenge, answer);
     }
     return {};
+}
+
+ChallengeResult evaluateIntegratorMetrics(const ChallengeDefinition& challenge,
+                                           const std::vector<IntegratorBenchmarkMetrics>& metrics,
+                                           Integrator selectedIntegrator) {
+    return scoreNumericalMetrics(challenge, metrics, selectedIntegrator);
 }
 
 const char* challengeDifficultyName(ChallengeDifficulty difficulty) {

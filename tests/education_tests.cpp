@@ -9,6 +9,8 @@
 #include "education/EducationChallenges.hpp"
 #include "education/EducationContent.hpp"
 #include "education/EducationProgress.hpp"
+#include "education/ExperimentEvaluation.hpp"
+#include "missions/Mission.hpp"
 
 int main() {
     using namespace bag;
@@ -22,6 +24,102 @@ int main() {
     const EducationReport report = progress.report();
     assert(report.completedLessons == 1 && report.completedExperiments == 2);
     assert(report.completionRatio > 0.0 && report.observations.size() == 1);
+
+    ExperimentObservation escapeObservation;
+    escapeObservation.radiusM = PhysicsEngine::AU;
+    Body sunDistance;
+    sunDistance.position = {PhysicsEngine::AU, 0.0, 0.0};
+    escapeObservation.measuredPrimaryValue = PhysicsEngine::escapeVelocity(sunDistance);
+    const ExperimentEvaluation escapeEvaluation = evaluateExperiment("escape-velocity", escapeObservation);
+    assert(escapeEvaluation.valid && escapeEvaluation.passed && escapeEvaluation.score == 100.0);
+    const ExperimentEvaluation repeatEscapeEvaluation = evaluateExperiment("escape-velocity", escapeObservation);
+    assert(repeatEscapeEvaluation.score == escapeEvaluation.score && repeatEscapeEvaluation.feedback == escapeEvaluation.feedback);
+    escapeObservation.measuredPrimaryValue *= 1.10;
+    assert(!evaluateExperiment("escape-velocity", escapeObservation).passed);
+    escapeObservation.measuredPrimaryValue = std::numeric_limits<double>::quiet_NaN();
+    assert(evaluateExperiment("escape-velocity", escapeObservation).status == ExperimentEvaluationStatus::InvalidInput);
+
+    ExperimentObservation keplerObservation;
+    keplerObservation.radiusM = PhysicsEngine::AU;
+    Body circularBody;
+    circularBody.position = {keplerObservation.radiusM, 0.0, 0.0};
+    circularBody.velocity = {0.0, PhysicsEngine::orbitalVelocity(circularBody), 0.0};
+    keplerObservation.measuredPrimaryValue = PhysicsEngine::orbitalElements(circularBody).period;
+    assert(evaluateExperiment("kepler-test", keplerObservation).passed);
+
+    ExperimentObservation gravityObservation;
+    gravityObservation.radiusM = PhysicsEngine::AU;
+    gravityObservation.measuredPrimaryValue = PhysicsEngine::G * PhysicsEngine::SOLAR_MASS /
+        (gravityObservation.radiusM * gravityObservation.radiusM);
+    assert(evaluateExperiment("gravity-lab", gravityObservation).passed);
+
+    ExperimentObservation energyObservation;
+    energyObservation.measuredPrimaryValue = -1.0;
+    assert(evaluateExperiment("orbit-energy", energyObservation).passed);
+    energyObservation.measuredPrimaryValue = 0.0;
+    assert(!evaluateExperiment("orbit-energy", energyObservation).passed);
+
+    ExperimentObservation hohmannObservation;
+    hohmannObservation.radiusM = PhysicsEngine::AU;
+    hohmannObservation.targetRadiusM = 1.524 * PhysicsEngine::AU;
+    const HohmannTransfer earthMars = PhysicsEngine::hohmannTransfer(
+        hohmannObservation.radiusM, hohmannObservation.targetRadiusM, PhysicsEngine::SOLAR_MASS);
+    hohmannObservation.measuredPrimaryValue = earthMars.totalDeltaV;
+    const ExperimentEvaluation hohmannEvaluation = evaluateExperiment("hohmann-lab", hohmannObservation);
+    assert(hohmannEvaluation.valid && hohmannEvaluation.passed && hohmannEvaluation.score == 100.0);
+    assert(hohmannEvaluation.metrics.absolutePrimaryError == 0.0);
+    hohmannObservation.measuredPrimaryValue *= 1.10;
+    assert(!evaluateExperiment("hohmann-lab", hohmannObservation).passed);
+    hohmannObservation.radiusM = hohmannObservation.targetRadiusM;
+    assert(evaluateExperiment("hohmann-lab", hohmannObservation).status == ExperimentEvaluationStatus::InvalidInput);
+
+    ExperimentObservation assistObservation;
+    assistObservation.centralMassKg = 5.972e24;
+    assistObservation.periapsisRadiusM = 7.0e6;
+    assistObservation.incomingSpeedMps = 11000.0;
+    const GravityAssistResult assistReference = gravityAssistTurn(
+        PhysicsEngine::G * assistObservation.centralMassKg,
+        assistObservation.periapsisRadiusM, assistObservation.incomingSpeedMps);
+    assistObservation.measuredPrimaryValue = assistReference.turnAngleRadians;
+    assert(evaluateExperiment("assist-lab", assistObservation).passed);
+
+    std::vector<Body> benchmarkBodies(2);
+    benchmarkBodies[0].mass = PhysicsEngine::SOLAR_MASS;
+    benchmarkBodies[1].mass = 5.972e24;
+    benchmarkBodies[1].position = {PhysicsEngine::AU, 0.0, 0.0};
+    benchmarkBodies[1].velocity = {0.0, PhysicsEngine::orbitalVelocity(benchmarkBodies[1]), 0.0};
+    IntegratorBenchmarkConfig benchmarkConfig;
+    benchmarkConfig.timestep = 6.0 * 3600.0;
+    benchmarkConfig.duration = 10.0 * PhysicsEngine::DAY;
+    benchmarkConfig.referenceTimestep = 3.0 * 3600.0;
+    ExperimentObservation numericalObservation;
+    numericalObservation.integrator = Integrator::VelocityVerlet;
+    numericalObservation.integratorMetrics = compareIntegrators(benchmarkBodies, benchmarkConfig);
+    const ExperimentEvaluation numericalEvaluation = evaluateExperiment("numerical-methods", numericalObservation);
+    assert(numericalEvaluation.valid && std::isfinite(numericalEvaluation.score));
+    numericalObservation.integratorMetrics.clear();
+    assert(evaluateExperiment("numerical-methods", numericalObservation).status == ExperimentEvaluationStatus::InsufficientData);
+
+    ExperimentObservation timestepObservation;
+    timestepObservation.measuredPrimaryValue = 1.0;
+    timestepObservation.measuredSecondaryValue = 0.5;
+    assert(evaluateExperiment("timestep-sensitivity", timestepObservation).passed);
+    timestepObservation.measuredSecondaryValue = 0.99;
+    assert(!evaluateExperiment("timestep-sensitivity", timestepObservation).passed);
+    timestepObservation.measuredSecondaryValue = std::numeric_limits<double>::quiet_NaN();
+    assert(evaluateExperiment("timestep-sensitivity", timestepObservation).status == ExperimentEvaluationStatus::InsufficientData);
+
+    ExperimentObservation conservationObservation;
+    conservationObservation.energyDrift = 0.01;
+    conservationObservation.angularMomentumDrift = 0.02;
+    const ExperimentEvaluation conservationEvaluation = evaluateExperiment("conservation", conservationObservation);
+    assert(conservationEvaluation.valid && conservationEvaluation.passed);
+    conservationObservation.energyDrift = 0.10;
+    assert(!evaluateExperiment("conservation", conservationObservation).passed);
+    conservationObservation.energyDrift = -1.0;
+    assert(evaluateExperiment("conservation", conservationObservation).status == ExperimentEvaluationStatus::InsufficientData);
+    const ExperimentEvaluation repeatEvaluation = evaluateExperiment("hohmann-lab", hohmannObservation);
+    assert(repeatEvaluation.status == ExperimentEvaluationStatus::InvalidInput);
 
     assert(challengeCount() == 5);
     assert(findChallenge("escape-velocity") != nullptr);
@@ -86,6 +184,11 @@ int main() {
     assert(!validChallengeDefinition(invalidHohmann));
 
     EducationProgress challengeProgress(lessonCount(), experimentCount(), challengeCount());
+    assert(challengeProgress.recordExperimentEvaluation(0, escapeEvaluation));
+    assert(challengeProgress.recordExperimentEvaluation(0, escapeEvaluation));
+    assert(challengeProgress.experimentProgress(0)->attempts == 2);
+    assert(challengeProgress.experimentProgress(0)->bestScore == 100.0);
+    assert(challengeProgress.experimentComplete(0));
     assert(challengeProgress.recordChallengeResult(0, escapeResult));
     assert(challengeProgress.recordChallengeResult(0, failedEscape));
     assert(challengeProgress.recordChallengeResult(4, hohmannResult));
@@ -106,7 +209,15 @@ int main() {
     assert(restored.challengeProgress(0)->attempts == 2);
     assert(restored.challengeProgress(4)->completed);
     assert(restored.challengeProgress(4)->bestScore == 100.0);
+    assert(restored.experimentProgress(0)->attempts == 2);
+    assert(restored.experimentProgress(0)->completed);
     assert(restored.report().observations.size() == 1);
+
+    nlohmann::json legacySchema = nlohmann::json::parse(serialized);
+    legacySchema.erase("experiment_evaluations");
+    EducationProgress legacyRestored(lessonCount(), experimentCount(), challengeCount());
+    assert(legacyRestored.deserialize(legacySchema.dump()));
+    assert(legacyRestored.experimentProgress(0)->attempts == 0);
 
     const std::filesystem::path progressPath = std::filesystem::temp_directory_path() / "bagsolar-education-progress-test.json";
     assert(challengeProgress.save(progressPath));
@@ -126,6 +237,10 @@ int main() {
     assert(restored.serialize() == beforeInvalidLoad);
     invalidMetrics["challenges"][0]["latest_metrics"]["energy_drift"] = -1.0;
     assert(!restored.deserialize(invalidMetrics.dump()));
+    assert(restored.serialize() == beforeInvalidLoad);
+    nlohmann::json invalidExperiment = nlohmann::json::parse(serialized);
+    invalidExperiment["experiment_evaluations"][0]["latest_metrics"]["energy_drift"] = "not-a-number";
+    assert(!restored.deserialize(invalidExperiment.dump()));
     assert(restored.serialize() == beforeInvalidLoad);
     progress.reset();
     assert(progress.report().completedLessons == 0 && progress.report().completedExperiments == 0);

@@ -8,6 +8,7 @@ struct Lesson {
 };
 
 struct Experiment {
+    const char* id;
     const char* title;
     const char* prompt;
     const char* equation;

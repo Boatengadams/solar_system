@@ -12,6 +12,7 @@
 #include "../physics/PhysicsEngine.hpp"
 #include "../telemetry/TelemetryTypes.hpp"
 #include "../education/EducationChallenges.hpp"
+#include "../education/ExperimentEvaluation.hpp"
 #include "../education/EducationProgress.hpp"
 #include "SimulationSettings.hpp"
 
@@ -52,6 +53,7 @@ public:
     Integrator challengeIntegrator = Integrator::VelocityVerlet;
     EducationProgress educationProgress;
     std::optional<ChallengeResult> lastChallengeResult;
+    std::optional<ExperimentEvaluation> lastExperimentEvaluation;
     std::optional<Epoch> ephemerisEpoch;
     Frame ephemerisFrame = Frame::heliocentric();
     std::string ephemerisSource;
@@ -81,6 +83,7 @@ public:
     void adjustChallengeAnswer(double relativeChange);
     void cycleChallengeIntegrator(int direction = 1);
     bool submitChallenge();
+    bool evaluateCurrentExperiment();
     bool saveEducationProgress(const std::filesystem::path& path) const;
     bool loadEducationProgress(const std::filesystem::path& path);
 

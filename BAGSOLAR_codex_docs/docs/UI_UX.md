@@ -47,6 +47,14 @@ not perform hidden filesystem writes.
 Challenge evaluation remains in the raylib-free education domain layer; the
 HUD only presents simulation state and the latest result.
 
+## Experiment evaluation flow
+
+The experiment panel uses the existing layout and adds `Y` to evaluate the
+current simulation state. It displays the evaluator status, grade, score, and
+short feedback. The evaluator remains raylib-independent and valid results
+are recorded through `EducationProgress`; no automatic filesystem writes are
+performed by the HUD.
+
 ## Suggested UI Technology
 raylib remains the renderer.
 Dear ImGui may be used for developer/scientific panels where appropriate.

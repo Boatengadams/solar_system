@@ -29,7 +29,8 @@ Lessons should encourage experimentation rather than only displaying text.
 The lesson catalog now includes gravity, orbit, escape, eccentricity, Kepler,
 conservation, numerical methods, Hohmann transfers, and gravity assists.
 Experiments include escape velocity, Kepler scaling, gravity, orbital energy,
-Hohmann transfers, and gravity assists. `EducationProgress` tracks completed
+Hohmann transfers, gravity assists, numerical-method comparison, timestep
+sensitivity, and conservation. `EducationProgress` tracks completed
 lessons, completed experiments, free-form student observations, and a
 deterministic completion report without depending on raylib or wall-clock
 state.
@@ -88,5 +89,30 @@ second arrival burn, and their sum. The model assumes coplanar circular
 orbits around a point mass, so it is an educational reference rather than a
 universal mission optimizer.
 
-Remaining Phase 9 work includes richer challenge content, broader experiment
-evaluation, and a more complete education UI.
+## Experiment-result evaluation
+
+The nine catalog experiments now have deterministic evaluators. Analytical
+evaluators compare SI measurements with existing PhysicsEngine or mission
+references for escape velocity, Kepler period, gravity, Hohmann delta-v, and
+gravity-assist turn angle. Bounded evaluators classify orbital specific
+energy and energy/angular-momentum conservation. Numerical evaluators reuse
+the existing IntegratorBenchmark for method comparison and compare coarse
+versus refined endpoint errors for timestep sensitivity.
+
+Every result separates status (`VALID`, invalid input, insufficient data,
+scientific failure, or unsupported), raw measurements, references, errors,
+score, grade, pass/fail, feedback, explanation, and next step. Analytical
+comparisons use 1% full credit and 5% passing relative-error thresholds;
+timestep convergence uses 25% full-credit and 5% passing improvement;
+conservation uses 1% full-credit and 5% passing drift envelopes. These are
+explicit educational thresholds, not claims of universal physical accuracy.
+
+Press `Y` in the experiment panel to evaluate the current simulation state.
+The HUD displays the result and valid results are recorded in
+`EducationProgress`. Some evaluations require caller-supplied benchmark or
+telemetry samples and therefore report insufficient data when the simulation
+does not contain those samples. The layer remains raylib-independent; the HUD
+only presents its result.
+
+Remaining Phase 9 work includes richer challenge/content authoring, broader
+learner-facing experiment workflows, and more complete education UI.

@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "../physics/PhysicsEngine.hpp"
+#include "../physics/IntegratorBenchmark.hpp"
 
 namespace bag {
 
@@ -112,8 +113,12 @@ int challengeCount();
 bool validChallengeDefinition(const ChallengeDefinition& challenge);
 ChallengeResult evaluateChallenge(const ChallengeDefinition& challenge,
                                   const ChallengeAnswer& answer);
+ChallengeResult evaluateIntegratorMetrics(const ChallengeDefinition& challenge,
+                                           const std::vector<IntegratorBenchmarkMetrics>& metrics,
+                                           Integrator selectedIntegrator);
 const char* challengeDifficultyName(ChallengeDifficulty difficulty);
 const char* challengeKindName(ChallengeKind kind);
 const char* challengeGrade(double score, bool passed);
+double scoreRelativeError(double error, const ChallengeScoringRules& rules);
 
 } // namespace bag
