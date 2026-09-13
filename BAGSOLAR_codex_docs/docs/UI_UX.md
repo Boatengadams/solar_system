@@ -38,6 +38,12 @@ integrator, result score/grade, feedback, and next-step context. Controls are:
 - `I`: cycle numerical integrator
 - `C`: submit the current answer
 
+The Hohmann challenge uses the same scalar answer controls for total delta-v.
+After submission, the result panel also shows the analytical departure and
+arrival burn components in km/s. Progress file save/load is exposed through
+the simulation domain API with an explicit caller-provided path; the HUD does
+not perform hidden filesystem writes.
+
 Challenge evaluation remains in the raylib-free education domain layer; the
 HUD only presents simulation state and the latest result.
 

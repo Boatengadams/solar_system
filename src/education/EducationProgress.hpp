@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <filesystem>
 #include <vector>
 
 #include "EducationChallenges.hpp"
@@ -28,6 +29,8 @@ struct ChallengeProgress {
 
 class EducationProgress {
 public:
+    static constexpr int CURRENT_SCHEMA_VERSION = 1;
+
     EducationProgress(int lessonCount, int experimentCount, int challengeCount = 0);
 
     bool completeLesson(int index);
@@ -41,6 +44,10 @@ public:
     void reset();
     EducationReport report() const;
     std::string exportText() const;
+    std::string serialize() const;
+    bool deserialize(const std::string& serialized);
+    bool save(const std::filesystem::path& path) const;
+    bool load(const std::filesystem::path& path);
 
 private:
     std::vector<bool> lessons;

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Added versioned offline JSON persistence for education progress with safe
+  parse-validate-commit imports.
+- Added a Hohmann transfer challenge using the existing analytical physics
+  reference, including departure/arrival burn reporting.
 - Added deterministic Phase 9 education challenges for escape velocity,
   circular orbits, integrator comparison, and timestep selection.
 - Added explicit numerical scoring, learner feedback, challenge progress, and

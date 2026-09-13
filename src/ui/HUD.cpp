@@ -159,6 +159,11 @@ void HUD::challengePanel(const Simulation& simulation) const {
         text((result.grade + "  " + format(result.score, 1) + "/100").c_str(), box.x + 18, box.y + 177, 15,
              result.passed ? Color{80, 235, 150, 255} : ORANGE);
         DrawTextEx(GetFontDefault(), result.feedback.c_str(), {box.x + 18, box.y + 201}, 12, 2, alpha(RAYWHITE, 0.75f));
+        if (challenge.kind == ChallengeKind::HohmannTransfer) {
+            text(("Burns: " + format(result.metrics.referenceDepartureDeltaV / 1000.0, 2) + " + " +
+                  format(result.metrics.referenceArrivalDeltaV / 1000.0, 2) + " km/s").c_str(),
+                 box.x + 18, box.y + 225, 11, alpha({190, 215, 235, 255}, 0.78f));
+        }
     } else {
         text("Z / X challenge   [ / ] adjust   I method   C submit", box.x + 18, box.y + 188, 11, alpha(RAYWHITE, 0.58f));
     }

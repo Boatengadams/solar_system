@@ -37,7 +37,8 @@ bool finiteDefinition(const ChallengeDefinition& challenge) {
         !challenge.learningObjective.empty() && std::isfinite(challenge.centralMassKg) &&
         challenge.centralMassKg > 0.0 && std::isfinite(challenge.innerRadiusM) &&
         challenge.innerRadiusM > 0.0 && std::isfinite(challenge.outerRadiusM) &&
-        challenge.outerRadiusM > 0.0 && std::isfinite(challenge.durationSeconds) &&
+        challenge.outerRadiusM > 0.0 && std::isfinite(challenge.centralBodyRadiusM) &&
+        challenge.centralBodyRadiusM >= 0.0 && std::isfinite(challenge.durationSeconds) &&
         challenge.durationSeconds > 0.0 && std::isfinite(challenge.referenceTimestepSeconds) &&
         challenge.referenceTimestepSeconds > 0.0 && std::isfinite(challenge.defaultTimestepSeconds) &&
         challenge.defaultTimestepSeconds > 0.0 && std::isfinite(challenge.defaultAnswer) &&
@@ -125,9 +126,28 @@ ChallengeDefinition makeTimestepChallenge() {
     return result;
 }
 
+ChallengeDefinition makeHohmannChallenge() {
+    ChallengeDefinition result;
+    result.id = "hohmann-transfer";
+    result.title = "Hohmann transfer delta-v";
+    result.description = "Find the total delta-v for a coplanar transfer from Earth's orbit to Mars's orbit.";
+    result.learningObjective = "Connect circular velocity, the transfer ellipse, and the two efficient tangential burns.";
+    result.scenario = "Radii are measured from the Sun's center; both initial and target orbits are circular and coplanar.";
+    result.difficulty = ChallengeDifficulty::Intermediate;
+    result.kind = ChallengeKind::HohmannTransfer;
+    result.centralBodyRadiusM = 6.957e8;
+    result.defaultAnswer = PhysicsEngine::hohmannTransfer(result.innerRadiusM, result.outerRadiusM, result.centralMassKg).totalDeltaV;
+    result.scoring.fullCreditRelativeError = 0.01;
+    result.scoring.passingRelativeError = 0.05;
+    result.hints = {"The first burn raises apoapsis; the second burn circularizes there.", "Use the total of the two tangential burns."};
+    result.explanation = "A Hohmann transfer uses an ellipse tangent to both circular orbits. It is delta-v efficient for coplanar circular orbits under the point-mass model, not a universal optimum for every mission.";
+    result.nextStep = "Inspect the two reference burns separately and compare their magnitudes with the total.";
+    return result;
+}
+
 const std::vector<ChallengeDefinition>& catalog() {
     static const std::vector<ChallengeDefinition> challenges = {
-        makeEscapeChallenge(), makeCircularChallenge(), makeIntegratorChallenge(), makeTimestepChallenge()};
+        makeEscapeChallenge(), makeCircularChallenge(), makeIntegratorChallenge(), makeTimestepChallenge(), makeHohmannChallenge()};
     return challenges;
 }
 
@@ -164,13 +184,39 @@ ChallengeResult evaluateScalar(const ChallengeDefinition& challenge, const Chall
     const double actual = secondary ? answer.secondaryValue : answer.primaryValue;
     const double error = relativeError(actual, expected);
     result.valid = std::isfinite(error);
+    result.metrics.learnerPrimaryValue = actual;
     result.metrics.expectedPrimaryValue = expected;
+    result.metrics.absolutePrimaryError = std::abs(actual - expected);
     if (secondary) result.metrics.secondaryRelativeError = error;
     else result.metrics.primaryRelativeError = error;
     result.score = scoreFromError(error, challenge.scoring);
     result.passed = result.valid && error <= challenge.scoring.passingRelativeError;
     result.objectiveResult = name + (result.passed ? " is within the documented tolerance." : " is outside the documented tolerance.");
     result.feedback = result.passed ? "Good: the answer respects the analytical reference." : "Compare the answer with the analytical reference and inspect the hint.";
+    finishText(result, challenge);
+    return result;
+}
+
+ChallengeResult evaluateHohmann(const ChallengeDefinition& challenge, const ChallengeAnswer& answer) {
+    ChallengeResult result;
+    if (!validChallengeDefinition(challenge)) return result;
+    const HohmannTransfer reference = PhysicsEngine::hohmannTransfer(
+        challenge.innerRadiusM, challenge.outerRadiusM, challenge.centralMassKg);
+    if (!reference.valid || !std::isfinite(answer.primaryValue)) return result;
+    result.valid = true;
+    result.metrics.learnerPrimaryValue = answer.primaryValue;
+    result.metrics.expectedPrimaryValue = reference.totalDeltaV;
+    result.metrics.absolutePrimaryError = std::abs(answer.primaryValue - reference.totalDeltaV);
+    result.metrics.primaryRelativeError = relativeError(answer.primaryValue, reference.totalDeltaV);
+    result.metrics.referenceDepartureDeltaV = reference.departureDeltaV;
+    result.metrics.referenceArrivalDeltaV = reference.arrivalDeltaV;
+    result.metrics.referenceTotalDeltaV = reference.totalDeltaV;
+    result.score = scoreFromError(result.metrics.primaryRelativeError, challenge.scoring);
+    result.passed = result.metrics.primaryRelativeError <= challenge.scoring.passingRelativeError;
+    result.objectiveResult = result.passed ? "Total delta-v is within the documented Hohmann reference tolerance."
+                                           : "Total delta-v is outside the documented Hohmann reference tolerance.";
+    result.feedback = result.passed ? "Good: the answer matches the two-burn analytical reference."
+                                    : "Compare the total with the departure and arrival burn components.";
     finishText(result, challenge);
     return result;
 }
@@ -244,6 +290,9 @@ int challengeCount() { return static_cast<int>(catalog().size()); }
 
 bool validChallengeDefinition(const ChallengeDefinition& challenge) {
     if (!finiteDefinition(challenge)) return false;
+    if (challenge.kind == ChallengeKind::HohmannTransfer &&
+        (challenge.centralBodyRadiusM <= 0.0 || challenge.innerRadiusM <= challenge.centralBodyRadiusM ||
+         challenge.outerRadiusM <= challenge.centralBodyRadiusM || challenge.innerRadiusM == challenge.outerRadiusM)) return false;
     if (challenge.kind == ChallengeKind::IntegratorComparison || challenge.kind == ChallengeKind::TimestepSelection) {
         const double totalWeight = challenge.scoring.energyWeight + challenge.scoring.positionWeight +
             challenge.scoring.velocityWeight + challenge.scoring.stabilityWeight;
@@ -261,6 +310,8 @@ ChallengeResult evaluateChallenge(const ChallengeDefinition& challenge, const Ch
     case ChallengeKind::IntegratorComparison:
     case ChallengeKind::TimestepSelection:
         return evaluateNumerical(challenge, answer);
+    case ChallengeKind::HohmannTransfer:
+        return evaluateHohmann(challenge, answer);
     }
     return {};
 }
@@ -280,6 +331,7 @@ const char* challengeKindName(ChallengeKind kind) {
     case ChallengeKind::CircularOrbit: return "circular_orbit";
     case ChallengeKind::IntegratorComparison: return "integrator_comparison";
     case ChallengeKind::TimestepSelection: return "timestep_selection";
+    case ChallengeKind::HohmannTransfer: return "hohmann_transfer";
     }
     return "unknown";
 }

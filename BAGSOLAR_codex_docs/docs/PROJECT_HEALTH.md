@@ -43,8 +43,10 @@ arbitrary frame rotations.
 - Four deterministic interactive challenge definitions.
 - Analytical escape-velocity and circular-orbit scoring.
 - Integrator and timestep comparison/scoring using existing benchmark metrics.
+- Hohmann transfer scoring using the existing analytical physics reference.
 - Learner-facing challenge results in the raylib HUD.
-- Challenge attempts, best/latest scores, metrics, and deterministic export.
+- Challenge attempts, best/latest scores, metrics, versioned JSON persistence,
+  and parse-validate-commit import.
 - Education unit tests and CTest integration.
 
 ### Remaining
@@ -52,11 +54,9 @@ arbitrary frame rotations.
 - Broader interactive challenge catalog.
 - Broader lesson-specific experiment result evaluation.
 - Richer education UI integration.
-- Durable persistence of learner progress beyond the deterministic export boundary.
 
-Phase 9 remains partial: the roadmap checklist items for challenges and
-numerical-method comparisons are complete, while broader education scope
-remains.
+Phase 9 remains partial: challenge/scoring and durable progress checklist work
+is complete, while broader education scope remains.
 
 ## Current Phase 10 status
 

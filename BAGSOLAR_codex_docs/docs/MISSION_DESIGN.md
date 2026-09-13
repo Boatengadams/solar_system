@@ -53,3 +53,9 @@ and incoming relative speed.
 The current implementation does not claim full mission optimization,
 ephemeris-targeted arrival matching, finite-burn thrust integration, or
 high-fidelity gravity-assist trajectory design.
+
+The Phase 9 Hohmann education challenge reuses the same
+`PhysicsEngine::hohmannTransfer` analytical reference as mission design. Its
+inputs and outputs use SI metres and metres/second internally; orbit radii are
+measured from the central body's center. The challenge reports total delta-v
+for the learner answer and the two reference tangential burns separately.

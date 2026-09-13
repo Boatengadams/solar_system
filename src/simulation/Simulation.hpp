@@ -81,6 +81,8 @@ public:
     void adjustChallengeAnswer(double relativeChange);
     void cycleChallengeIntegrator(int direction = 1);
     bool submitChallenge();
+    bool saveEducationProgress(const std::filesystem::path& path) const;
+    bool loadEducationProgress(const std::filesystem::path& path);
 
     double distanceFromSun(const Body& body) const;
     double specificEnergy(const Body& body) const;

@@ -92,3 +92,15 @@ CSPICE-enabled build. It loads the manifest named by
 `BAGSOLAR_SPICE_TEST_MANIFEST`, queries Earth at JD 2451545.0, checks finite SI
 state and provenance, then unloads kernels. If the variable is absent, CTest
 marks it skipped with return code 77.
+
+## Phase 9 education coverage
+
+`bagsolar_education_tests` covers challenge catalog validation, deterministic
+escape/circular/integrator/timestep scoring, Hohmann transfer scoring against
+the existing analytical physics reference, invalid radii and non-finite
+answers, pass/fail boundaries, and repeated-result determinism.
+
+It also covers version-1 education-progress JSON round trips, preservation of
+attempts/best scores/metrics, file save/load, malformed JSON, unsupported
+schema versions, missing fields, invalid metric values, and the requirement
+that failed imports do not mutate existing progress.

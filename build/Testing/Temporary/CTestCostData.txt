@@ -1,9 +1,9 @@
-bagsolar_physics_tests 64 0.000107865
-bagsolar_data_tests 59 0.000770879
-bagsolar_validation_tests 45 0.0515026
-bagsolar_telemetry_tests 39 0.000479717
-bagsolar_ephemeris_tests 32 0.000287475
-bagsolar_spacecraft_tests 27 0.000447588
-bagsolar_education_tests 24 0.000687252
-bagsolar_advanced_data_tests 24 0.000126885
+bagsolar_physics_tests 67 0.000143247
+bagsolar_data_tests 62 0.000477267
+bagsolar_validation_tests 48 0.0571232
+bagsolar_telemetry_tests 42 0.000999694
+bagsolar_ephemeris_tests 35 0.000638996
+bagsolar_spacecraft_tests 30 0.00021257
+bagsolar_education_tests 27 0.00250842
+bagsolar_advanced_data_tests 27 0.000625846
 ---

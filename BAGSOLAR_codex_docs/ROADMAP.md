@@ -159,9 +159,9 @@ work.
 - Progress tracking. [x]
 
 Status: deterministic challenge workflows, numerical-method scoring, learner
-results, and challenge progress tracking are implemented. Broader challenge
-content, richer experiment evaluation, full progress persistence, and a more
-complete education UI remain future work.
+results, Hohmann transfer scoring, and versioned durable progress persistence
+are implemented. Broader challenge content, richer experiment evaluation, and
+a more complete education UI remain future work.
 
 ## Phase 10 — Professional Release
 - Cross-platform build presets. [x]

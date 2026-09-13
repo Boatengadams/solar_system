@@ -325,6 +325,14 @@ bool Simulation::submitChallenge() {
     return true;
 }
 
+bool Simulation::saveEducationProgress(const std::filesystem::path& path) const {
+    return educationProgress.save(path);
+}
+
+bool Simulation::loadEducationProgress(const std::filesystem::path& path) {
+    return educationProgress.load(path);
+}
+
 void Simulation::setSpeed(double value) {
     speed = std::max(0.01, std::min(100000.0, value));
     settings.timeScale = speed;

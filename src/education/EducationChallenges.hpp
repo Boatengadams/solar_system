@@ -18,6 +18,7 @@ enum class ChallengeKind {
     CircularOrbit,
     IntegratorComparison,
     TimestepSelection,
+    HohmannTransfer,
 };
 
 struct ChallengeScoringRules {
@@ -43,6 +44,7 @@ struct ChallengeDefinition {
     double centralMassKg = PhysicsEngine::SOLAR_MASS;
     double innerRadiusM = PhysicsEngine::AU;
     double outerRadiusM = 1.524 * PhysicsEngine::AU;
+    double centralBodyRadiusM = 0.0;
     double durationSeconds = 30.0 * PhysicsEngine::DAY;
     double referenceTimestepSeconds = 3.0 * 3600.0;
     double defaultTimestepSeconds = 6.0 * 3600.0;
@@ -63,8 +65,12 @@ struct ChallengeAnswer {
 };
 
 struct ChallengeMetrics {
+    double learnerPrimaryValue = 0.0;
+    double learnerSecondaryValue = 0.0;
     double expectedPrimaryValue = 0.0;
     double expectedSecondaryValue = 0.0;
+    double absolutePrimaryError = 0.0;
+    double absoluteSecondaryError = 0.0;
     double primaryRelativeError = 0.0;
     double secondaryRelativeError = 0.0;
     double energyDrift = 0.0;
@@ -73,6 +79,9 @@ struct ChallengeMetrics {
     double velocityError = 0.0;
     double orbitalPeriodError = 0.0;
     double normalizedNumericalError = 0.0;
+    double referenceDepartureDeltaV = 0.0;
+    double referenceArrivalDeltaV = 0.0;
+    double referenceTotalDeltaV = 0.0;
     bool numericallyStable = false;
 };
 

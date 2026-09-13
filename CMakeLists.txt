@@ -198,7 +198,7 @@ if(BUILD_TESTING)
         src/physics/PhysicsEngine.cpp
         src/physics/IntegratorBenchmark.cpp
     )
-    target_include_directories(bagsolar_education_tests PRIVATE src)
+    target_include_directories(bagsolar_education_tests PRIVATE src third_party/nlohmann-json3-dev/usr/include)
     if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
         target_compile_options(bagsolar_education_tests PRIVATE -Wall -Wextra -Wpedantic)
     endif()
