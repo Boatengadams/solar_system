@@ -118,3 +118,8 @@ Missing benchmark collections and missing conservation metrics remain
 insufficient-data outcomes. Threshold constants are centralized in
 `ExperimentEvaluationThresholds` so boundary tests share the production
 policy.
+
+Phase 9.4 workflow tests cover initial state, deterministic selection,
+guarded start/observe/evaluate transitions, retry/continue, lesson completion,
+successful and failed results, invalid/insufficient results, home summaries,
+and preservation of best/latest progress across retries.

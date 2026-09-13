@@ -55,6 +55,22 @@ concise measured/reference line when available, and short feedback. The evaluato
 are recorded through `EducationProgress`; no automatic filesystem writes are
 performed by the HUD.
 
+## Phase 9.4 education workflow
+
+The existing panels expose a compact education home summary and selected
+activity state. Controls are:
+
+- `A` / `D`: previous/next lesson.
+- `E` / `Up` / `Down`: select experiments.
+- `Z` / `X`: select challenges.
+- `Enter`: start; `B`: begin observation.
+- `Y`: complete a lesson or evaluate an experiment; `C`: evaluate a challenge.
+- `Q`: retry; `N`: continue to the next catalog activity.
+
+Result panels show only metrics available from the result: measured/reference
+values, normalized numerical error, or energy/angular-momentum drift as
+appropriate. Scoring and physics remain outside the UI.
+
 ## Suggested UI Technology
 raylib remains the renderer.
 Dear ImGui may be used for developer/scientific panels where appropriate.

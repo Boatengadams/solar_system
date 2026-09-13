@@ -119,4 +119,19 @@ does not contain those samples. The layer remains raylib-independent; the HUD
 only presents its result.
 
 Remaining Phase 9 work includes richer challenge/content authoring, broader
-learner-facing experiment workflows, and more complete education UI.
+learner reports, and more complete education UI.
+
+## Phase 9.4 learner workflow
+
+`EducationWorkflow` is a raylib-independent orchestration layer over the
+existing lesson catalog, experiment evaluator, challenge evaluator, and
+`EducationProgress`. Activities move deterministically through:
+
+`SELECTING → READY → RUNNING → OBSERVING → READY_FOR_EVALUATION → EVALUATED`.
+
+Evaluation is rejected until observation is explicitly marked ready. Existing
+experiment and challenge evaluators remain the scoring authorities. Invalid or
+insufficient results are shown but are not silently recorded as successful
+progress. Valid failed attempts update latest/best scores through schema-1
+progress; retry preserves best results, while continue selects the next
+catalog activity deterministically.

@@ -10,6 +10,7 @@
 #include "education/EducationContent.hpp"
 #include "education/EducationProgress.hpp"
 #include "education/ExperimentEvaluation.hpp"
+#include "education/EducationWorkflow.hpp"
 #include "missions/Mission.hpp"
 
 int main() {
@@ -206,6 +207,63 @@ int main() {
     assert(challengeProgress.challengeProgress(0)->bestScore == 100.0);
     assert(challengeProgress.exportText() == challengeProgress.exportText());
     assert(challengeProgress.report().completedChallenges == 2);
+
+    EducationProgress workflowProgress(lessonCount(), experimentCount(), challengeCount());
+    EducationWorkflow workflow(workflowProgress, lessonCount(), experimentCount(), challengeCount());
+    assert(workflow.state() == EducationWorkflowState::Selecting);
+    assert(!workflow.start());
+    assert(workflow.select(EducationActivityType::Experiment, 0));
+    assert(workflow.state() == EducationWorkflowState::Ready);
+    assert(workflow.activity().id == "escape-velocity");
+    assert(!workflow.readyForEvaluation());
+    assert(workflow.start() && workflow.beginObservation() && workflow.readyForEvaluation());
+    assert(workflow.submitExperiment(escapeEvaluation));
+    assert(workflow.state() == EducationWorkflowState::Evaluated);
+    assert(workflowProgress.experimentProgress(0)->attempts == 1);
+    assert(workflowProgress.experimentComplete(0));
+    const EducationActivity nextExperiment = workflow.recommendedActivity();
+    assert(nextExperiment.index == 1 && nextExperiment.type == EducationActivityType::Experiment);
+    assert(workflow.retry() && workflow.state() == EducationWorkflowState::Ready);
+    ExperimentEvaluation failedEvaluation = escapeEvaluation;
+    failedEvaluation.score = 0.0;
+    failedEvaluation.passed = false;
+    failedEvaluation.grade = "RETRY";
+    assert(workflow.start() && workflow.beginObservation() && workflow.readyForEvaluation());
+    assert(workflow.submitExperiment(failedEvaluation));
+    assert(workflowProgress.experimentProgress(0)->attempts == 2);
+    assert(workflowProgress.experimentProgress(0)->bestScore == 100.0);
+    assert(workflowProgress.experimentProgress(0)->latestScore == 0.0);
+    assert(workflowProgress.experimentComplete(0));
+    assert(workflow.continueToRecommended());
+    assert(workflow.activity().index == 1 && workflow.state() == EducationWorkflowState::Ready);
+    assert(!workflow.continueToRecommended());
+    assert(workflow.start() && workflow.beginObservation() && workflow.readyForEvaluation());
+    ExperimentEvaluation insufficientEvaluation;
+    insufficientEvaluation.experimentId = "kepler-test";
+    insufficientEvaluation.status = ExperimentEvaluationStatus::InsufficientData;
+    assert(workflow.submitExperiment(insufficientEvaluation));
+    assert(workflowProgress.experimentProgress(1)->attempts == 0);
+
+    EducationWorkflow challengeWorkflow(workflowProgress, lessonCount(), experimentCount(), challengeCount());
+    assert(challengeWorkflow.select(EducationActivityType::Challenge, 0));
+    assert(challengeWorkflow.start() && challengeWorkflow.beginObservation() && challengeWorkflow.readyForEvaluation());
+    assert(challengeWorkflow.submitChallenge(failedEscape));
+    assert(workflowProgress.challengeProgress(0)->attempts == 1);
+    assert(challengeWorkflow.retry());
+    assert(challengeWorkflow.activity().id == "escape-velocity");
+    assert(challengeWorkflow.start() && challengeWorkflow.beginObservation() && challengeWorkflow.readyForEvaluation());
+    ChallengeResult invalidWorkflowChallenge;
+    assert(challengeWorkflow.submitChallenge(invalidWorkflowChallenge));
+    assert(workflowProgress.challengeProgress(0)->attempts == 1);
+
+    EducationWorkflow lessonWorkflow(workflowProgress, lessonCount(), experimentCount(), challengeCount());
+    assert(lessonWorkflow.select(EducationActivityType::Lesson, 0));
+    assert(lessonWorkflow.start() && lessonWorkflow.beginObservation());
+    assert(lessonWorkflow.completeLesson());
+    assert(workflowProgress.lessonComplete(0));
+    const std::vector<EducationActivityProgress> home = lessonWorkflow.home();
+    assert(home.size() == static_cast<std::size_t>(lessonCount() + experimentCount() + challengeCount()));
+    assert(home.front().completed);
 
     assert(challengeProgress.completeLesson(2));
     assert(challengeProgress.recordObservation(1, "the transfer uses two tangential burns"));

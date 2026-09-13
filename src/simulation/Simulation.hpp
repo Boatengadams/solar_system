@@ -14,6 +14,7 @@
 #include "../education/EducationChallenges.hpp"
 #include "../education/ExperimentEvaluation.hpp"
 #include "../education/EducationProgress.hpp"
+#include "../education/EducationWorkflow.hpp"
 #include "SimulationSettings.hpp"
 
 namespace bag {
@@ -52,6 +53,7 @@ public:
     double challengeAnswer = 0.0;
     Integrator challengeIntegrator = Integrator::VelocityVerlet;
     EducationProgress educationProgress;
+    EducationWorkflow educationWorkflow;
     std::optional<ChallengeResult> lastChallengeResult;
     std::optional<ExperimentEvaluation> lastExperimentEvaluation;
     std::optional<Epoch> ephemerisEpoch;
@@ -84,6 +86,12 @@ public:
     void cycleChallengeIntegrator(int direction = 1);
     bool submitChallenge();
     bool evaluateCurrentExperiment();
+    bool selectEducationActivity(EducationActivityType type, int index);
+    bool startEducationActivity();
+    bool beginEducationObservation();
+    bool readyEducationForEvaluation();
+    bool retryEducationActivity();
+    bool continueEducationActivity();
     bool saveEducationProgress(const std::filesystem::path& path) const;
     bool loadEducationProgress(const std::filesystem::path& path);
 

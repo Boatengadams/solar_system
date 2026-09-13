@@ -27,7 +27,7 @@ ephemeris: $(SOURCES)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) src/astronomy/main.cpp src/astronomy/CurlHttpClient.cpp src/astronomy/EphemerisTypes.cpp src/astronomy/EphemerisComparison.cpp src/astronomy/HorizonsParser.cpp src/astronomy/HorizonsProvider.cpp src/astronomy/HorizonsRequest.cpp src/astronomy/JsonEphemerisProvider.cpp src/astronomy/LocalEphemerisProvider.cpp src/astronomy/SpiceProvider.cpp -o bagsolar_ephemeris
 
 education: $(SOURCES)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) tests/education_tests.cpp src/education/EducationChallenges.cpp src/education/ExperimentEvaluation.cpp src/education/EducationContent.cpp src/education/EducationProgress.cpp src/missions/Mission.cpp src/spacecraft/Spacecraft.cpp src/physics/PhysicsEngine.cpp src/physics/IntegratorBenchmark.cpp -o bagsolar_education_tests
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) tests/education_tests.cpp src/education/EducationChallenges.cpp src/education/ExperimentEvaluation.cpp src/education/EducationContent.cpp src/education/EducationProgress.cpp src/education/EducationWorkflow.cpp src/missions/Mission.cpp src/spacecraft/Spacecraft.cpp src/physics/PhysicsEngine.cpp src/physics/IntegratorBenchmark.cpp -o bagsolar_education_tests
 	./bagsolar_education_tests
 
 test: planets

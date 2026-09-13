@@ -252,3 +252,12 @@ Spacecraft + ManeuverNode
 Spacecraft and mission calculations are independent of raylib and external
 ephemeris providers. The prediction layer reuses the existing integrator and
 does not alter the main simulation state.
+
+## Phase 9.4 education flow
+
+`EducationWorkflow` is a raylib-independent coordinator between the catalog,
+existing evaluation authorities, and durable progress. `Simulation` owns the
+workflow and exposes narrow activity-control methods to `InputController`;
+`HUD` reads the selected activity, workflow state, home summary, and result.
+The workflow does not calculate physics, duplicate scoring, or replace the
+existing persistence architecture.

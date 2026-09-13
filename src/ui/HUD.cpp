@@ -108,7 +108,25 @@ void HUD::lessonPanel(const Simulation& simulation) const {
     text("LEARN", box.x + 18, box.y + 16, 11, {100, 220, 255, 255});
     text(lesson.title, box.x + 18, box.y + 39, 19);
     DrawTextEx(GetFontDefault(), lesson.body, {box.x + 18, box.y + 73}, 15, 2, alpha(RAYWHITE, 0.82f));
-    text("A / D  change lesson", box.x + 18, box.y + 208, 11, alpha(RAYWHITE, 0.48f));
+    text("EDUCATION HOME", box.x + 18, box.y + 174, 10, {255, 205, 105, 255});
+    const EducationReport report = simulation.educationProgress.report();
+    text(("Lessons " + std::to_string(report.completedLessons) + "/" + std::to_string(report.totalLessons) +
+          "  Experiments " + std::to_string(report.completedExperiments) + "/" + std::to_string(report.totalExperiments)).c_str(),
+         box.x + 18, box.y + 192, 10, alpha(RAYWHITE, 0.75f));
+    text(("Challenges " + std::to_string(report.completedChallenges) + "/" + std::to_string(report.totalChallenges) +
+          "  " + std::string(EducationWorkflow::stateName(simulation.educationWorkflow.state()))).c_str(),
+         box.x + 18, box.y + 208, 10, alpha(RAYWHITE, 0.75f));
+    std::string selectedProgress = "Selected activity";
+    for (const EducationActivityProgress& item : simulation.educationWorkflow.home()) {
+        const EducationActivity& current = simulation.educationWorkflow.activity();
+        if (item.activity.type == current.type && item.activity.index == current.index &&
+            current.type != EducationActivityType::Lesson) {
+            selectedProgress = "Selected attempts " + std::to_string(item.attempts) +
+                "  best " + format(item.bestScore, 1) + "  latest " + format(item.latestScore, 1);
+            break;
+        }
+    }
+    text(selectedProgress.c_str(), box.x + 18, box.y + 224, 10, alpha(RAYWHITE, 0.72f));
 }
 
 void HUD::bottom(const Simulation& simulation) const {
@@ -131,13 +149,19 @@ void HUD::bottom(const Simulation& simulation) const {
 
 void HUD::experimentPanel(const Simulation& simulation) const {
     if (!simulation.education) return;
-    const Rectangle box = panel(20, 345, 360, 245);
+    const Rectangle box = panel(20, 345, 360, 285);
     const Experiment& experiment = experimentAt(simulation.experiment);
     text("EXPERIMENT", box.x + 18, box.y + 16, 11, {100, 220, 255, 255});
     text(experiment.title, box.x + 18, box.y + 39, 19);
     DrawTextEx(GetFontDefault(), experiment.prompt, {box.x + 18, box.y + 74}, 15, 2, alpha(RAYWHITE, 0.82f));
     text(experiment.equation, box.x + 18, box.y + 137, 21, {150, 225, 255, 255});
-    text("↑ / ↓  change   Y  evaluate", box.x + 18, box.y + 184, 11, alpha(RAYWHITE, 0.48f));
+    const bool selectedExperiment = simulation.educationWorkflow.activity().type == EducationActivityType::Experiment &&
+        simulation.educationWorkflow.activity().index == simulation.experiment;
+    const std::string workflowState = (selectedExperiment ? std::string("STATE ") : "STATE SELECT ACTIVITY: ") +
+        EducationWorkflow::stateName(simulation.educationWorkflow.state());
+    text(workflowState.c_str(),
+         box.x + 18, box.y + 161, 10, alpha(RAYWHITE, 0.62f));
+    text("ENTER start  B observe  Y evaluate  Q retry  N next", box.x + 18, box.y + 184, 10, alpha(RAYWHITE, 0.48f));
     if (simulation.lastExperimentEvaluation) {
         const ExperimentEvaluation& result = *simulation.lastExperimentEvaluation;
         text((std::string(experimentEvaluationStatusName(result.status)) + "  " + result.grade + "  " + format(result.score, 1) + "/100").c_str(),
@@ -147,8 +171,17 @@ void HUD::experimentPanel(const Simulation& simulation) const {
                 (std::isfinite(result.metrics.referencePrimaryValue)
                     ? "  Ref: " + format(result.metrics.referencePrimaryValue, 2) : "");
             text(measured.c_str(), box.x + 18, box.y + 220, 10, alpha({190, 215, 235, 255}, 0.78f));
+        } else if (std::isfinite(result.metrics.normalizedError)) {
+            text(("Normalized error: " + format(result.metrics.normalizedError, 4)).c_str(),
+                 box.x + 18, box.y + 220, 10, alpha({190, 215, 235, 255}, 0.78f));
+        } else if (std::isfinite(result.metrics.energyDrift)) {
+            text(("Drift E/L: " + format(result.metrics.energyDrift, 4) + " / " +
+                  format(result.metrics.angularMomentumDrift, 4)).c_str(),
+                 box.x + 18, box.y + 220, 10, alpha({190, 215, 235, 255}, 0.78f));
         }
         DrawTextEx(GetFontDefault(), result.feedback.c_str(), {box.x + 18, box.y + 236}, 10, 1, alpha(RAYWHITE, 0.75f));
+        DrawTextEx(GetFontDefault(), ("Next: " + result.nextStep).c_str(), {box.x + 18, box.y + 251}, 9, 1, alpha({190, 215, 235, 255}, 0.72f));
+        DrawTextEx(GetFontDefault(), ("Why: " + result.explanation).c_str(), {box.x + 18, box.y + 266}, 9, 1, alpha({190, 215, 235, 255}, 0.68f));
     } else {
         text("P  launch probe at escape velocity", box.x + 18, box.y + 204, 11, alpha(RAYWHITE, 0.65f));
     }
@@ -162,6 +195,8 @@ void HUD::challengePanel(const Simulation& simulation) const {
     text(challenge.title.c_str(), box.x + 18, box.y + 39, 19);
     DrawTextEx(GetFontDefault(), challenge.description.c_str(), {box.x + 18, box.y + 73}, 14, 2, alpha(RAYWHITE, 0.82f));
     text(("Objective: " + challenge.learningObjective).c_str(), box.x + 18, box.y + 125, 11, alpha({190, 215, 235, 255}, 0.82f));
+    text(("State: " + std::string(EducationWorkflow::stateName(simulation.educationWorkflow.state()))).c_str(),
+         box.x + 18, box.y + 140, 10, alpha(RAYWHITE, 0.62f));
     if (challenge.kind == ChallengeKind::IntegratorComparison) {
         text(("Method: " + std::string(integratorName(simulation.challengeIntegrator))).c_str(), box.x + 18, box.y + 150, 14, {150, 225, 255, 255});
     } else {
@@ -177,8 +212,10 @@ void HUD::challengePanel(const Simulation& simulation) const {
                   format(result.metrics.referenceArrivalDeltaV / 1000.0, 2) + " km/s").c_str(),
                  box.x + 18, box.y + 225, 11, alpha({190, 215, 235, 255}, 0.78f));
         }
+        DrawTextEx(GetFontDefault(), ("Next: " + result.nextStep).c_str(), {box.x + 18, box.y + 240}, 9, 1, alpha({190, 215, 235, 255}, 0.72f));
+        DrawTextEx(GetFontDefault(), ("Why: " + result.explanation).c_str(), {box.x + 18, box.y + 255}, 9, 1, alpha({190, 215, 235, 255}, 0.68f));
     } else {
-        text("Z / X challenge   [ / ] adjust   I method   C submit", box.x + 18, box.y + 188, 11, alpha(RAYWHITE, 0.58f));
+        text("ENTER start  B observe  [ / ] adjust  I method  C submit", box.x + 18, box.y + 188, 11, alpha(RAYWHITE, 0.58f));
     }
 }
 

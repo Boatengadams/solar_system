@@ -45,6 +45,7 @@ set(BAGSOLAR_SOURCES
     src/education/EducationChallenges.cpp
     src/education/ExperimentEvaluation.cpp
     src/education/EducationProgress.cpp
+    src/education/EducationWorkflow.cpp
     src/input/InputController.cpp
     src/physics/PhysicsEngine.cpp
     src/physics/IntegratorBenchmark.cpp
@@ -131,6 +132,7 @@ if(BUILD_TESTING)
         src/education/ExperimentEvaluation.cpp
         src/education/EducationContent.cpp
         src/education/EducationProgress.cpp
+        src/education/EducationWorkflow.cpp
         src/missions/Mission.cpp
         src/spacecraft/Spacecraft.cpp
         src/physics/PhysicsEngine.cpp
@@ -165,6 +167,7 @@ if(BUILD_TESTING)
         src/education/ExperimentEvaluation.cpp
         src/education/EducationContent.cpp
         src/education/EducationProgress.cpp
+        src/education/EducationWorkflow.cpp
         src/missions/Mission.cpp
         src/spacecraft/Spacecraft.cpp
         src/physics/PhysicsEngine.cpp
@@ -203,6 +206,7 @@ if(BUILD_TESTING)
         src/education/ExperimentEvaluation.cpp
         src/education/EducationContent.cpp
         src/education/EducationProgress.cpp
+        src/education/EducationWorkflow.cpp
         src/missions/Mission.cpp
         src/spacecraft/Spacecraft.cpp
         src/physics/PhysicsEngine.cpp
@@ -250,6 +254,7 @@ if(BUILD_TESTING)
             src/education/EducationChallenges.cpp
             src/education/ExperimentEvaluation.cpp
             src/education/EducationProgress.cpp
+            src/education/EducationWorkflow.cpp
             src/missions/Mission.cpp
             src/spacecraft/Spacecraft.cpp
             src/physics/PhysicsEngine.cpp

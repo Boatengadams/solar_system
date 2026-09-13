@@ -164,6 +164,14 @@ structured experiment-result evaluation are implemented. Broader challenge
 content, richer experiment workflows, and a more complete education UI remain
 future work. Phase 9 remains partial.
 
+### Phase 9.4 — Education workflow
+
+The deterministic learner workflow, activity descriptions, home progress
+summary, guarded run/observe/evaluate transitions, retry/continue actions, and
+minimal HUD controls are implemented over the existing evaluation and progress
+APIs. Richer authored content, learner reports, and a dedicated full education
+screen remain future work; Phase 9 remains partial.
+
 ## Phase 10 — Professional Release
 - Cross-platform build presets. [x]
 - GitHub Actions. [x]

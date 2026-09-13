@@ -20,6 +20,9 @@
 - Centralized experiment-evaluation thresholds, rejected unsafe/non-finite
   numerical observations before scoring, and exposed concise measured/reference
   output in the existing experiment panel.
+- Added a raylib-independent Phase 9.4 education workflow with guarded
+  select/start/observe/evaluate/retry/continue states, home progress summaries,
+  activity descriptions, and existing evaluator/progress routing.
 
 ## 0.10.0
 

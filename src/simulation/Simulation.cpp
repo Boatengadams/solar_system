@@ -18,7 +18,9 @@ constexpr double MAX_FRAME_DELTA = 1.0 / 30.0;
 }
 
 Simulation::Simulation(std::filesystem::path root)
-    : educationProgress(lessonCount(), experimentCount(), challengeCount()), dataRoot(std::move(root)) {
+    : educationProgress(lessonCount(), experimentCount(), challengeCount()),
+      educationWorkflow(educationProgress, lessonCount(), experimentCount(), challengeCount()),
+      dataRoot(std::move(root)) {
     reset();
     setChallenge(0);
 }
@@ -66,6 +68,7 @@ bool Simulation::loadScenario(const std::string& id) {
     challengeScore = 0.0;
     lastChallengeResult.reset();
     lastExperimentEvaluation.reset();
+    educationWorkflow.resetToSelection();
     return true;
 }
 
@@ -291,7 +294,9 @@ bool Simulation::exportTelemetryJson(const std::filesystem::path& path) const { 
 
 void Simulation::setChallenge(int index) {
     if (challengeCount() == 0) return;
-    challenge = ((index % challengeCount()) + challengeCount()) % challengeCount();
+    const int next = ((index % challengeCount()) + challengeCount()) % challengeCount();
+    if (!educationWorkflow.select(EducationActivityType::Challenge, next)) return;
+    challenge = next;
     const ChallengeDefinition& definition = challengeAt(challenge);
     challengeAnswer = definition.defaultAnswer;
     challengeIntegrator = definition.defaultIntegrator;
@@ -316,6 +321,11 @@ void Simulation::cycleChallengeIntegrator(int direction) {
 
 bool Simulation::evaluateCurrentExperiment() {
     if (experiment < 0 || experiment >= experimentCount()) return false;
+    if (educationWorkflow.activity().type == EducationActivityType::Lesson &&
+        educationWorkflow.activity().index == lesson) return educationWorkflow.completeLesson();
+    if (educationWorkflow.state() != EducationWorkflowState::ReadyForEvaluation ||
+        educationWorkflow.activity().type != EducationActivityType::Experiment ||
+        educationWorkflow.activity().index != experiment) return false;
     ExperimentObservation observation;
     int bodyIndex = selected;
     if (bodyIndex < 0 || bodyIndex >= static_cast<int>(bodies.size()) || !bodies[static_cast<std::size_t>(bodyIndex)].active) {
@@ -353,26 +363,69 @@ bool Simulation::evaluateCurrentExperiment() {
         observation.integratorMetrics = compareIntegrators(fixture, config);
     } else {
         lastExperimentEvaluation = evaluateExperiment(id, observation);
-        if (lastExperimentEvaluation->valid) educationProgress.recordExperimentEvaluation(experiment, *lastExperimentEvaluation);
+        educationWorkflow.submitExperiment(*lastExperimentEvaluation);
         return true;
     }
     lastExperimentEvaluation = evaluateExperiment(id, observation);
-    if (lastExperimentEvaluation->valid) educationProgress.recordExperimentEvaluation(experiment, *lastExperimentEvaluation);
+    educationWorkflow.submitExperiment(*lastExperimentEvaluation);
     return true;
 }
 
 bool Simulation::submitChallenge() {
-    if (challengeCount() == 0) return false;
+    if (challengeCount() == 0 || educationWorkflow.state() != EducationWorkflowState::ReadyForEvaluation ||
+        educationWorkflow.activity().type != EducationActivityType::Challenge ||
+        educationWorkflow.activity().index != challenge) return false;
     const ChallengeDefinition& definition = challengeAt(challenge);
     ChallengeAnswer answer;
     answer.primaryValue = challengeAnswer;
     answer.timestepSeconds = challengeAnswer;
     answer.integrator = challengeIntegrator;
     lastChallengeResult = evaluateChallenge(definition, answer);
-    if (!lastChallengeResult->valid) return false;
-    challengeScore = lastChallengeResult->score;
-    educationProgress.recordChallengeResult(challenge, *lastChallengeResult);
+    const bool accepted = educationWorkflow.submitChallenge(*lastChallengeResult);
+    if (accepted && lastChallengeResult->valid) challengeScore = lastChallengeResult->score;
+    return accepted;
+}
+
+bool Simulation::selectEducationActivity(EducationActivityType type, int index) {
+    if (!educationWorkflow.select(type, index)) return false;
+    if (type == EducationActivityType::Experiment) {
+        experiment = educationWorkflow.activity().index;
+        lastExperimentEvaluation.reset();
+    } else if (type == EducationActivityType::Challenge) {
+        challenge = educationWorkflow.activity().index;
+        const ChallengeDefinition& definition = challengeAt(challenge);
+        challengeAnswer = definition.defaultAnswer;
+        challengeIntegrator = definition.defaultIntegrator;
+        challengeScore = 0.0;
+        lastChallengeResult.reset();
+    } else {
+        lesson = educationWorkflow.activity().index;
+    }
     return true;
+}
+
+bool Simulation::startEducationActivity() { return educationWorkflow.start(); }
+bool Simulation::beginEducationObservation() { return educationWorkflow.beginObservation(); }
+bool Simulation::readyEducationForEvaluation() { return educationWorkflow.readyForEvaluation(); }
+bool Simulation::retryEducationActivity() {
+    const bool result = educationWorkflow.retry();
+    if (result) {
+        lastExperimentEvaluation.reset();
+        lastChallengeResult.reset();
+    }
+    return result;
+}
+bool Simulation::continueEducationActivity() {
+    const bool result = educationWorkflow.continueToRecommended();
+    if (result) {
+        const EducationActivity& next = educationWorkflow.activity();
+        if (next.type == EducationActivityType::Experiment) experiment = next.index;
+        else if (next.type == EducationActivityType::Challenge) challenge = next.index;
+        else lesson = next.index;
+        lastExperimentEvaluation.reset();
+        lastChallengeResult.reset();
+    }
+    return result;
 }
 
 bool Simulation::saveEducationProgress(const std::filesystem::path& path) const {
