@@ -45,6 +45,7 @@ public:
     bool showVectors = false;
     bool showGrid = false;
     bool education = true;
+    bool educationScreen = false;
     int selected = -1;
     int lesson = 0;
     int experiment = 0;

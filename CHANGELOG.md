@@ -23,6 +23,11 @@
 - Added a raylib-independent Phase 9.4 education workflow with guarded
   select/start/observe/evaluate/retry/continue states, home progress summaries,
   activity descriptions, and existing evaluator/progress routing.
+- Added a deterministic nine-lesson Phase 9.5 education catalog with
+  prerequisite/reference validation and links to existing activities.
+- Added a dedicated education screen, progress visualization, deterministic
+  learner reports, and next-activity recommendations using the existing HUD,
+  InputController, EducationWorkflow, and schema-v1 progress.
 
 ## 0.10.0
 

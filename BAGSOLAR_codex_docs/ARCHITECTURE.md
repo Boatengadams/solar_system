@@ -261,3 +261,31 @@ workflow and exposes narrow activity-control methods to `InputController`;
 `HUD` reads the selected activity, workflow state, home summary, and result.
 The workflow does not calculate physics, duplicate scoring, or replace the
 existing persistence architecture.
+
+## Phase 9.5 education content and reporting flow
+
+The authored catalog and learner report extend the existing education domain:
+
+```text
+Physics → Simulation → Telemetry / Validation
+                         ↓
+              ExperimentEvaluation / Challenges
+                         ↓
+              EducationProgress (schema v1)
+                         ↓
+             EducationCatalog / LearnerReport
+                         ↓
+                 EducationWorkflow
+                         ↓
+                HUD + InputController
+```
+
+`EducationCatalog` is a small deterministic C++ content model with validation
+for IDs, references, ordering, durations, and prerequisite cycles. It links
+authored lessons to the existing activity catalogs rather than duplicating
+scientific definitions. `LearnerReport` is a pure projection of persisted
+progress; it adds no persistence schema and owns no physics or scoring rules.
+The report recommendation is deterministic and prioritizes incomplete
+prerequisites, incomplete lessons, weak results, then the next unattempted
+activity. The dedicated screen only renders these domain results and routes
+existing workflow actions.

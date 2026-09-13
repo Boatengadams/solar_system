@@ -9,7 +9,17 @@ namespace bag {
 void InputController::update(Simulation& simulation, Renderer& renderer) const {
     renderer.update(simulation);
     if (IsKeyPressed(KEY_SPACE)) simulation.paused = !simulation.paused;
-    if (IsKeyPressed(KEY_L)) simulation.education = !simulation.education;
+    if (IsKeyPressed(KEY_L)) simulation.educationScreen = !simulation.educationScreen;
+    if (simulation.educationScreen) {
+        if (IsKeyPressed(KEY_A)) simulation.selectEducationActivity(EducationActivityType::Lesson, simulation.lesson - 1);
+        if (IsKeyPressed(KEY_D)) simulation.selectEducationActivity(EducationActivityType::Lesson, simulation.lesson + 1);
+        if (IsKeyPressed(KEY_ENTER)) simulation.startEducationActivity();
+        if (IsKeyPressed(KEY_B)) simulation.beginEducationObservation();
+        if (IsKeyPressed(KEY_Y)) simulation.evaluateCurrentExperiment();
+        if (IsKeyPressed(KEY_N)) simulation.continueEducationActivity();
+        if (IsKeyPressed(KEY_BACKSPACE)) simulation.educationScreen = false;
+        return;
+    }
     if (IsKeyPressed(KEY_A)) simulation.selectEducationActivity(EducationActivityType::Lesson, simulation.lesson - 1);
     if (IsKeyPressed(KEY_D)) simulation.selectEducationActivity(EducationActivityType::Lesson, simulation.lesson + 1);
     if (IsKeyPressed(KEY_E)) simulation.selectEducationActivity(EducationActivityType::Experiment, simulation.experiment + 1);

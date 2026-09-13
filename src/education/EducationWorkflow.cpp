@@ -4,6 +4,7 @@
 #include <utility>
 
 #include "EducationChallenges.hpp"
+#include "EducationCatalog.hpp"
 
 namespace bag {
 namespace {
@@ -46,15 +47,16 @@ EducationActivity EducationWorkflow::describe(EducationActivityType type, int in
     result.type = type;
     result.index = wrapIndex(index, count(type));
     if (type == EducationActivityType::Lesson && lessonTotal > 0) {
-        const Lesson& lesson = lessonAt(result.index);
+        const AuthoredLesson& lesson = authoredLessonAt(result.index);
+        result.id = lesson.id;
         result.title = lesson.title;
-        result.objective = "Build a physical intuition for " + std::string(lesson.title) + ".";
-        result.explanation = lesson.body;
-        result.instructions = "Read the objective, then use the simulation view to inspect the stated concept.";
-        result.procedure = "Start the activity, observe the model, and record what changes when the relevant state changes.";
-        result.expectedObservation = "The observed trend should agree with the lesson explanation within the Newtonian model.";
-        result.evaluationMetric = "Learner completion and optional observation; no fabricated numerical score.";
-        result.nextStep = "Continue to the next lesson or select a related experiment.";
+        result.objective = lesson.objectives.empty() ? lesson.shortDescription : lesson.objectives.front();
+        result.explanation = lesson.shortDescription;
+        result.instructions = lesson.sections.empty() ? "Read the objective and inspect the simulation." : lesson.sections.front();
+        result.procedure = "Start the activity, observe the model, and work through the lesson sections in order.";
+        result.expectedObservation = "The observed trend should agree with the authored lesson explanation within the Newtonian model.";
+        result.evaluationMetric = "Lesson completion and optional observation; no fabricated numerical score.";
+        result.nextStep = "Continue to the next lesson or select the associated experiment.";
     } else if (type == EducationActivityType::Experiment && experimentTotal > 0) {
         const Experiment& experiment = experimentAt(result.index);
         result.id = experiment.id;

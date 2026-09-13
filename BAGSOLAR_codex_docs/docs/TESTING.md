@@ -123,3 +123,13 @@ Phase 9.4 workflow tests cover initial state, deterministic selection,
 guarded start/observe/evaluate transitions, retry/continue, lesson completion,
 successful and failed results, invalid/insufficient results, home summaries,
 and preservation of best/latest progress across retries.
+
+Phase 9.5 education tests cover authored-catalog validation (duplicate IDs,
+dangling references, invalid duration, prerequisite cycles, and deterministic
+ordering), lesson lookup and completion, empty/partial/complete learner
+reports, outcome classification, score aggregation, strongest/weak areas,
+recommendation priority, and deterministic report generation. The same tests
+round-trip reports through schema-v1 progress persistence and verify that
+invalid imports do not mutate existing progress. Workflow coverage includes
+education-screen selection, return/continue behavior, and guarded transitions;
+raylib rendering remains outside the domain test boundary.

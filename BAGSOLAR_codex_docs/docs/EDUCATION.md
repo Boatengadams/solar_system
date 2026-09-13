@@ -135,3 +135,31 @@ insufficient results are shown but are not silently recorded as successful
 progress. Valid failed attempts update latest/best scores through schema-1
 progress; retry preserves best results, while continue selects the next
 catalog activity deterministically.
+
+## Phase 9.5 authored catalog and learner report
+
+The education catalog now contains nine authored lessons: Gravity and
+Newton's Law, Escape Velocity, Circular Orbits, Kepler/Orbital Period,
+Orbital Energy, Numerical Integration, Timestep Selection, Hohmann Transfers,
+and Gravity Assists. Each lesson has an ID, concise description, objectives,
+ordered sections, difficulty, estimated duration, prerequisites, and links to
+the existing experiment and challenge IDs. Catalog validation rejects
+duplicate IDs, dangling references, invalid durations or difficulty, and
+prerequisite cycles before the catalog is used.
+
+`LearnerReport` is derived entirely from `EducationProgress`. It reports
+lesson, experiment, and challenge completion; attempts; best/latest scores;
+average latest score for attempted scored activities; strongest areas; areas
+needing practice; and a deterministic next recommendation. It distinguishes
+no attempt, attempted, completed, passed, and failed outcomes. A weak result
+is an attempted failed activity or a latest score below the explicit 75-point
+education policy threshold. No new persisted fields or schema version were
+needed; schema v1 remains the source of truth and reports are reproducible
+after save/load.
+
+The `L` key opens the dedicated Education screen. It presents progress,
+lesson selection, objectives, linked activities, completion state, and the
+learner report while leaving the simulation HUD and domain workflow intact.
+`A`/`D` select lessons, `Enter` starts, `B` begins observation, `Y` completes
+a lesson or evaluates an experiment, `N` follows the recommendation, and
+Backspace returns to simulation.

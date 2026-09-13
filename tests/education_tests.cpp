@@ -11,12 +11,32 @@
 #include "education/EducationProgress.hpp"
 #include "education/ExperimentEvaluation.hpp"
 #include "education/EducationWorkflow.hpp"
+#include "education/EducationCatalog.hpp"
+#include "education/LearnerReport.hpp"
 #include "missions/Mission.hpp"
 
 int main() {
     using namespace bag;
     assert(lessonCount() >= 9);
     assert(experimentCount() >= 6);
+    const EducationCatalogValidation catalogValidation = validateEducationCatalog();
+    assert(catalogValidation.valid && catalogValidation.errors.empty());
+    assert(authoredLessonCount() == 9);
+    assert(authoredLessonAt(0).id == "gravity");
+    assert(authoredLessonAt(1).id == "escape-velocity");
+    std::vector<AuthoredLesson> invalidCatalog = {authoredLessonAt(0), authoredLessonAt(1)};
+    invalidCatalog[1].id = invalidCatalog[0].id;
+    assert(!validateEducationCatalog(invalidCatalog).valid);
+    invalidCatalog = {authoredLessonAt(0)};
+    invalidCatalog[0].estimatedMinutes = 0;
+    assert(!validateEducationCatalog(invalidCatalog).valid);
+    invalidCatalog = {authoredLessonAt(0)};
+    invalidCatalog[0].prerequisites = {"missing"};
+    assert(!validateEducationCatalog(invalidCatalog).valid);
+    invalidCatalog = {authoredLessonAt(0), authoredLessonAt(1)};
+    invalidCatalog[0].prerequisites = {invalidCatalog[1].id};
+    invalidCatalog[1].prerequisites = {invalidCatalog[0].id};
+    assert(!validateEducationCatalog(invalidCatalog).valid);
     EducationProgress progress(lessonCount(), experimentCount());
     assert(progress.completeLesson(0));
     assert(progress.completeExperiment(0));
@@ -207,6 +227,26 @@ int main() {
     assert(challengeProgress.challengeProgress(0)->bestScore == 100.0);
     assert(challengeProgress.exportText() == challengeProgress.exportText());
     assert(challengeProgress.report().completedChallenges == 2);
+
+    EducationProgress emptyReportProgress(lessonCount(), experimentCount(), challengeCount());
+    const LearnerReport emptyReport = buildLearnerReport(emptyReportProgress);
+    assert(emptyReport.completedLessons == 0 && emptyReport.completedExperiments == 0 && emptyReport.completedChallenges == 0);
+    assert(!emptyReport.hasAverageScore && emptyReport.recommendation.id == "gravity");
+    assert(learnerActivityOutcomeName(LearnerActivityOutcome::NoAttempt) == std::string("NO_ATTEMPT"));
+    assert(emptyReportProgress.completeLesson(0));
+    assert(emptyReportProgress.recordExperimentEvaluation(0, escapeEvaluation));
+    assert(emptyReportProgress.recordChallengeResult(0, failedEscape));
+    const LearnerReport partialReport = buildLearnerReport(emptyReportProgress);
+    assert(partialReport.completedLessons == 1 && partialReport.completedExperiments == 1);
+    assert(partialReport.hasAverageScore && partialReport.averageScore == 50.0);
+    assert(partialReport.recommendation.id == "circular-orbits");
+    assert(!partialReport.areasNeedingImprovement.empty());
+    const std::string reportProgressSerialized = emptyReportProgress.serialize();
+    EducationProgress reportRestored(lessonCount(), experimentCount(), challengeCount());
+    assert(reportRestored.deserialize(reportProgressSerialized));
+    const LearnerReport restoredReport = buildLearnerReport(reportRestored);
+    assert(restoredReport.recommendation.id == partialReport.recommendation.id);
+    assert(restoredReport.averageScore == partialReport.averageScore);
 
     EducationProgress workflowProgress(lessonCount(), experimentCount(), challengeCount());
     EducationWorkflow workflow(workflowProgress, lessonCount(), experimentCount(), challengeCount());

@@ -20,6 +20,7 @@ private:
     void bottom(const Simulation& simulation) const;
     void experimentPanel(const Simulation& simulation) const;
     void challengePanel(const Simulation& simulation) const;
+    void educationScreenPanel(const Simulation& simulation) const;
 };
 
 } // namespace bag

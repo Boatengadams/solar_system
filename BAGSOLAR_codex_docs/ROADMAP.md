@@ -172,6 +172,22 @@ minimal HUD controls are implemented over the existing evaluation and progress
 APIs. Richer authored content, learner reports, and a dedicated full education
 screen remain future work; Phase 9 remains partial.
 
+### Phase 9.5 — Education content, dedicated UI, and learner reports
+
+- Authored nine-lesson deterministic catalog with validation. [x]
+- Lesson objectives, sections, prerequisites, and activity links. [x]
+- Dedicated education screen using existing HUD/InputController seams. [x]
+- Learner report derived from schema-v1 progress. [x]
+- Deterministic next-activity recommendation. [x]
+- Catalog, report, workflow, and persistence regression tests. [x]
+
+Status: Phase 9.5 is complete for the focused catalog, education-screen, and
+reporting scope. The implementation remains intentionally lightweight: lesson
+content is compiled deterministic data rather than a general content CMS, and
+the screen is a compact raylib HUD view. Phase 9 remains partial for future
+broader authored content, richer presentation, and additional learner-facing
+polish. Phase 10 has not started.
+
 ## Phase 10 — Professional Release
 - Cross-platform build presets. [x]
 - GitHub Actions. [x]

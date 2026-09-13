@@ -7,6 +7,8 @@
 
 #include "../education/EducationContent.hpp"
 #include "../education/EducationChallenges.hpp"
+#include "../education/EducationCatalog.hpp"
+#include "../education/LearnerReport.hpp"
 #include "../physics/PhysicsEngine.hpp"
 
 namespace bag {
@@ -220,12 +222,70 @@ void HUD::challengePanel(const Simulation& simulation) const {
 }
 
 void HUD::draw(const Simulation& simulation) const {
+    if (simulation.educationScreen) {
+        educationScreenPanel(simulation);
+        return;
+    }
     top(simulation);
     lessonPanel(simulation);
     experimentPanel(simulation);
     challengePanel(simulation);
     selectedInfo(simulation);
     bottom(simulation);
+}
+
+void HUD::educationScreenPanel(const Simulation& simulation) const {
+    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), {5, 12, 24, 255});
+    const LearnerReport report = buildLearnerReport(simulation.educationProgress);
+    const AuthoredLesson& lesson = authoredLessonAt(simulation.lesson);
+    text("EDUCATION", 36, 28, 30, {110, 220, 255, 255});
+    text("Offline Newtonian astrodynamics laboratory", 38, 64, 13, alpha(RAYWHITE, 0.62f));
+
+    text("PROGRESS", 38, 108, 12, {255, 205, 105, 255});
+    text(("Lessons      " + std::to_string(report.completedLessons) + " / " + std::to_string(report.totalLessons)).c_str(), 38, 132, 14);
+    text(("Experiments  " + std::to_string(report.completedExperiments) + " / " + std::to_string(report.totalExperiments)).c_str(), 38, 154, 14);
+    text(("Challenges   " + std::to_string(report.completedChallenges) + " / " + std::to_string(report.totalChallenges)).c_str(), 38, 176, 14);
+    DrawRectangle(38, 202, 250, 12, {30, 55, 80, 255});
+    DrawRectangle(38, 202, report.totalLessons == 0 ? 0 : 250 * report.completedLessons / report.totalLessons, 12, {80, 200, 255, 255});
+    text("Lesson completion", 38, 222, 11, alpha(RAYWHITE, 0.58f));
+
+    text("LESSONS", 38, 270, 12, {255, 205, 105, 255});
+    for (int index = 0; index < authoredLessonCount(); ++index) {
+        const AuthoredLesson& item = authoredLessonAt(index);
+        const bool selected = index == simulation.lesson;
+        const bool complete = simulation.educationProgress.lessonComplete(index);
+        if (selected) DrawRectangleRounded({32, 292.0f + index * 28.0f, 300, 24}, 0.2f, 8, {35, 82, 112, 255});
+        text((std::string(complete ? "✓ " : "• ") + item.title).c_str(), 44, 297.0f + index * 28.0f, 12,
+             selected ? RAYWHITE : alpha(RAYWHITE, 0.68f));
+    }
+
+    text(lesson.title.c_str(), 380, 108, 25, {150, 225, 255, 255});
+    text(lesson.shortDescription.c_str(), 382, 142, 13, alpha(RAYWHITE, 0.82f));
+    text("OBJECTIVES", 382, 184, 11, {255, 205, 105, 255});
+    for (std::size_t index = 0; index < lesson.objectives.size() && index < 3; ++index)
+        text(("• " + lesson.objectives[index]).c_str(), 390, 207.0f + index * 20.0f, 12, alpha(RAYWHITE, 0.78f));
+    text(("Difficulty: " + std::string(educationDifficultyName(lesson.difficulty)) +
+          "   Duration: " + std::to_string(lesson.estimatedMinutes) + " min").c_str(), 382, 274, 12, alpha(RAYWHITE, 0.65f));
+    text("LINKED ACTIVITIES", 382, 314, 11, {255, 205, 105, 255});
+    const std::string experiment = lesson.experimentIds.empty() ? "none" : lesson.experimentIds.front();
+    const std::string challenge = lesson.challengeIds.empty() ? "none" : lesson.challengeIds.front();
+    text(("Experiment: " + experiment).c_str(), 390, 337, 12, alpha(RAYWHITE, 0.78f));
+    text(("Challenge: " + challenge).c_str(), 390, 359, 12, alpha(RAYWHITE, 0.78f));
+    text(("Status: " + std::string(simulation.educationProgress.lessonComplete(simulation.lesson) ? "COMPLETED" : "NOT COMPLETED")).c_str(), 382, 399, 13,
+         simulation.educationProgress.lessonComplete(simulation.lesson) ? Color{80, 235, 150, 255} : ORANGE);
+
+    text("LEARNER REPORT", 760, 108, 12, {255, 205, 105, 255});
+    text(report.hasAverageScore ? ("Average score: " + format(report.averageScore, 1)).c_str() : "Average score: no scored activities", 760, 134, 12);
+    text("Strongest areas", 760, 174, 11, alpha(RAYWHITE, 0.6f));
+    if (report.strongestAreas.empty()) text("None yet", 770, 196, 12, alpha(RAYWHITE, 0.7f));
+    for (std::size_t index = 0; index < report.strongestAreas.size() && index < 3; ++index) text(("• " + report.strongestAreas[index]).c_str(), 770, 196.0f + index * 20.0f, 12);
+    text("Needs practice", 760, 272, 11, alpha(RAYWHITE, 0.6f));
+    if (report.areasNeedingImprovement.empty()) text("None identified", 770, 294, 12, alpha(RAYWHITE, 0.7f));
+    for (std::size_t index = 0; index < report.areasNeedingImprovement.size() && index < 3; ++index) text(("• " + report.areasNeedingImprovement[index]).c_str(), 770, 294.0f + index * 20.0f, 12);
+    text("RECOMMENDED NEXT", 760, 370, 11, {255, 205, 105, 255});
+    text(report.recommendation.available ? report.recommendation.title.c_str() : "None", 760, 394, 14, {150, 225, 255, 255});
+    if (report.recommendation.available) DrawTextEx(GetFontDefault(), report.recommendation.reason.c_str(), {760, 420}, 11, 1, alpha(RAYWHITE, 0.72f));
+    text("A / D browse lessons   ENTER start   B observe   Y complete   N next   BACKSPACE return", 38, GetScreenHeight() - 34, 12, alpha(RAYWHITE, 0.65f));
 }
 
 } // namespace bag

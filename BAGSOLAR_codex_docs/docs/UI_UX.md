@@ -71,6 +71,22 @@ Result panels show only metrics available from the result: measured/reference
 values, normalized numerical error, or energy/angular-momentum drift as
 appropriate. Scoring and physics remain outside the UI.
 
+## Phase 9.5 Education screen
+
+`L` toggles a dedicated Education screen over the existing simulation view.
+It is organized as Education, progress summary, lessons, selected lesson
+details, linked activities, and a compact learner report. The selected lesson
+shows its objective, explanation, objectives, prerequisites/status, difficulty,
+duration, experiment/challenge links, and completion bar. The report shows
+attempt-aware average performance, strongest areas, areas needing practice,
+and the deterministic next activity. It does not fabricate unavailable
+scientific metrics and does not write progress implicitly.
+
+Education-screen controls are `A`/`D` for lesson selection, `Enter` to start,
+`B` to begin observation, `Y` to complete/evaluate, `N` for the recommended
+next activity, and Backspace to return to simulation. The normal simulation
+HUD remains available when the screen is closed.
+
 ## Suggested UI Technology
 raylib remains the renderer.
 Dear ImGui may be used for developer/scientific panels where appropriate.
