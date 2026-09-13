@@ -1,9 +1,0 @@
-bagsolar_physics_tests 71 5.75664e-05
-bagsolar_data_tests 66 0.00018997
-bagsolar_validation_tests 52 0.0246279
-bagsolar_telemetry_tests 46 0.000335754
-bagsolar_ephemeris_tests 39 0.000205106
-bagsolar_spacecraft_tests 34 8.80561e-05
-bagsolar_education_tests 31 0.0017038
-bagsolar_advanced_data_tests 31 9.42083e-05
----

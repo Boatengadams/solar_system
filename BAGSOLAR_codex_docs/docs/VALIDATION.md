@@ -104,4 +104,5 @@ step and is therefore a numerical reference, not external ephemeris data.
 `compareEphemerisStates` compares valid states only when body, Julian Date,
 frame, orientation, origin, and SI units match. It reports position difference
 in metres and velocity difference in metres/second, without claiming that independent providers are
-identical. This is the foundation for future prediction-versus-reality work.
+identical. This is the foundation for the implemented Prediction vs Reference
+workflow.

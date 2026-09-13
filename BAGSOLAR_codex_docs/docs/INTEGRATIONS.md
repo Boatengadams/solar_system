@@ -16,7 +16,9 @@ Use for scientific/debug/control panels if it improves UX.
 Phase 6 provides an isolated `HorizonsProvider` using the official API's JSON
 VECTORS contract. HTTP is injected through `HttpClient`; normal tests use a
 fake client and never access NASA. The command-line curl transport is explicit
-and timeout-bounded. SPICE and spacecraft ephemeris remain future work.
+and timeout-bounded. Optional SPICE support is provided by the astronomy
+adapter; spacecraft dynamics remain an internal domain subsystem rather than
+an ephemeris provider.
 
 ## Advanced
 ### NASA SPICE

@@ -2,9 +2,26 @@
 /build/
 /build-spice/
 /build-release/
+/build-warnings/
 /planets
 /bagsolar_validation
 /bagsolar_*
+
+# Compiler and IDE-generated files
+*.o
+*.obj
+*.a
+*.so
+*.dll
+*.dylib
+*.exe
+*.out
+*.d
+*.gcda
+*.gcno
+*.profraw
+compile_commands.json
+CMakeUserPresets.json
 
 # Generated packages, logs, and local test output
 *.tar.gz

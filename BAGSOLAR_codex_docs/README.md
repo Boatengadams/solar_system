@@ -8,13 +8,18 @@ BAGSOLAR lets users simulate, visualize and experiment with orbital mechanics us
 ## Status
 Active development / prototype-to-engineering transition.
 
-## Architecture
-See:
-- PROJECT.md
-- ARCHITECTURE.md
-- CODEX.md
-- ROADMAP.md
-- docs/
+## Architecture and documentation
+
+`BAGSOLAR_codex_docs/` is the canonical documentation tree. Start with:
+
+- `PROJECT.md`
+- `ARCHITECTURE.md`
+- `CODEX.md`
+- `ROADMAP.md`
+- `docs/BUILD.md`
+- `docs/VALIDATION.md`
+- `docs/PREDICTION_VS_REFERENCE.md`
+- `THIRD_PARTY_LICENSES.md`
 
 ## Development
 Read `CODEX.md` before making architectural changes.

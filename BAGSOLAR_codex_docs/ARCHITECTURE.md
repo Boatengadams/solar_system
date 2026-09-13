@@ -48,12 +48,13 @@ BAGSOLAR/
 ├── README.md
 ├── LICENSE
 ├── CHANGELOG.md
-├── CONTRIBUTING.md
-├── ROADMAP.md
-├── PROJECT.md
-├── ARCHITECTURE.md
-├── CODEX.md
-├── docs/
+├── BAGSOLAR_codex_docs/
+│   ├── PROJECT.md
+│   ├── ARCHITECTURE.md
+│   ├── CODEX.md
+│   ├── ROADMAP.md
+│   ├── THIRD_PARTY_LICENSES.md
+│   └── docs/
 │   ├── PHYSICS.md
 │   ├── DATA_MODEL.md
 │   ├── EPHEMERIS.md

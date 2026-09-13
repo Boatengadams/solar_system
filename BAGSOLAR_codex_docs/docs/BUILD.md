@@ -4,11 +4,10 @@
 - C++17 or newer as intentionally selected by the project
 - CMake
 - raylib
-- test framework
-- optional JSON library
-- optional UI/plotting dependencies
+- CTest (provided by CMake) for the regression suite
+- the bundled nlohmann/json headers for JSON data and persistence
 
-Phase 2 adds the local nlohmann/json single-header package under
+Phase 2 adds the local nlohmann/json package under
 `third_party/nlohmann-json3-dev/usr/include`. The package is MIT licensed and
 is used only by the data layer for JSON parsing and serialization.
 

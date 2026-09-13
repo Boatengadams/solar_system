@@ -1,5 +1,10 @@
 # Prediction vs Reference
 
+The authoritative version of this document is
+[`BAGSOLAR_codex_docs/docs/PREDICTION_VS_REFERENCE.md`](../BAGSOLAR_codex_docs/docs/PREDICTION_VS_REFERENCE.md).
+This root-level entry is retained as a compatibility entry point for existing
+readers and references.
+
 BAGSOLAR compares a deterministic numerical prediction with an explicit reference ephemeris state. A reference is a model or data source, not observational truth; the feature is intentionally called **Prediction vs Reference**.
 
 Every request records Julian Date epochs, frame, frame origin and orientation, SI metres/metres-per-second, provider/source, integrator, timestep, initial reference state, and comparison epochs. The prediction starts from the same reference state at the initial epoch. Incompatible epochs, bodies, frames, origins, or units are rejected with structured status values.

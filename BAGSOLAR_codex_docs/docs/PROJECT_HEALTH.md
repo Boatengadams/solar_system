@@ -60,15 +60,11 @@ the education tests, so the running HUD path exercises the same API.
 Evaluator policy constants are shared and malformed numerical observations are
 rejected before scoring.
 
-### Remaining
+### Scope beyond Phase 9.7
 
-- Broader interactive challenge catalog.
-- Broader learner-facing experiment workflows and richer evaluation display.
-- Additional challenge/content authoring and progress views.
-
-Phase 9 remains partial: challenge/scoring, durable progress, and structured
-experiment evaluation are implemented, while broader education UI/catalog
-scope remains.
+- A general education content CMS.
+- Broader optional challenge/content authoring.
+- Additional presentation polish beyond the compact documented UI.
 
 ## Current Phase 10 status
 
@@ -88,7 +84,9 @@ scope remains.
 - Screenshots, demo video, and release media.
 - Release signing, artifact publication, and a formal 1.0 process.
 
-Estimated Phase 10 completion: 71% of the roadmap checklist.
+Phase 10 release preparation is in progress. Repository hygiene, licensing,
+documentation consistency, installed-resource discovery, and release/demo
+work are tracked separately from the completed feature phases.
 
 ## Architecture health
 
@@ -137,6 +135,6 @@ future build artifacts from being added.
 - Generated build files are historically tracked and need a separate cleanup
   decision before a clean release commit; they currently prevent an exact
   clean `git diff --check` after verification.
-- Phase 9 education challenges and Phase 10 publication/media work remain.
+- Phase 10 publication/media and release-readiness work remain.
 - External CSPICE and kernels remain optional runtime/build inputs and are not
   distributed by BAGSOLAR.

@@ -128,8 +128,9 @@ telemetry samples and therefore report insufficient data when the simulation
 does not contain those samples. The layer remains raylib-independent; the HUD
 only presents its result.
 
-Remaining Phase 9 work includes richer challenge/content authoring, broader
-learner reports, and more complete education UI.
+Future work beyond Phase 9.7 may add richer challenge/content authoring and
+broader education presentation; the current catalog, workflow, reporting, and
+compact UI are implemented for the documented scope.
 
 ## Phase 9.4 learner workflow
 

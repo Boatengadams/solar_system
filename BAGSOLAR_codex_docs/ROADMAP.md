@@ -158,19 +158,20 @@ work.
 - Student experiment reports. [x]
 - Progress tracking. [x]
 
-Status: deterministic challenge workflows, numerical-method scoring, learner
-results, Hohmann transfer scoring, versioned durable progress persistence, and
-structured experiment-result evaluation are implemented. Broader challenge
-content, richer experiment workflows, and a more complete education UI remain
-future work. Phase 9 remains partial.
+Status: complete for the documented Phase 9 scope. Deterministic challenge
+workflows, numerical-method scoring, learner results, Hohmann transfer
+scoring, versioned durable progress persistence, structured experiment-result
+evaluation, the authored catalog, learner reporting, and the compact education
+UI are implemented. A general content CMS and broader content remain outside
+this phase.
 
 ### Phase 9.4 — Education workflow
 
 The deterministic learner workflow, activity descriptions, home progress
 summary, guarded run/observe/evaluate transitions, retry/continue actions, and
-minimal HUD controls are implemented over the existing evaluation and progress
-APIs. Richer authored content, learner reports, and a dedicated full education
-screen remain future work; Phase 9 remains partial.
+HUD controls are implemented over the existing evaluation and progress APIs.
+The catalog, learner reports, and dedicated compact education screen are also
+implemented; a general content CMS remains outside the phase.
 
 ### Phase 9.5 — Education content, dedicated UI, and learner reports
 
@@ -184,9 +185,21 @@ screen remain future work; Phase 9 remains partial.
 Status: Phase 9.5 is complete for the focused catalog, education-screen, and
 reporting scope. The implementation remains intentionally lightweight: lesson
 content is compiled deterministic data rather than a general content CMS, and
-the screen is a compact raylib HUD view. Phase 9 remains partial for future
-broader authored content, richer presentation, and additional learner-facing
-polish. Phase 10 has not started.
+the screen is a compact raylib HUD view.
+
+### Phase 9.6 — Prediction vs Reference
+
+Status: complete. Deterministic multi-epoch prediction/reference comparison,
+provider injection, education integration, persistence, and offline coverage
+are implemented. Reference disagreement is not presented as literal truth or
+as automatically pure numerical integration error.
+
+### Phase 9.7 — Education and UI polish
+
+Status: complete for the documented scope. Discoverable navigation, Help,
+Education, Scenario Browser, Telemetry, Settings, Mission Tools status, and
+compact Prediction vs Reference presentation are implemented without changing
+scientific calculations or telemetry schema.
 
 ## Phase 10 — Professional Release
 - Cross-platform build presets. [x]
@@ -203,10 +216,3 @@ Published binaries, media assets, and cross-platform CI remain outstanding.
 
 ## Priority Rule
 Do not start advanced features until the previous phase has tests and a stable interface.
-# Phase 9.6
-
-Prediction vs Reference comparison is implemented with explicit scientific
-contracts, deterministic multi-epoch propagation, education integration, and
-offline validation coverage. The learner-facing workflow uses Simulation's
-configured provider, with the deterministic local provider as its offline
-default.

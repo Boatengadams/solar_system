@@ -1,5 +1,13 @@
 # Changelog
 
+## Phase 10.2 — Repository and licensing hygiene
+
+- Removed tracked generated build outputs and the tracked development binary.
+- Added the project MIT license and a third-party software/external-data
+  summary.
+- Identified `BAGSOLAR_codex_docs/` as the canonical documentation tree and
+  corrected stale Phase 9, SPICE, and Prediction vs Reference wording.
+
 ## Phase 9.7
 
 - Added compact application navigation, Help/Controls, scenario discovery,

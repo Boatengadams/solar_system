@@ -7,9 +7,15 @@ BAGSOLAR behavior is preserved while the code is organized into raylib-free
 physics/simulation modules and raylib-facing rendering, UI, and input modules.
 
 Project specifications and the Phase 0/1 implementation plan are in
-`BAGSOLAR_codex_docs/`.
+`BAGSOLAR_codex_docs/`. This is the canonical documentation tree for the
+project; the root `docs/` path is retained only for the public
+Prediction vs Reference entry point.
 
-Validation uses an offline-capable [Prediction vs Reference](docs/PREDICTION_VS_REFERENCE.md)
+BAGSOLAR source code is released under the MIT License in `LICENSE`.
+Bundled and optional external components are summarized in
+`BAGSOLAR_codex_docs/THIRD_PARTY_LICENSES.md`.
+
+Validation uses an offline-capable [Prediction vs Reference](BAGSOLAR_codex_docs/docs/PREDICTION_VS_REFERENCE.md)
 comparison with explicit Julian Date, frame/origin, SI-unit, provider, integrator,
 and timestep contracts. Reference disagreement is not treated as observational truth
 or automatically attributed solely to numerical integration.
@@ -34,6 +40,11 @@ Install the system dependency once by using the following command in your termin
 sudo apt update
 sudo apt install g++ cmake pkg-config libraylib-dev
 ```
+
+The application build requires raylib. The bundled nlohmann/json package is
+used by the data layer. CSPICE, external kernels, and network access are
+optional; the Horizons command-line transport additionally uses a local
+`curl` executable.
 
 to configure this and build follow this process:
 
