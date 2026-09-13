@@ -65,6 +65,26 @@ CMAKE_BINARY_DIR = /home/kali/Desktop/Cpp_Advance/build
 #=============================================================================
 # Targets provided globally by CMake.
 
+# Special rule for the target package
+package: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Run CPack packaging tool..."
+	/usr/bin/cpack --config ./CPackConfig.cmake
+.PHONY : package
+
+# Special rule for the target package
+package/fast: package
+.PHONY : package/fast
+
+# Special rule for the target package_source
+package_source:
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Run CPack packaging tool for source..."
+	/usr/bin/cpack --config ./CPackSourceConfig.cmake
+.PHONY : package_source
+
+# Special rule for the target package_source
+package_source/fast: package_source
+.PHONY : package_source/fast
+
 # Special rule for the target test
 test:
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Running tests..."
@@ -94,6 +114,51 @@ rebuild_cache:
 # Special rule for the target rebuild_cache
 rebuild_cache/fast: rebuild_cache
 .PHONY : rebuild_cache/fast
+
+# Special rule for the target list_install_components
+list_install_components:
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Available install components are: \"Unspecified\""
+.PHONY : list_install_components
+
+# Special rule for the target list_install_components
+list_install_components/fast: list_install_components
+.PHONY : list_install_components/fast
+
+# Special rule for the target install
+install: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Install the project..."
+	/usr/bin/cmake -P cmake_install.cmake
+.PHONY : install
+
+# Special rule for the target install
+install/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Install the project..."
+	/usr/bin/cmake -P cmake_install.cmake
+.PHONY : install/fast
+
+# Special rule for the target install/local
+install/local: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing only the local directory..."
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local
+
+# Special rule for the target install/local
+install/local/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing only the local directory..."
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local/fast
+
+# Special rule for the target install/strip
+install/strip: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing the project stripped..."
+	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip
+
+# Special rule for the target install/strip
+install/strip/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing the project stripped..."
+	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -529,6 +594,110 @@ bagsolar_data_tests/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_data_tests.dir/build.make CMakeFiles/bagsolar_data_tests.dir/build
 .PHONY : bagsolar_data_tests/fast
 
+#=============================================================================
+# Target rules for targets named bagsolar_validation_tests
+
+# Build rule for target.
+bagsolar_validation_tests: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 bagsolar_validation_tests
+.PHONY : bagsolar_validation_tests
+
+# fast build rule for target.
+bagsolar_validation_tests/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_validation_tests.dir/build.make CMakeFiles/bagsolar_validation_tests.dir/build
+.PHONY : bagsolar_validation_tests/fast
+
+#=============================================================================
+# Target rules for targets named bagsolar_telemetry_tests
+
+# Build rule for target.
+bagsolar_telemetry_tests: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 bagsolar_telemetry_tests
+.PHONY : bagsolar_telemetry_tests
+
+# fast build rule for target.
+bagsolar_telemetry_tests/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/build
+.PHONY : bagsolar_telemetry_tests/fast
+
+#=============================================================================
+# Target rules for targets named bagsolar_ephemeris_tests
+
+# Build rule for target.
+bagsolar_ephemeris_tests: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 bagsolar_ephemeris_tests
+.PHONY : bagsolar_ephemeris_tests
+
+# fast build rule for target.
+bagsolar_ephemeris_tests/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/build
+.PHONY : bagsolar_ephemeris_tests/fast
+
+#=============================================================================
+# Target rules for targets named bagsolar_spacecraft_tests
+
+# Build rule for target.
+bagsolar_spacecraft_tests: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 bagsolar_spacecraft_tests
+.PHONY : bagsolar_spacecraft_tests
+
+# fast build rule for target.
+bagsolar_spacecraft_tests/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_spacecraft_tests.dir/build.make CMakeFiles/bagsolar_spacecraft_tests.dir/build
+.PHONY : bagsolar_spacecraft_tests/fast
+
+#=============================================================================
+# Target rules for targets named bagsolar_education_tests
+
+# Build rule for target.
+bagsolar_education_tests: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 bagsolar_education_tests
+.PHONY : bagsolar_education_tests
+
+# fast build rule for target.
+bagsolar_education_tests/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_education_tests.dir/build.make CMakeFiles/bagsolar_education_tests.dir/build
+.PHONY : bagsolar_education_tests/fast
+
+#=============================================================================
+# Target rules for targets named bagsolar_advanced_data_tests
+
+# Build rule for target.
+bagsolar_advanced_data_tests: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 bagsolar_advanced_data_tests
+.PHONY : bagsolar_advanced_data_tests
+
+# fast build rule for target.
+bagsolar_advanced_data_tests/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_advanced_data_tests.dir/build.make CMakeFiles/bagsolar_advanced_data_tests.dir/build
+.PHONY : bagsolar_advanced_data_tests/fast
+
+#=============================================================================
+# Target rules for targets named bagsolar_validation
+
+# Build rule for target.
+bagsolar_validation: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 bagsolar_validation
+.PHONY : bagsolar_validation
+
+# fast build rule for target.
+bagsolar_validation/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_validation.dir/build.make CMakeFiles/bagsolar_validation.dir/build
+.PHONY : bagsolar_validation/fast
+
+#=============================================================================
+# Target rules for targets named bagsolar_ephemeris
+
+# Build rule for target.
+bagsolar_ephemeris: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 bagsolar_ephemeris
+.PHONY : bagsolar_ephemeris
+
+# fast build rule for target.
+bagsolar_ephemeris/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris.dir/build.make CMakeFiles/bagsolar_ephemeris.dir/build
+.PHONY : bagsolar_ephemeris/fast
+
 src/app/main.o: src/app/main.cpp.o
 .PHONY : src/app/main.o
 
@@ -553,12 +722,311 @@ src/app/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/app/main.cpp.s
 .PHONY : src/app/main.cpp.s
 
+src/astronomy/CurlHttpClient.o: src/astronomy/CurlHttpClient.cpp.o
+.PHONY : src/astronomy/CurlHttpClient.o
+
+# target to build an object file
+src/astronomy/CurlHttpClient.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/astronomy/CurlHttpClient.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/astronomy/CurlHttpClient.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris.dir/build.make CMakeFiles/bagsolar_ephemeris.dir/src/astronomy/CurlHttpClient.cpp.o
+.PHONY : src/astronomy/CurlHttpClient.cpp.o
+
+src/astronomy/CurlHttpClient.i: src/astronomy/CurlHttpClient.cpp.i
+.PHONY : src/astronomy/CurlHttpClient.i
+
+# target to preprocess a source file
+src/astronomy/CurlHttpClient.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/astronomy/CurlHttpClient.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/astronomy/CurlHttpClient.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris.dir/build.make CMakeFiles/bagsolar_ephemeris.dir/src/astronomy/CurlHttpClient.cpp.i
+.PHONY : src/astronomy/CurlHttpClient.cpp.i
+
+src/astronomy/CurlHttpClient.s: src/astronomy/CurlHttpClient.cpp.s
+.PHONY : src/astronomy/CurlHttpClient.s
+
+# target to generate assembly for a file
+src/astronomy/CurlHttpClient.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/astronomy/CurlHttpClient.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/astronomy/CurlHttpClient.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris.dir/build.make CMakeFiles/bagsolar_ephemeris.dir/src/astronomy/CurlHttpClient.cpp.s
+.PHONY : src/astronomy/CurlHttpClient.cpp.s
+
+src/astronomy/EphemerisComparison.o: src/astronomy/EphemerisComparison.cpp.o
+.PHONY : src/astronomy/EphemerisComparison.o
+
+# target to build an object file
+src/astronomy/EphemerisComparison.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/astronomy/EphemerisComparison.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_advanced_data_tests.dir/build.make CMakeFiles/bagsolar_advanced_data_tests.dir/src/astronomy/EphemerisComparison.cpp.o
+.PHONY : src/astronomy/EphemerisComparison.cpp.o
+
+src/astronomy/EphemerisComparison.i: src/astronomy/EphemerisComparison.cpp.i
+.PHONY : src/astronomy/EphemerisComparison.i
+
+# target to preprocess a source file
+src/astronomy/EphemerisComparison.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/astronomy/EphemerisComparison.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_advanced_data_tests.dir/build.make CMakeFiles/bagsolar_advanced_data_tests.dir/src/astronomy/EphemerisComparison.cpp.i
+.PHONY : src/astronomy/EphemerisComparison.cpp.i
+
+src/astronomy/EphemerisComparison.s: src/astronomy/EphemerisComparison.cpp.s
+.PHONY : src/astronomy/EphemerisComparison.s
+
+# target to generate assembly for a file
+src/astronomy/EphemerisComparison.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/astronomy/EphemerisComparison.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_advanced_data_tests.dir/build.make CMakeFiles/bagsolar_advanced_data_tests.dir/src/astronomy/EphemerisComparison.cpp.s
+.PHONY : src/astronomy/EphemerisComparison.cpp.s
+
+src/astronomy/EphemerisTypes.o: src/astronomy/EphemerisTypes.cpp.o
+.PHONY : src/astronomy/EphemerisTypes.o
+
+# target to build an object file
+src/astronomy/EphemerisTypes.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/astronomy/EphemerisTypes.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/astronomy/EphemerisTypes.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/astronomy/EphemerisTypes.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_advanced_data_tests.dir/build.make CMakeFiles/bagsolar_advanced_data_tests.dir/src/astronomy/EphemerisTypes.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris.dir/build.make CMakeFiles/bagsolar_ephemeris.dir/src/astronomy/EphemerisTypes.cpp.o
+.PHONY : src/astronomy/EphemerisTypes.cpp.o
+
+src/astronomy/EphemerisTypes.i: src/astronomy/EphemerisTypes.cpp.i
+.PHONY : src/astronomy/EphemerisTypes.i
+
+# target to preprocess a source file
+src/astronomy/EphemerisTypes.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/astronomy/EphemerisTypes.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/astronomy/EphemerisTypes.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/astronomy/EphemerisTypes.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_advanced_data_tests.dir/build.make CMakeFiles/bagsolar_advanced_data_tests.dir/src/astronomy/EphemerisTypes.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris.dir/build.make CMakeFiles/bagsolar_ephemeris.dir/src/astronomy/EphemerisTypes.cpp.i
+.PHONY : src/astronomy/EphemerisTypes.cpp.i
+
+src/astronomy/EphemerisTypes.s: src/astronomy/EphemerisTypes.cpp.s
+.PHONY : src/astronomy/EphemerisTypes.s
+
+# target to generate assembly for a file
+src/astronomy/EphemerisTypes.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/astronomy/EphemerisTypes.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/astronomy/EphemerisTypes.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/astronomy/EphemerisTypes.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_advanced_data_tests.dir/build.make CMakeFiles/bagsolar_advanced_data_tests.dir/src/astronomy/EphemerisTypes.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris.dir/build.make CMakeFiles/bagsolar_ephemeris.dir/src/astronomy/EphemerisTypes.cpp.s
+.PHONY : src/astronomy/EphemerisTypes.cpp.s
+
+src/astronomy/HorizonsParser.o: src/astronomy/HorizonsParser.cpp.o
+.PHONY : src/astronomy/HorizonsParser.o
+
+# target to build an object file
+src/astronomy/HorizonsParser.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/astronomy/HorizonsParser.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/astronomy/HorizonsParser.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris.dir/build.make CMakeFiles/bagsolar_ephemeris.dir/src/astronomy/HorizonsParser.cpp.o
+.PHONY : src/astronomy/HorizonsParser.cpp.o
+
+src/astronomy/HorizonsParser.i: src/astronomy/HorizonsParser.cpp.i
+.PHONY : src/astronomy/HorizonsParser.i
+
+# target to preprocess a source file
+src/astronomy/HorizonsParser.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/astronomy/HorizonsParser.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/astronomy/HorizonsParser.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris.dir/build.make CMakeFiles/bagsolar_ephemeris.dir/src/astronomy/HorizonsParser.cpp.i
+.PHONY : src/astronomy/HorizonsParser.cpp.i
+
+src/astronomy/HorizonsParser.s: src/astronomy/HorizonsParser.cpp.s
+.PHONY : src/astronomy/HorizonsParser.s
+
+# target to generate assembly for a file
+src/astronomy/HorizonsParser.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/astronomy/HorizonsParser.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/astronomy/HorizonsParser.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris.dir/build.make CMakeFiles/bagsolar_ephemeris.dir/src/astronomy/HorizonsParser.cpp.s
+.PHONY : src/astronomy/HorizonsParser.cpp.s
+
+src/astronomy/HorizonsProvider.o: src/astronomy/HorizonsProvider.cpp.o
+.PHONY : src/astronomy/HorizonsProvider.o
+
+# target to build an object file
+src/astronomy/HorizonsProvider.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/astronomy/HorizonsProvider.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/astronomy/HorizonsProvider.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris.dir/build.make CMakeFiles/bagsolar_ephemeris.dir/src/astronomy/HorizonsProvider.cpp.o
+.PHONY : src/astronomy/HorizonsProvider.cpp.o
+
+src/astronomy/HorizonsProvider.i: src/astronomy/HorizonsProvider.cpp.i
+.PHONY : src/astronomy/HorizonsProvider.i
+
+# target to preprocess a source file
+src/astronomy/HorizonsProvider.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/astronomy/HorizonsProvider.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/astronomy/HorizonsProvider.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris.dir/build.make CMakeFiles/bagsolar_ephemeris.dir/src/astronomy/HorizonsProvider.cpp.i
+.PHONY : src/astronomy/HorizonsProvider.cpp.i
+
+src/astronomy/HorizonsProvider.s: src/astronomy/HorizonsProvider.cpp.s
+.PHONY : src/astronomy/HorizonsProvider.s
+
+# target to generate assembly for a file
+src/astronomy/HorizonsProvider.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/astronomy/HorizonsProvider.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/astronomy/HorizonsProvider.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris.dir/build.make CMakeFiles/bagsolar_ephemeris.dir/src/astronomy/HorizonsProvider.cpp.s
+.PHONY : src/astronomy/HorizonsProvider.cpp.s
+
+src/astronomy/HorizonsRequest.o: src/astronomy/HorizonsRequest.cpp.o
+.PHONY : src/astronomy/HorizonsRequest.o
+
+# target to build an object file
+src/astronomy/HorizonsRequest.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/astronomy/HorizonsRequest.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/astronomy/HorizonsRequest.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris.dir/build.make CMakeFiles/bagsolar_ephemeris.dir/src/astronomy/HorizonsRequest.cpp.o
+.PHONY : src/astronomy/HorizonsRequest.cpp.o
+
+src/astronomy/HorizonsRequest.i: src/astronomy/HorizonsRequest.cpp.i
+.PHONY : src/astronomy/HorizonsRequest.i
+
+# target to preprocess a source file
+src/astronomy/HorizonsRequest.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/astronomy/HorizonsRequest.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/astronomy/HorizonsRequest.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris.dir/build.make CMakeFiles/bagsolar_ephemeris.dir/src/astronomy/HorizonsRequest.cpp.i
+.PHONY : src/astronomy/HorizonsRequest.cpp.i
+
+src/astronomy/HorizonsRequest.s: src/astronomy/HorizonsRequest.cpp.s
+.PHONY : src/astronomy/HorizonsRequest.s
+
+# target to generate assembly for a file
+src/astronomy/HorizonsRequest.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/astronomy/HorizonsRequest.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/astronomy/HorizonsRequest.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris.dir/build.make CMakeFiles/bagsolar_ephemeris.dir/src/astronomy/HorizonsRequest.cpp.s
+.PHONY : src/astronomy/HorizonsRequest.cpp.s
+
+src/astronomy/JsonEphemerisProvider.o: src/astronomy/JsonEphemerisProvider.cpp.o
+.PHONY : src/astronomy/JsonEphemerisProvider.o
+
+# target to build an object file
+src/astronomy/JsonEphemerisProvider.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/astronomy/JsonEphemerisProvider.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/astronomy/JsonEphemerisProvider.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris.dir/build.make CMakeFiles/bagsolar_ephemeris.dir/src/astronomy/JsonEphemerisProvider.cpp.o
+.PHONY : src/astronomy/JsonEphemerisProvider.cpp.o
+
+src/astronomy/JsonEphemerisProvider.i: src/astronomy/JsonEphemerisProvider.cpp.i
+.PHONY : src/astronomy/JsonEphemerisProvider.i
+
+# target to preprocess a source file
+src/astronomy/JsonEphemerisProvider.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/astronomy/JsonEphemerisProvider.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/astronomy/JsonEphemerisProvider.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris.dir/build.make CMakeFiles/bagsolar_ephemeris.dir/src/astronomy/JsonEphemerisProvider.cpp.i
+.PHONY : src/astronomy/JsonEphemerisProvider.cpp.i
+
+src/astronomy/JsonEphemerisProvider.s: src/astronomy/JsonEphemerisProvider.cpp.s
+.PHONY : src/astronomy/JsonEphemerisProvider.s
+
+# target to generate assembly for a file
+src/astronomy/JsonEphemerisProvider.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/astronomy/JsonEphemerisProvider.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/astronomy/JsonEphemerisProvider.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris.dir/build.make CMakeFiles/bagsolar_ephemeris.dir/src/astronomy/JsonEphemerisProvider.cpp.s
+.PHONY : src/astronomy/JsonEphemerisProvider.cpp.s
+
+src/astronomy/LocalEphemerisProvider.o: src/astronomy/LocalEphemerisProvider.cpp.o
+.PHONY : src/astronomy/LocalEphemerisProvider.o
+
+# target to build an object file
+src/astronomy/LocalEphemerisProvider.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/astronomy/LocalEphemerisProvider.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/astronomy/LocalEphemerisProvider.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris.dir/build.make CMakeFiles/bagsolar_ephemeris.dir/src/astronomy/LocalEphemerisProvider.cpp.o
+.PHONY : src/astronomy/LocalEphemerisProvider.cpp.o
+
+src/astronomy/LocalEphemerisProvider.i: src/astronomy/LocalEphemerisProvider.cpp.i
+.PHONY : src/astronomy/LocalEphemerisProvider.i
+
+# target to preprocess a source file
+src/astronomy/LocalEphemerisProvider.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/astronomy/LocalEphemerisProvider.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/astronomy/LocalEphemerisProvider.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris.dir/build.make CMakeFiles/bagsolar_ephemeris.dir/src/astronomy/LocalEphemerisProvider.cpp.i
+.PHONY : src/astronomy/LocalEphemerisProvider.cpp.i
+
+src/astronomy/LocalEphemerisProvider.s: src/astronomy/LocalEphemerisProvider.cpp.s
+.PHONY : src/astronomy/LocalEphemerisProvider.s
+
+# target to generate assembly for a file
+src/astronomy/LocalEphemerisProvider.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/astronomy/LocalEphemerisProvider.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/astronomy/LocalEphemerisProvider.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris.dir/build.make CMakeFiles/bagsolar_ephemeris.dir/src/astronomy/LocalEphemerisProvider.cpp.s
+.PHONY : src/astronomy/LocalEphemerisProvider.cpp.s
+
+src/astronomy/SpiceProvider.o: src/astronomy/SpiceProvider.cpp.o
+.PHONY : src/astronomy/SpiceProvider.o
+
+# target to build an object file
+src/astronomy/SpiceProvider.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/astronomy/SpiceProvider.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_advanced_data_tests.dir/build.make CMakeFiles/bagsolar_advanced_data_tests.dir/src/astronomy/SpiceProvider.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris.dir/build.make CMakeFiles/bagsolar_ephemeris.dir/src/astronomy/SpiceProvider.cpp.o
+.PHONY : src/astronomy/SpiceProvider.cpp.o
+
+src/astronomy/SpiceProvider.i: src/astronomy/SpiceProvider.cpp.i
+.PHONY : src/astronomy/SpiceProvider.i
+
+# target to preprocess a source file
+src/astronomy/SpiceProvider.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/astronomy/SpiceProvider.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_advanced_data_tests.dir/build.make CMakeFiles/bagsolar_advanced_data_tests.dir/src/astronomy/SpiceProvider.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris.dir/build.make CMakeFiles/bagsolar_ephemeris.dir/src/astronomy/SpiceProvider.cpp.i
+.PHONY : src/astronomy/SpiceProvider.cpp.i
+
+src/astronomy/SpiceProvider.s: src/astronomy/SpiceProvider.cpp.s
+.PHONY : src/astronomy/SpiceProvider.s
+
+# target to generate assembly for a file
+src/astronomy/SpiceProvider.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/astronomy/SpiceProvider.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_advanced_data_tests.dir/build.make CMakeFiles/bagsolar_advanced_data_tests.dir/src/astronomy/SpiceProvider.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris.dir/build.make CMakeFiles/bagsolar_ephemeris.dir/src/astronomy/SpiceProvider.cpp.s
+.PHONY : src/astronomy/SpiceProvider.cpp.s
+
+src/astronomy/main.o: src/astronomy/main.cpp.o
+.PHONY : src/astronomy/main.o
+
+# target to build an object file
+src/astronomy/main.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris.dir/build.make CMakeFiles/bagsolar_ephemeris.dir/src/astronomy/main.cpp.o
+.PHONY : src/astronomy/main.cpp.o
+
+src/astronomy/main.i: src/astronomy/main.cpp.i
+.PHONY : src/astronomy/main.i
+
+# target to preprocess a source file
+src/astronomy/main.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris.dir/build.make CMakeFiles/bagsolar_ephemeris.dir/src/astronomy/main.cpp.i
+.PHONY : src/astronomy/main.cpp.i
+
+src/astronomy/main.s: src/astronomy/main.cpp.s
+.PHONY : src/astronomy/main.s
+
+# target to generate assembly for a file
+src/astronomy/main.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris.dir/build.make CMakeFiles/bagsolar_ephemeris.dir/src/astronomy/main.cpp.s
+.PHONY : src/astronomy/main.cpp.s
+
 src/core/Logger.o: src/core/Logger.cpp.o
 .PHONY : src/core/Logger.o
 
 # target to build an object file
 src/core/Logger.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/core/Logger.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/core/Logger.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/core/Logger.cpp.o
 .PHONY : src/core/Logger.cpp.o
 
 src/core/Logger.i: src/core/Logger.cpp.i
@@ -567,6 +1035,8 @@ src/core/Logger.i: src/core/Logger.cpp.i
 # target to preprocess a source file
 src/core/Logger.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/core/Logger.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/core/Logger.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/core/Logger.cpp.i
 .PHONY : src/core/Logger.cpp.i
 
 src/core/Logger.s: src/core/Logger.cpp.s
@@ -575,6 +1045,8 @@ src/core/Logger.s: src/core/Logger.cpp.s
 # target to generate assembly for a file
 src/core/Logger.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/core/Logger.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/core/Logger.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/core/Logger.cpp.s
 .PHONY : src/core/Logger.cpp.s
 
 src/data/BodyFactory.o: src/data/BodyFactory.cpp.o
@@ -585,6 +1057,8 @@ src/data/BodyFactory.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/data/BodyFactory.cpp.o
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_physics_tests.dir/build.make CMakeFiles/bagsolar_physics_tests.dir/src/data/BodyFactory.cpp.o
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_data_tests.dir/build.make CMakeFiles/bagsolar_data_tests.dir/src/data/BodyFactory.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/data/BodyFactory.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/data/BodyFactory.cpp.o
 .PHONY : src/data/BodyFactory.cpp.o
 
 src/data/BodyFactory.i: src/data/BodyFactory.cpp.i
@@ -595,6 +1069,8 @@ src/data/BodyFactory.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/data/BodyFactory.cpp.i
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_physics_tests.dir/build.make CMakeFiles/bagsolar_physics_tests.dir/src/data/BodyFactory.cpp.i
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_data_tests.dir/build.make CMakeFiles/bagsolar_data_tests.dir/src/data/BodyFactory.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/data/BodyFactory.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/data/BodyFactory.cpp.i
 .PHONY : src/data/BodyFactory.cpp.i
 
 src/data/BodyFactory.s: src/data/BodyFactory.cpp.s
@@ -605,6 +1081,8 @@ src/data/BodyFactory.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/data/BodyFactory.cpp.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_physics_tests.dir/build.make CMakeFiles/bagsolar_physics_tests.dir/src/data/BodyFactory.cpp.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_data_tests.dir/build.make CMakeFiles/bagsolar_data_tests.dir/src/data/BodyFactory.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/data/BodyFactory.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/data/BodyFactory.cpp.s
 .PHONY : src/data/BodyFactory.cpp.s
 
 src/data/ScenarioLoader.o: src/data/ScenarioLoader.cpp.o
@@ -614,6 +1092,8 @@ src/data/ScenarioLoader.o: src/data/ScenarioLoader.cpp.o
 src/data/ScenarioLoader.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/data/ScenarioLoader.cpp.o
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_data_tests.dir/build.make CMakeFiles/bagsolar_data_tests.dir/src/data/ScenarioLoader.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/data/ScenarioLoader.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/data/ScenarioLoader.cpp.o
 .PHONY : src/data/ScenarioLoader.cpp.o
 
 src/data/ScenarioLoader.i: src/data/ScenarioLoader.cpp.i
@@ -623,6 +1103,8 @@ src/data/ScenarioLoader.i: src/data/ScenarioLoader.cpp.i
 src/data/ScenarioLoader.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/data/ScenarioLoader.cpp.i
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_data_tests.dir/build.make CMakeFiles/bagsolar_data_tests.dir/src/data/ScenarioLoader.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/data/ScenarioLoader.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/data/ScenarioLoader.cpp.i
 .PHONY : src/data/ScenarioLoader.cpp.i
 
 src/data/ScenarioLoader.s: src/data/ScenarioLoader.cpp.s
@@ -632,6 +1114,8 @@ src/data/ScenarioLoader.s: src/data/ScenarioLoader.cpp.s
 src/data/ScenarioLoader.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/data/ScenarioLoader.cpp.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_data_tests.dir/build.make CMakeFiles/bagsolar_data_tests.dir/src/data/ScenarioLoader.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/data/ScenarioLoader.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/data/ScenarioLoader.cpp.s
 .PHONY : src/data/ScenarioLoader.cpp.s
 
 src/data/ScenarioSerializer.o: src/data/ScenarioSerializer.cpp.o
@@ -641,6 +1125,8 @@ src/data/ScenarioSerializer.o: src/data/ScenarioSerializer.cpp.o
 src/data/ScenarioSerializer.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/data/ScenarioSerializer.cpp.o
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_data_tests.dir/build.make CMakeFiles/bagsolar_data_tests.dir/src/data/ScenarioSerializer.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/data/ScenarioSerializer.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/data/ScenarioSerializer.cpp.o
 .PHONY : src/data/ScenarioSerializer.cpp.o
 
 src/data/ScenarioSerializer.i: src/data/ScenarioSerializer.cpp.i
@@ -650,6 +1136,8 @@ src/data/ScenarioSerializer.i: src/data/ScenarioSerializer.cpp.i
 src/data/ScenarioSerializer.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/data/ScenarioSerializer.cpp.i
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_data_tests.dir/build.make CMakeFiles/bagsolar_data_tests.dir/src/data/ScenarioSerializer.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/data/ScenarioSerializer.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/data/ScenarioSerializer.cpp.i
 .PHONY : src/data/ScenarioSerializer.cpp.i
 
 src/data/ScenarioSerializer.s: src/data/ScenarioSerializer.cpp.s
@@ -659,6 +1147,8 @@ src/data/ScenarioSerializer.s: src/data/ScenarioSerializer.cpp.s
 src/data/ScenarioSerializer.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/data/ScenarioSerializer.cpp.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_data_tests.dir/build.make CMakeFiles/bagsolar_data_tests.dir/src/data/ScenarioSerializer.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/data/ScenarioSerializer.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/data/ScenarioSerializer.cpp.s
 .PHONY : src/data/ScenarioSerializer.cpp.s
 
 src/education/EducationContent.o: src/education/EducationContent.cpp.o
@@ -667,6 +1157,7 @@ src/education/EducationContent.o: src/education/EducationContent.cpp.o
 # target to build an object file
 src/education/EducationContent.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/education/EducationContent.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_education_tests.dir/build.make CMakeFiles/bagsolar_education_tests.dir/src/education/EducationContent.cpp.o
 .PHONY : src/education/EducationContent.cpp.o
 
 src/education/EducationContent.i: src/education/EducationContent.cpp.i
@@ -675,6 +1166,7 @@ src/education/EducationContent.i: src/education/EducationContent.cpp.i
 # target to preprocess a source file
 src/education/EducationContent.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/education/EducationContent.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_education_tests.dir/build.make CMakeFiles/bagsolar_education_tests.dir/src/education/EducationContent.cpp.i
 .PHONY : src/education/EducationContent.cpp.i
 
 src/education/EducationContent.s: src/education/EducationContent.cpp.s
@@ -683,7 +1175,35 @@ src/education/EducationContent.s: src/education/EducationContent.cpp.s
 # target to generate assembly for a file
 src/education/EducationContent.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/education/EducationContent.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_education_tests.dir/build.make CMakeFiles/bagsolar_education_tests.dir/src/education/EducationContent.cpp.s
 .PHONY : src/education/EducationContent.cpp.s
+
+src/education/EducationProgress.o: src/education/EducationProgress.cpp.o
+.PHONY : src/education/EducationProgress.o
+
+# target to build an object file
+src/education/EducationProgress.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/education/EducationProgress.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_education_tests.dir/build.make CMakeFiles/bagsolar_education_tests.dir/src/education/EducationProgress.cpp.o
+.PHONY : src/education/EducationProgress.cpp.o
+
+src/education/EducationProgress.i: src/education/EducationProgress.cpp.i
+.PHONY : src/education/EducationProgress.i
+
+# target to preprocess a source file
+src/education/EducationProgress.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/education/EducationProgress.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_education_tests.dir/build.make CMakeFiles/bagsolar_education_tests.dir/src/education/EducationProgress.cpp.i
+.PHONY : src/education/EducationProgress.cpp.i
+
+src/education/EducationProgress.s: src/education/EducationProgress.cpp.s
+.PHONY : src/education/EducationProgress.s
+
+# target to generate assembly for a file
+src/education/EducationProgress.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/education/EducationProgress.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_education_tests.dir/build.make CMakeFiles/bagsolar_education_tests.dir/src/education/EducationProgress.cpp.s
+.PHONY : src/education/EducationProgress.cpp.s
 
 src/input/InputController.o: src/input/InputController.cpp.o
 .PHONY : src/input/InputController.o
@@ -708,6 +1228,60 @@ src/input/InputController.s: src/input/InputController.cpp.s
 src/input/InputController.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/input/InputController.cpp.s
 .PHONY : src/input/InputController.cpp.s
+
+src/missions/Mission.o: src/missions/Mission.cpp.o
+.PHONY : src/missions/Mission.o
+
+# target to build an object file
+src/missions/Mission.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/missions/Mission.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_spacecraft_tests.dir/build.make CMakeFiles/bagsolar_spacecraft_tests.dir/src/missions/Mission.cpp.o
+.PHONY : src/missions/Mission.cpp.o
+
+src/missions/Mission.i: src/missions/Mission.cpp.i
+.PHONY : src/missions/Mission.i
+
+# target to preprocess a source file
+src/missions/Mission.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/missions/Mission.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_spacecraft_tests.dir/build.make CMakeFiles/bagsolar_spacecraft_tests.dir/src/missions/Mission.cpp.i
+.PHONY : src/missions/Mission.cpp.i
+
+src/missions/Mission.s: src/missions/Mission.cpp.s
+.PHONY : src/missions/Mission.s
+
+# target to generate assembly for a file
+src/missions/Mission.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/missions/Mission.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_spacecraft_tests.dir/build.make CMakeFiles/bagsolar_spacecraft_tests.dir/src/missions/Mission.cpp.s
+.PHONY : src/missions/Mission.cpp.s
+
+src/missions/TrajectoryPrediction.o: src/missions/TrajectoryPrediction.cpp.o
+.PHONY : src/missions/TrajectoryPrediction.o
+
+# target to build an object file
+src/missions/TrajectoryPrediction.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/missions/TrajectoryPrediction.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_spacecraft_tests.dir/build.make CMakeFiles/bagsolar_spacecraft_tests.dir/src/missions/TrajectoryPrediction.cpp.o
+.PHONY : src/missions/TrajectoryPrediction.cpp.o
+
+src/missions/TrajectoryPrediction.i: src/missions/TrajectoryPrediction.cpp.i
+.PHONY : src/missions/TrajectoryPrediction.i
+
+# target to preprocess a source file
+src/missions/TrajectoryPrediction.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/missions/TrajectoryPrediction.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_spacecraft_tests.dir/build.make CMakeFiles/bagsolar_spacecraft_tests.dir/src/missions/TrajectoryPrediction.cpp.i
+.PHONY : src/missions/TrajectoryPrediction.cpp.i
+
+src/missions/TrajectoryPrediction.s: src/missions/TrajectoryPrediction.cpp.s
+.PHONY : src/missions/TrajectoryPrediction.s
+
+# target to generate assembly for a file
+src/missions/TrajectoryPrediction.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/missions/TrajectoryPrediction.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_spacecraft_tests.dir/build.make CMakeFiles/bagsolar_spacecraft_tests.dir/src/missions/TrajectoryPrediction.cpp.s
+.PHONY : src/missions/TrajectoryPrediction.cpp.s
 
 src/physics/IntegratorBenchmark.o: src/physics/IntegratorBenchmark.cpp.o
 .PHONY : src/physics/IntegratorBenchmark.o
@@ -744,6 +1318,11 @@ src/physics/PhysicsEngine.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/physics/PhysicsEngine.cpp.o
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_physics_tests.dir/build.make CMakeFiles/bagsolar_physics_tests.dir/src/physics/PhysicsEngine.cpp.o
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_data_tests.dir/build.make CMakeFiles/bagsolar_data_tests.dir/src/physics/PhysicsEngine.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_validation_tests.dir/build.make CMakeFiles/bagsolar_validation_tests.dir/src/physics/PhysicsEngine.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/physics/PhysicsEngine.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/physics/PhysicsEngine.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_spacecraft_tests.dir/build.make CMakeFiles/bagsolar_spacecraft_tests.dir/src/physics/PhysicsEngine.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_validation.dir/build.make CMakeFiles/bagsolar_validation.dir/src/physics/PhysicsEngine.cpp.o
 .PHONY : src/physics/PhysicsEngine.cpp.o
 
 src/physics/PhysicsEngine.i: src/physics/PhysicsEngine.cpp.i
@@ -754,6 +1333,11 @@ src/physics/PhysicsEngine.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/physics/PhysicsEngine.cpp.i
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_physics_tests.dir/build.make CMakeFiles/bagsolar_physics_tests.dir/src/physics/PhysicsEngine.cpp.i
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_data_tests.dir/build.make CMakeFiles/bagsolar_data_tests.dir/src/physics/PhysicsEngine.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_validation_tests.dir/build.make CMakeFiles/bagsolar_validation_tests.dir/src/physics/PhysicsEngine.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/physics/PhysicsEngine.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/physics/PhysicsEngine.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_spacecraft_tests.dir/build.make CMakeFiles/bagsolar_spacecraft_tests.dir/src/physics/PhysicsEngine.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_validation.dir/build.make CMakeFiles/bagsolar_validation.dir/src/physics/PhysicsEngine.cpp.i
 .PHONY : src/physics/PhysicsEngine.cpp.i
 
 src/physics/PhysicsEngine.s: src/physics/PhysicsEngine.cpp.s
@@ -764,6 +1348,11 @@ src/physics/PhysicsEngine.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/physics/PhysicsEngine.cpp.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_physics_tests.dir/build.make CMakeFiles/bagsolar_physics_tests.dir/src/physics/PhysicsEngine.cpp.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_data_tests.dir/build.make CMakeFiles/bagsolar_data_tests.dir/src/physics/PhysicsEngine.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_validation_tests.dir/build.make CMakeFiles/bagsolar_validation_tests.dir/src/physics/PhysicsEngine.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/physics/PhysicsEngine.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/physics/PhysicsEngine.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_spacecraft_tests.dir/build.make CMakeFiles/bagsolar_spacecraft_tests.dir/src/physics/PhysicsEngine.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_validation.dir/build.make CMakeFiles/bagsolar_validation.dir/src/physics/PhysicsEngine.cpp.s
 .PHONY : src/physics/PhysicsEngine.cpp.s
 
 src/rendering/Renderer.o: src/rendering/Renderer.cpp.o
@@ -796,6 +1385,8 @@ src/simulation/Simulation.o: src/simulation/Simulation.cpp.o
 # target to build an object file
 src/simulation/Simulation.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/simulation/Simulation.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/simulation/Simulation.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/simulation/Simulation.cpp.o
 .PHONY : src/simulation/Simulation.cpp.o
 
 src/simulation/Simulation.i: src/simulation/Simulation.cpp.i
@@ -804,6 +1395,8 @@ src/simulation/Simulation.i: src/simulation/Simulation.cpp.i
 # target to preprocess a source file
 src/simulation/Simulation.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/simulation/Simulation.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/simulation/Simulation.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/simulation/Simulation.cpp.i
 .PHONY : src/simulation/Simulation.cpp.i
 
 src/simulation/Simulation.s: src/simulation/Simulation.cpp.s
@@ -812,7 +1405,156 @@ src/simulation/Simulation.s: src/simulation/Simulation.cpp.s
 # target to generate assembly for a file
 src/simulation/Simulation.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/simulation/Simulation.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/simulation/Simulation.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/simulation/Simulation.cpp.s
 .PHONY : src/simulation/Simulation.cpp.s
+
+src/spacecraft/Spacecraft.o: src/spacecraft/Spacecraft.cpp.o
+.PHONY : src/spacecraft/Spacecraft.o
+
+# target to build an object file
+src/spacecraft/Spacecraft.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/spacecraft/Spacecraft.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_spacecraft_tests.dir/build.make CMakeFiles/bagsolar_spacecraft_tests.dir/src/spacecraft/Spacecraft.cpp.o
+.PHONY : src/spacecraft/Spacecraft.cpp.o
+
+src/spacecraft/Spacecraft.i: src/spacecraft/Spacecraft.cpp.i
+.PHONY : src/spacecraft/Spacecraft.i
+
+# target to preprocess a source file
+src/spacecraft/Spacecraft.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/spacecraft/Spacecraft.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_spacecraft_tests.dir/build.make CMakeFiles/bagsolar_spacecraft_tests.dir/src/spacecraft/Spacecraft.cpp.i
+.PHONY : src/spacecraft/Spacecraft.cpp.i
+
+src/spacecraft/Spacecraft.s: src/spacecraft/Spacecraft.cpp.s
+.PHONY : src/spacecraft/Spacecraft.s
+
+# target to generate assembly for a file
+src/spacecraft/Spacecraft.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/spacecraft/Spacecraft.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_spacecraft_tests.dir/build.make CMakeFiles/bagsolar_spacecraft_tests.dir/src/spacecraft/Spacecraft.cpp.s
+.PHONY : src/spacecraft/Spacecraft.cpp.s
+
+src/telemetry/TelemetryAnalyzer.o: src/telemetry/TelemetryAnalyzer.cpp.o
+.PHONY : src/telemetry/TelemetryAnalyzer.o
+
+# target to build an object file
+src/telemetry/TelemetryAnalyzer.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/telemetry/TelemetryAnalyzer.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/telemetry/TelemetryAnalyzer.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/telemetry/TelemetryAnalyzer.cpp.o
+.PHONY : src/telemetry/TelemetryAnalyzer.cpp.o
+
+src/telemetry/TelemetryAnalyzer.i: src/telemetry/TelemetryAnalyzer.cpp.i
+.PHONY : src/telemetry/TelemetryAnalyzer.i
+
+# target to preprocess a source file
+src/telemetry/TelemetryAnalyzer.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/telemetry/TelemetryAnalyzer.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/telemetry/TelemetryAnalyzer.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/telemetry/TelemetryAnalyzer.cpp.i
+.PHONY : src/telemetry/TelemetryAnalyzer.cpp.i
+
+src/telemetry/TelemetryAnalyzer.s: src/telemetry/TelemetryAnalyzer.cpp.s
+.PHONY : src/telemetry/TelemetryAnalyzer.s
+
+# target to generate assembly for a file
+src/telemetry/TelemetryAnalyzer.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/telemetry/TelemetryAnalyzer.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/telemetry/TelemetryAnalyzer.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/telemetry/TelemetryAnalyzer.cpp.s
+.PHONY : src/telemetry/TelemetryAnalyzer.cpp.s
+
+src/telemetry/TelemetryCollector.o: src/telemetry/TelemetryCollector.cpp.o
+.PHONY : src/telemetry/TelemetryCollector.o
+
+# target to build an object file
+src/telemetry/TelemetryCollector.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/telemetry/TelemetryCollector.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/telemetry/TelemetryCollector.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/telemetry/TelemetryCollector.cpp.o
+.PHONY : src/telemetry/TelemetryCollector.cpp.o
+
+src/telemetry/TelemetryCollector.i: src/telemetry/TelemetryCollector.cpp.i
+.PHONY : src/telemetry/TelemetryCollector.i
+
+# target to preprocess a source file
+src/telemetry/TelemetryCollector.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/telemetry/TelemetryCollector.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/telemetry/TelemetryCollector.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/telemetry/TelemetryCollector.cpp.i
+.PHONY : src/telemetry/TelemetryCollector.cpp.i
+
+src/telemetry/TelemetryCollector.s: src/telemetry/TelemetryCollector.cpp.s
+.PHONY : src/telemetry/TelemetryCollector.s
+
+# target to generate assembly for a file
+src/telemetry/TelemetryCollector.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/telemetry/TelemetryCollector.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/telemetry/TelemetryCollector.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/telemetry/TelemetryCollector.cpp.s
+.PHONY : src/telemetry/TelemetryCollector.cpp.s
+
+src/telemetry/TelemetryExporter.o: src/telemetry/TelemetryExporter.cpp.o
+.PHONY : src/telemetry/TelemetryExporter.o
+
+# target to build an object file
+src/telemetry/TelemetryExporter.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/telemetry/TelemetryExporter.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/telemetry/TelemetryExporter.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/telemetry/TelemetryExporter.cpp.o
+.PHONY : src/telemetry/TelemetryExporter.cpp.o
+
+src/telemetry/TelemetryExporter.i: src/telemetry/TelemetryExporter.cpp.i
+.PHONY : src/telemetry/TelemetryExporter.i
+
+# target to preprocess a source file
+src/telemetry/TelemetryExporter.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/telemetry/TelemetryExporter.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/telemetry/TelemetryExporter.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/telemetry/TelemetryExporter.cpp.i
+.PHONY : src/telemetry/TelemetryExporter.cpp.i
+
+src/telemetry/TelemetryExporter.s: src/telemetry/TelemetryExporter.cpp.s
+.PHONY : src/telemetry/TelemetryExporter.s
+
+# target to generate assembly for a file
+src/telemetry/TelemetryExporter.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/telemetry/TelemetryExporter.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/telemetry/TelemetryExporter.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/telemetry/TelemetryExporter.cpp.s
+.PHONY : src/telemetry/TelemetryExporter.cpp.s
+
+src/telemetry/TelemetrySession.o: src/telemetry/TelemetrySession.cpp.o
+.PHONY : src/telemetry/TelemetrySession.o
+
+# target to build an object file
+src/telemetry/TelemetrySession.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/telemetry/TelemetrySession.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/telemetry/TelemetrySession.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/telemetry/TelemetrySession.cpp.o
+.PHONY : src/telemetry/TelemetrySession.cpp.o
+
+src/telemetry/TelemetrySession.i: src/telemetry/TelemetrySession.cpp.i
+.PHONY : src/telemetry/TelemetrySession.i
+
+# target to preprocess a source file
+src/telemetry/TelemetrySession.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/telemetry/TelemetrySession.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/telemetry/TelemetrySession.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/telemetry/TelemetrySession.cpp.i
+.PHONY : src/telemetry/TelemetrySession.cpp.i
+
+src/telemetry/TelemetrySession.s: src/telemetry/TelemetrySession.cpp.s
+.PHONY : src/telemetry/TelemetrySession.s
+
+# target to generate assembly for a file
+src/telemetry/TelemetrySession.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/telemetry/TelemetrySession.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/src/telemetry/TelemetrySession.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/src/telemetry/TelemetrySession.cpp.s
+.PHONY : src/telemetry/TelemetrySession.cpp.s
 
 src/ui/HUD.o: src/ui/HUD.cpp.o
 .PHONY : src/ui/HUD.o
@@ -838,6 +1580,81 @@ src/ui/HUD.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/planets.dir/build.make CMakeFiles/planets.dir/src/ui/HUD.cpp.s
 .PHONY : src/ui/HUD.cpp.s
 
+src/validation/ValidationRunner.o: src/validation/ValidationRunner.cpp.o
+.PHONY : src/validation/ValidationRunner.o
+
+# target to build an object file
+src/validation/ValidationRunner.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_validation_tests.dir/build.make CMakeFiles/bagsolar_validation_tests.dir/src/validation/ValidationRunner.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_validation.dir/build.make CMakeFiles/bagsolar_validation.dir/src/validation/ValidationRunner.cpp.o
+.PHONY : src/validation/ValidationRunner.cpp.o
+
+src/validation/ValidationRunner.i: src/validation/ValidationRunner.cpp.i
+.PHONY : src/validation/ValidationRunner.i
+
+# target to preprocess a source file
+src/validation/ValidationRunner.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_validation_tests.dir/build.make CMakeFiles/bagsolar_validation_tests.dir/src/validation/ValidationRunner.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_validation.dir/build.make CMakeFiles/bagsolar_validation.dir/src/validation/ValidationRunner.cpp.i
+.PHONY : src/validation/ValidationRunner.cpp.i
+
+src/validation/ValidationRunner.s: src/validation/ValidationRunner.cpp.s
+.PHONY : src/validation/ValidationRunner.s
+
+# target to generate assembly for a file
+src/validation/ValidationRunner.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_validation_tests.dir/build.make CMakeFiles/bagsolar_validation_tests.dir/src/validation/ValidationRunner.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_validation.dir/build.make CMakeFiles/bagsolar_validation.dir/src/validation/ValidationRunner.cpp.s
+.PHONY : src/validation/ValidationRunner.cpp.s
+
+src/validation/main.o: src/validation/main.cpp.o
+.PHONY : src/validation/main.o
+
+# target to build an object file
+src/validation/main.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_validation.dir/build.make CMakeFiles/bagsolar_validation.dir/src/validation/main.cpp.o
+.PHONY : src/validation/main.cpp.o
+
+src/validation/main.i: src/validation/main.cpp.i
+.PHONY : src/validation/main.i
+
+# target to preprocess a source file
+src/validation/main.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_validation.dir/build.make CMakeFiles/bagsolar_validation.dir/src/validation/main.cpp.i
+.PHONY : src/validation/main.cpp.i
+
+src/validation/main.s: src/validation/main.cpp.s
+.PHONY : src/validation/main.s
+
+# target to generate assembly for a file
+src/validation/main.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_validation.dir/build.make CMakeFiles/bagsolar_validation.dir/src/validation/main.cpp.s
+.PHONY : src/validation/main.cpp.s
+
+tests/advanced_data_tests.o: tests/advanced_data_tests.cpp.o
+.PHONY : tests/advanced_data_tests.o
+
+# target to build an object file
+tests/advanced_data_tests.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_advanced_data_tests.dir/build.make CMakeFiles/bagsolar_advanced_data_tests.dir/tests/advanced_data_tests.cpp.o
+.PHONY : tests/advanced_data_tests.cpp.o
+
+tests/advanced_data_tests.i: tests/advanced_data_tests.cpp.i
+.PHONY : tests/advanced_data_tests.i
+
+# target to preprocess a source file
+tests/advanced_data_tests.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_advanced_data_tests.dir/build.make CMakeFiles/bagsolar_advanced_data_tests.dir/tests/advanced_data_tests.cpp.i
+.PHONY : tests/advanced_data_tests.cpp.i
+
+tests/advanced_data_tests.s: tests/advanced_data_tests.cpp.s
+.PHONY : tests/advanced_data_tests.s
+
+# target to generate assembly for a file
+tests/advanced_data_tests.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_advanced_data_tests.dir/build.make CMakeFiles/bagsolar_advanced_data_tests.dir/tests/advanced_data_tests.cpp.s
+.PHONY : tests/advanced_data_tests.cpp.s
+
 tests/data_tests.o: tests/data_tests.cpp.o
 .PHONY : tests/data_tests.o
 
@@ -861,6 +1678,54 @@ tests/data_tests.s: tests/data_tests.cpp.s
 tests/data_tests.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_data_tests.dir/build.make CMakeFiles/bagsolar_data_tests.dir/tests/data_tests.cpp.s
 .PHONY : tests/data_tests.cpp.s
+
+tests/education_tests.o: tests/education_tests.cpp.o
+.PHONY : tests/education_tests.o
+
+# target to build an object file
+tests/education_tests.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_education_tests.dir/build.make CMakeFiles/bagsolar_education_tests.dir/tests/education_tests.cpp.o
+.PHONY : tests/education_tests.cpp.o
+
+tests/education_tests.i: tests/education_tests.cpp.i
+.PHONY : tests/education_tests.i
+
+# target to preprocess a source file
+tests/education_tests.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_education_tests.dir/build.make CMakeFiles/bagsolar_education_tests.dir/tests/education_tests.cpp.i
+.PHONY : tests/education_tests.cpp.i
+
+tests/education_tests.s: tests/education_tests.cpp.s
+.PHONY : tests/education_tests.s
+
+# target to generate assembly for a file
+tests/education_tests.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_education_tests.dir/build.make CMakeFiles/bagsolar_education_tests.dir/tests/education_tests.cpp.s
+.PHONY : tests/education_tests.cpp.s
+
+tests/ephemeris_tests.o: tests/ephemeris_tests.cpp.o
+.PHONY : tests/ephemeris_tests.o
+
+# target to build an object file
+tests/ephemeris_tests.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/tests/ephemeris_tests.cpp.o
+.PHONY : tests/ephemeris_tests.cpp.o
+
+tests/ephemeris_tests.i: tests/ephemeris_tests.cpp.i
+.PHONY : tests/ephemeris_tests.i
+
+# target to preprocess a source file
+tests/ephemeris_tests.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/tests/ephemeris_tests.cpp.i
+.PHONY : tests/ephemeris_tests.cpp.i
+
+tests/ephemeris_tests.s: tests/ephemeris_tests.cpp.s
+.PHONY : tests/ephemeris_tests.s
+
+# target to generate assembly for a file
+tests/ephemeris_tests.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_ephemeris_tests.dir/build.make CMakeFiles/bagsolar_ephemeris_tests.dir/tests/ephemeris_tests.cpp.s
+.PHONY : tests/ephemeris_tests.cpp.s
 
 tests/physics_tests.o: tests/physics_tests.cpp.o
 .PHONY : tests/physics_tests.o
@@ -886,6 +1751,78 @@ tests/physics_tests.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_physics_tests.dir/build.make CMakeFiles/bagsolar_physics_tests.dir/tests/physics_tests.cpp.s
 .PHONY : tests/physics_tests.cpp.s
 
+tests/spacecraft_tests.o: tests/spacecraft_tests.cpp.o
+.PHONY : tests/spacecraft_tests.o
+
+# target to build an object file
+tests/spacecraft_tests.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_spacecraft_tests.dir/build.make CMakeFiles/bagsolar_spacecraft_tests.dir/tests/spacecraft_tests.cpp.o
+.PHONY : tests/spacecraft_tests.cpp.o
+
+tests/spacecraft_tests.i: tests/spacecraft_tests.cpp.i
+.PHONY : tests/spacecraft_tests.i
+
+# target to preprocess a source file
+tests/spacecraft_tests.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_spacecraft_tests.dir/build.make CMakeFiles/bagsolar_spacecraft_tests.dir/tests/spacecraft_tests.cpp.i
+.PHONY : tests/spacecraft_tests.cpp.i
+
+tests/spacecraft_tests.s: tests/spacecraft_tests.cpp.s
+.PHONY : tests/spacecraft_tests.s
+
+# target to generate assembly for a file
+tests/spacecraft_tests.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_spacecraft_tests.dir/build.make CMakeFiles/bagsolar_spacecraft_tests.dir/tests/spacecraft_tests.cpp.s
+.PHONY : tests/spacecraft_tests.cpp.s
+
+tests/telemetry_tests.o: tests/telemetry_tests.cpp.o
+.PHONY : tests/telemetry_tests.o
+
+# target to build an object file
+tests/telemetry_tests.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/tests/telemetry_tests.cpp.o
+.PHONY : tests/telemetry_tests.cpp.o
+
+tests/telemetry_tests.i: tests/telemetry_tests.cpp.i
+.PHONY : tests/telemetry_tests.i
+
+# target to preprocess a source file
+tests/telemetry_tests.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/tests/telemetry_tests.cpp.i
+.PHONY : tests/telemetry_tests.cpp.i
+
+tests/telemetry_tests.s: tests/telemetry_tests.cpp.s
+.PHONY : tests/telemetry_tests.s
+
+# target to generate assembly for a file
+tests/telemetry_tests.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_telemetry_tests.dir/build.make CMakeFiles/bagsolar_telemetry_tests.dir/tests/telemetry_tests.cpp.s
+.PHONY : tests/telemetry_tests.cpp.s
+
+tests/validation_tests.o: tests/validation_tests.cpp.o
+.PHONY : tests/validation_tests.o
+
+# target to build an object file
+tests/validation_tests.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_validation_tests.dir/build.make CMakeFiles/bagsolar_validation_tests.dir/tests/validation_tests.cpp.o
+.PHONY : tests/validation_tests.cpp.o
+
+tests/validation_tests.i: tests/validation_tests.cpp.i
+.PHONY : tests/validation_tests.i
+
+# target to preprocess a source file
+tests/validation_tests.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_validation_tests.dir/build.make CMakeFiles/bagsolar_validation_tests.dir/tests/validation_tests.cpp.i
+.PHONY : tests/validation_tests.cpp.i
+
+tests/validation_tests.s: tests/validation_tests.cpp.s
+.PHONY : tests/validation_tests.s
+
+# target to generate assembly for a file
+tests/validation_tests.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bagsolar_validation_tests.dir/build.make CMakeFiles/bagsolar_validation_tests.dir/tests/validation_tests.cpp.s
+.PHONY : tests/validation_tests.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -893,6 +1830,12 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... edit_cache"
+	@echo "... install"
+	@echo "... install/local"
+	@echo "... install/strip"
+	@echo "... list_install_components"
+	@echo "... package"
+	@echo "... package_source"
 	@echo "... rebuild_cache"
 	@echo "... test"
 	@echo "... Continuous"
@@ -923,12 +1866,50 @@ help:
 	@echo "... NightlySubmit"
 	@echo "... NightlyTest"
 	@echo "... NightlyUpdate"
+	@echo "... bagsolar_advanced_data_tests"
 	@echo "... bagsolar_data_tests"
+	@echo "... bagsolar_education_tests"
+	@echo "... bagsolar_ephemeris"
+	@echo "... bagsolar_ephemeris_tests"
 	@echo "... bagsolar_physics_tests"
+	@echo "... bagsolar_spacecraft_tests"
+	@echo "... bagsolar_telemetry_tests"
+	@echo "... bagsolar_validation"
+	@echo "... bagsolar_validation_tests"
 	@echo "... planets"
 	@echo "... src/app/main.o"
 	@echo "... src/app/main.i"
 	@echo "... src/app/main.s"
+	@echo "... src/astronomy/CurlHttpClient.o"
+	@echo "... src/astronomy/CurlHttpClient.i"
+	@echo "... src/astronomy/CurlHttpClient.s"
+	@echo "... src/astronomy/EphemerisComparison.o"
+	@echo "... src/astronomy/EphemerisComparison.i"
+	@echo "... src/astronomy/EphemerisComparison.s"
+	@echo "... src/astronomy/EphemerisTypes.o"
+	@echo "... src/astronomy/EphemerisTypes.i"
+	@echo "... src/astronomy/EphemerisTypes.s"
+	@echo "... src/astronomy/HorizonsParser.o"
+	@echo "... src/astronomy/HorizonsParser.i"
+	@echo "... src/astronomy/HorizonsParser.s"
+	@echo "... src/astronomy/HorizonsProvider.o"
+	@echo "... src/astronomy/HorizonsProvider.i"
+	@echo "... src/astronomy/HorizonsProvider.s"
+	@echo "... src/astronomy/HorizonsRequest.o"
+	@echo "... src/astronomy/HorizonsRequest.i"
+	@echo "... src/astronomy/HorizonsRequest.s"
+	@echo "... src/astronomy/JsonEphemerisProvider.o"
+	@echo "... src/astronomy/JsonEphemerisProvider.i"
+	@echo "... src/astronomy/JsonEphemerisProvider.s"
+	@echo "... src/astronomy/LocalEphemerisProvider.o"
+	@echo "... src/astronomy/LocalEphemerisProvider.i"
+	@echo "... src/astronomy/LocalEphemerisProvider.s"
+	@echo "... src/astronomy/SpiceProvider.o"
+	@echo "... src/astronomy/SpiceProvider.i"
+	@echo "... src/astronomy/SpiceProvider.s"
+	@echo "... src/astronomy/main.o"
+	@echo "... src/astronomy/main.i"
+	@echo "... src/astronomy/main.s"
 	@echo "... src/core/Logger.o"
 	@echo "... src/core/Logger.i"
 	@echo "... src/core/Logger.s"
@@ -944,9 +1925,18 @@ help:
 	@echo "... src/education/EducationContent.o"
 	@echo "... src/education/EducationContent.i"
 	@echo "... src/education/EducationContent.s"
+	@echo "... src/education/EducationProgress.o"
+	@echo "... src/education/EducationProgress.i"
+	@echo "... src/education/EducationProgress.s"
 	@echo "... src/input/InputController.o"
 	@echo "... src/input/InputController.i"
 	@echo "... src/input/InputController.s"
+	@echo "... src/missions/Mission.o"
+	@echo "... src/missions/Mission.i"
+	@echo "... src/missions/Mission.s"
+	@echo "... src/missions/TrajectoryPrediction.o"
+	@echo "... src/missions/TrajectoryPrediction.i"
+	@echo "... src/missions/TrajectoryPrediction.s"
 	@echo "... src/physics/IntegratorBenchmark.o"
 	@echo "... src/physics/IntegratorBenchmark.i"
 	@echo "... src/physics/IntegratorBenchmark.s"
@@ -959,15 +1949,54 @@ help:
 	@echo "... src/simulation/Simulation.o"
 	@echo "... src/simulation/Simulation.i"
 	@echo "... src/simulation/Simulation.s"
+	@echo "... src/spacecraft/Spacecraft.o"
+	@echo "... src/spacecraft/Spacecraft.i"
+	@echo "... src/spacecraft/Spacecraft.s"
+	@echo "... src/telemetry/TelemetryAnalyzer.o"
+	@echo "... src/telemetry/TelemetryAnalyzer.i"
+	@echo "... src/telemetry/TelemetryAnalyzer.s"
+	@echo "... src/telemetry/TelemetryCollector.o"
+	@echo "... src/telemetry/TelemetryCollector.i"
+	@echo "... src/telemetry/TelemetryCollector.s"
+	@echo "... src/telemetry/TelemetryExporter.o"
+	@echo "... src/telemetry/TelemetryExporter.i"
+	@echo "... src/telemetry/TelemetryExporter.s"
+	@echo "... src/telemetry/TelemetrySession.o"
+	@echo "... src/telemetry/TelemetrySession.i"
+	@echo "... src/telemetry/TelemetrySession.s"
 	@echo "... src/ui/HUD.o"
 	@echo "... src/ui/HUD.i"
 	@echo "... src/ui/HUD.s"
+	@echo "... src/validation/ValidationRunner.o"
+	@echo "... src/validation/ValidationRunner.i"
+	@echo "... src/validation/ValidationRunner.s"
+	@echo "... src/validation/main.o"
+	@echo "... src/validation/main.i"
+	@echo "... src/validation/main.s"
+	@echo "... tests/advanced_data_tests.o"
+	@echo "... tests/advanced_data_tests.i"
+	@echo "... tests/advanced_data_tests.s"
 	@echo "... tests/data_tests.o"
 	@echo "... tests/data_tests.i"
 	@echo "... tests/data_tests.s"
+	@echo "... tests/education_tests.o"
+	@echo "... tests/education_tests.i"
+	@echo "... tests/education_tests.s"
+	@echo "... tests/ephemeris_tests.o"
+	@echo "... tests/ephemeris_tests.i"
+	@echo "... tests/ephemeris_tests.s"
 	@echo "... tests/physics_tests.o"
 	@echo "... tests/physics_tests.i"
 	@echo "... tests/physics_tests.s"
+	@echo "... tests/spacecraft_tests.o"
+	@echo "... tests/spacecraft_tests.i"
+	@echo "... tests/spacecraft_tests.s"
+	@echo "... tests/telemetry_tests.o"
+	@echo "... tests/telemetry_tests.i"
+	@echo "... tests/telemetry_tests.s"
+	@echo "... tests/validation_tests.o"
+	@echo "... tests/validation_tests.i"
+	@echo "... tests/validation_tests.s"
 .PHONY : help
 
 

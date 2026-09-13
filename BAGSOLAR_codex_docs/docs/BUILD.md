@@ -41,6 +41,43 @@ data/scenarios/*.json
 
 Run from the project root so the default `data` path resolves correctly.
 
+Phase 6 also builds `bagsolar_ephemeris`. It has no mandatory HTTP library;
+the explicit Horizons transport invokes the local `curl` executable when the
+`--horizons` command is selected. Offline local/JSON operation and all normal
+tests work without network access.
+
+Phase 8 SPICE support is deliberately optional and reports an explicit
+unavailable status unless CSPICE is supplied through `CSPICE_INCLUDE_DIR` and
+`CSPICE_LIBRARY`. The official NAIF static archive `cspice.a` is supported.
+Phase 10 provides `CMakePresets.json`, Linux GitHub Actions, install rules, and
+CPack TGZ packaging:
+
+```sh
+cmake --preset debug
+cmake --build --preset debug --parallel 2
+ctest --preset debug
+cmake --build build --target package
+```
+
+To request the optional path, configure a separate build directory. CMake
+fails immediately if the requested CSPICE header or library is missing:
+
+```sh
+cmake -S . -B build-spice -DBAGSOLAR_ENABLE_SPICE=ON \
+  -DCSPICE_INCLUDE_DIR=/opt/cspice/include \
+  -DCSPICE_LIBRARY=/opt/cspice/lib/cspice.a
+```
+
+CSPICE and kernel files are external resources and are never downloaded or
+committed by BAGSOLAR.
+
+With a valid local manifest, run the real integration test with:
+
+```sh
+export BAGSOLAR_SPICE_TEST_MANIFEST=/path/to/spice-manifest.json
+ctest --test-dir build-spice -R bagsolar_spice_live_tests --output-on-failure
+```
+
 ## CI
 CI should perform:
 1. Configure

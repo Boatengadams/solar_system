@@ -171,3 +171,84 @@ data/bodies/*.json       data/scenarios/*.json
 
 `nlohmann::json` is confined to data-layer implementation files. Physics,
 simulation state, rendering, and UI consume validated domain objects only.
+
+## Phase 4 validation flow
+
+```text
+ValidationCases → ValidationRunner → PhysicsEngine
+                         |
+                         +→ ValidationMetrics → CSV / CTest / CLI
+```
+
+The validation layer is raylib-free and depends on domain physics only. It
+contains deterministic analytical two-body fixtures, conservation metrics,
+timestep refinement, and machine-readable reporting. It does not alter the
+physics engine or rendering state.
+
+## Phase 5 telemetry flow
+
+```text
+Simulation → TelemetryCollector → TelemetrySession
+                                      |
+                         +------------+------------+
+                         v                         v
+                    TelemetryAnalyzer       CSV / JSON exporters
+```
+
+Telemetry observes state at simulation-time intervals. It has no raylib
+dependency, does not perform file I/O while stepping, and preserves explicit
+reference-body, epoch, frame, integrator, timestep, and numerical-status
+metadata.
+
+## Phase 6 ephemeris flow
+
+```text
+Local / JSON / Horizons Provider
+              ↓
+       EphemerisState
+   (epoch, frame, origin, SI)
+              ↓
+      EphemerisSnapshot
+              ↓
+Simulation initialization → Physics / Telemetry
+```
+
+The physics engine has no provider or HTTP dependency. Horizons request
+construction, transport, parsing, body-ID mapping, unit conversion, and cache
+behavior are isolated under `src/astronomy/`. Network access occurs only on an
+explicit provider query, never during rendering, integration, or telemetry
+sampling.
+
+## Phase 8 SPICE flow
+
+```text
+JSON kernel manifest
+          ↓
+SpiceKernelManager → CSPICE furnsh_c/unload_c
+          ↓
+SpiceEphemerisProvider → EphemerisState (SI, epoch, frame, origin)
+          ↓
+Simulation / Telemetry
+```
+
+`BAGSOLAR_ENABLE_SPICE` defaults to OFF. CSPICE types and linking are confined
+to the astronomy implementation target. The rest of the application sees the
+existing provider/result abstraction only.
+
+## Phase 7 spacecraft and mission flow
+
+```text
+Spacecraft + ManeuverNode
+          ↓
+       Mission
+          ↓
+ MissionAnalysis / Hohmann generation
+          ↓
+   TrajectoryPrediction → PhysicsEngine
+          ↓
+       Telemetry (future integration)
+```
+
+Spacecraft and mission calculations are independent of raylib and external
+ephemeris providers. The prediction layer reuses the existing integrator and
+does not alter the main simulation state.

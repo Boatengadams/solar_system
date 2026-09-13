@@ -109,6 +109,8 @@ public:
                                         const AdaptiveTimestepSettings& settings) const;
     static InteractionReport inspectInteractions(const std::vector<Body>& bodies,
                                                  const CloseApproachPolicy& policy = {});
+    static Vec3 acceleration(const std::vector<Body>& bodies, std::size_t bodyIndex,
+                             const CloseApproachPolicy& policy = {}, bool* valid = nullptr);
     static double totalEnergy(const std::vector<Body>& bodies);
     static Vec3 totalMomentum(const std::vector<Body>& bodies);
 

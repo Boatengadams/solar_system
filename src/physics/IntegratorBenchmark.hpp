@@ -11,10 +11,13 @@ struct IntegratorBenchmarkMetrics {
     Integrator integrator = Integrator::VelocityVerlet;
     bool valid = false;
     double timestep = 0.0;
+    double elapsedSimulationTime = 0.0;
     std::size_t integrationSteps = 0;
     double energyDrift = 0.0;
+    double angularMomentumDrift = 0.0;
     double positionError = 0.0;
     double velocityError = 0.0;
+    double orbitalPeriodError = 0.0;
 };
 
 struct IntegratorBenchmarkConfig {

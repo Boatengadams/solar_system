@@ -54,6 +54,9 @@ src/physics      Bodies and gravitational calculations
 src/simulation   Simulation state and clock
 src/data         Built-in baseline scenario loader
 src/education    Lessons and experiments
+src/spacecraft   Spacecraft propulsion and maneuver domain
+src/missions     Mission analysis and trajectory prediction
+src/astronomy    Ephemeris and optional advanced-data providers
 src/rendering    Raylib scene rendering
 src/ui           Raylib HUD
 src/input        Keyboard and mouse mapping
@@ -72,3 +75,18 @@ Phase 2 also provides `Simulation::saveSnapshot()` and
 
 In VS Code, run **Tasks: Run Build Task** after configuring, or use the included
 debug launch configuration.
+
+Release/education tools:
+
+```sh
+cmake --preset debug
+cmake --build --preset debug --parallel 2
+ctest --preset debug
+cmake --build build --target package
+```
+
+SPICE is not bundled. The optional provider boundary reports unavailable until
+CSPICE and compatible kernels are supplied. Enable it with
+`-DBAGSOLAR_ENABLE_SPICE=ON`, `CSPICE_INCLUDE_DIR`, and `CSPICE_LIBRARY`; use
+`bagsolar_ephemeris --spice MANIFEST BODY JULIAN_DATE FRAME` for an explicit
+query.

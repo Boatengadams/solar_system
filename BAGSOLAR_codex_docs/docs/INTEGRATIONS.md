@@ -13,11 +13,19 @@ not cross into physics or rendering.
 Use for scientific/debug/control panels if it improves UX.
 
 ### JPL Horizons
-Use for real planetary/spacecraft ephemeris.
+Phase 6 provides an isolated `HorizonsProvider` using the official API's JSON
+VECTORS contract. HTTP is injected through `HttpClient`; normal tests use a
+fake client and never access NASA. The command-line curl transport is explicit
+and timeout-bounded. SPICE and spacecraft ephemeris remain future work.
 
 ## Advanced
 ### NASA SPICE
-Use for high-fidelity spacecraft and planetary geometry.
+The Phase 8 boundary includes `SpiceEphemerisProvider` and
+`SpiceKernelManifest`, but CSPICE is not bundled. Without an explicit CSPICE
+integration build and kernels, requests return `PROVIDER_UNAVAILABLE`; no
+fake SPICE values are produced. With CSPICE enabled, `SpiceKernelManager`
+loads validated SPK/LSK/PCK/FK entries in deterministic order and the provider
+uses `spkezr_c` behind the astronomy boundary.
 
 ### Tudat
 Use as an optional reference/validation backend, not as a reason to replace the core engine.
@@ -29,6 +37,18 @@ Potential future satellite-orbit module for TLE-based objects.
 External libraries must sit behind adapters/interfaces where practical.
 
 External systems must never leak vendor-specific types throughout the physics core.
+
+## Phase 6 ephemeris boundary
+
+```text
+EphemerisProvider → EphemerisState (epoch/frame/origin/SI) → Simulation
+       ├→ LocalEphemerisProvider
+       ├→ JsonEphemerisProvider
+       └→ HorizonsProvider → HttpClient → HorizonsParser
+```
+
+Horizons failure is never silently converted into local data. The provider
+cache is in-memory and keyed by the complete generated request URL.
 
 ## Licensing
 Before adding any dependency:

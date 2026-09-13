@@ -11,6 +11,8 @@ constexpr Lesson LESSONS[] = {
     {"5  Kepler's third law", "For bodies orbiting the same central mass, orbital period increases strongly with orbital distance."},
     {"6  Conservation", "In an isolated system, momentum and energy provide powerful checks on a numerical simulation."},
     {"7  Numerical methods", "BAGSOLAR uses a fixed simulation step with velocity-Verlet integration for better long-term stability."},
+    {"8  Hohmann transfers", "Two carefully chosen tangential burns can move a spacecraft between circular orbits efficiently."},
+    {"9  Gravity assists", "A flyby exchanges energy with a moving planet while the spacecraft speed relative to that planet remains nearly constant."},
 };
 
 constexpr Experiment EXPERIMENTS[] = {
@@ -18,6 +20,8 @@ constexpr Experiment EXPERIMENTS[] = {
     {"KEPLER TEST", "Move through the planets and compare distance with orbital period.", "T² ∝ a³"},
     {"GRAVITY LAB", "Change mass and distance mentally, then observe the acceleration.", "F = Gm₁m₂/r²"},
     {"ORBIT ENERGY", "A negative specific orbital energy means the object is gravitationally bound.", "ε = v²/2 − GM/r"},
+    {"HOHMANN LAB", "Compare the departure and arrival burns required for two circular orbits.", "Δv = v_transfer − v_circular"},
+    {"ASSIST LAB", "Vary periapsis and incoming hyperbolic excess speed to inspect turn angle.", "δ = 2 asin(1/e)"},
 };
 
 } // namespace

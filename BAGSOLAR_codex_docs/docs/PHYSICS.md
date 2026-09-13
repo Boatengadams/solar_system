@@ -62,3 +62,9 @@ Protect against:
 - Invalid initial velocity
 
 Never hide numerical failure.
+
+Phase 4 validation uses barycentric two-body fixtures and the reduced-mass
+parameter `G(M + m)` for analytical periods. It validates numerical behavior
+over documented timestep and duration envelopes; it does not establish
+accuracy for all N-body configurations, close encounters, or astronomical
+ephemerides.

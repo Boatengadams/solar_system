@@ -328,6 +328,16 @@ InteractionReport PhysicsEngine::inspectInteractions(const std::vector<Body>& bo
     return report;
 }
 
+Vec3 PhysicsEngine::acceleration(const std::vector<Body>& bodies, std::size_t bodyIndex,
+                                 const CloseApproachPolicy& policy, bool* validOutput) {
+    InteractionReport report;
+    bool valid = false;
+    const std::vector<Vec3> values = accelerations(bodies, policy, report, valid);
+    if (validOutput) *validOutput = valid && bodyIndex < values.size();
+    if (!valid || bodyIndex >= values.size()) return {};
+    return values[bodyIndex];
+}
+
 double PhysicsEngine::totalEnergy(const std::vector<Body>& bodies) {
     double energy = 0.0;
     for (const Body& body : bodies) if (body.active) energy += 0.5 * body.mass * dot(body.velocity, body.velocity);

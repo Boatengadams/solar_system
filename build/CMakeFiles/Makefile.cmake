@@ -17,6 +17,8 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/usr/share/cmake-4.3/Modules/CMakeLanguageInformation.cmake"
   "/usr/share/cmake-4.3/Modules/CMakeSystemSpecificInformation.cmake"
   "/usr/share/cmake-4.3/Modules/CMakeSystemSpecificInitialize.cmake"
+  "/usr/share/cmake-4.3/Modules/CPack.cmake"
+  "/usr/share/cmake-4.3/Modules/CPackComponent.cmake"
   "/usr/share/cmake-4.3/Modules/CTest.cmake"
   "/usr/share/cmake-4.3/Modules/CTestTargets.cmake"
   "/usr/share/cmake-4.3/Modules/CTestUseLaunchers.cmake"
@@ -27,6 +29,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/usr/share/cmake-4.3/Modules/FindPackageHandleStandardArgs.cmake"
   "/usr/share/cmake-4.3/Modules/FindPackageMessage.cmake"
   "/usr/share/cmake-4.3/Modules/FindPkgConfig.cmake"
+  "/usr/share/cmake-4.3/Modules/GNUInstallDirs.cmake"
   "/usr/share/cmake-4.3/Modules/Internal/CMakeCXXLinkerInformation.cmake"
   "/usr/share/cmake-4.3/Modules/Internal/CMakeCommonLinkerInformation.cmake"
   "/usr/share/cmake-4.3/Modules/Linker/GNU-CXX.cmake"
@@ -39,6 +42,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/usr/share/cmake-4.3/Modules/Platform/Linux-Initialize.cmake"
   "/usr/share/cmake-4.3/Modules/Platform/Linux.cmake"
   "/usr/share/cmake-4.3/Modules/Platform/UnixPaths.cmake"
+  "/usr/share/cmake-4.3/Templates/CPackConfig.cmake.in"
   "/usr/share/cmake-4.3/Templates/CTestScript.cmake.in"
   )
 
@@ -52,6 +56,8 @@ set(CMAKE_MAKEFILE_OUTPUTS
 set(CMAKE_MAKEFILE_PRODUCTS
   "DartConfiguration.tcl"
   "CMakeFiles/CTestScript.cmake"
+  "CPackConfig.cmake"
+  "CPackSourceConfig.cmake"
   "CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 
@@ -88,4 +94,12 @@ set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/planets.dir/DependInfo.cmake"
   "CMakeFiles/bagsolar_physics_tests.dir/DependInfo.cmake"
   "CMakeFiles/bagsolar_data_tests.dir/DependInfo.cmake"
+  "CMakeFiles/bagsolar_validation_tests.dir/DependInfo.cmake"
+  "CMakeFiles/bagsolar_telemetry_tests.dir/DependInfo.cmake"
+  "CMakeFiles/bagsolar_ephemeris_tests.dir/DependInfo.cmake"
+  "CMakeFiles/bagsolar_spacecraft_tests.dir/DependInfo.cmake"
+  "CMakeFiles/bagsolar_education_tests.dir/DependInfo.cmake"
+  "CMakeFiles/bagsolar_advanced_data_tests.dir/DependInfo.cmake"
+  "CMakeFiles/bagsolar_validation.dir/DependInfo.cmake"
+  "CMakeFiles/bagsolar_ephemeris.dir/DependInfo.cmake"
   )

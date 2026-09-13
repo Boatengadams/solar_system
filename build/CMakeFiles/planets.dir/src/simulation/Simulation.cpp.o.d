@@ -186,6 +186,8 @@ CMakeFiles/planets.dir/src/simulation/Simulation.cpp.o: \
  /usr/include/c++/15/bits/unique_ptr.h \
  /usr/include/c++/15/ext/aligned_buffer.h \
  /usr/include/c++/15/bits/fs_dir.h /usr/include/c++/15/bits/fs_ops.h \
+ /usr/include/c++/15/optional \
+ /usr/include/c++/15/bits/enable_special_members.h \
  /usr/include/c++/15/random /usr/include/c++/15/cmath /usr/include/math.h \
  /usr/include/x86_64-linux-gnu/bits/math-vector.h \
  /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h \
@@ -222,10 +224,12 @@ CMakeFiles/planets.dir/src/simulation/Simulation.cpp.o: \
  /usr/include/c++/15/pstl/execution_defs.h \
  /home/kali/Desktop/Cpp_Advance/src/simulation/../core/Star.hpp \
  /home/kali/Desktop/Cpp_Advance/src/simulation/../core/Vector2.hpp \
+ /home/kali/Desktop/Cpp_Advance/src/simulation/../astronomy/EphemerisTypes.hpp \
+ /home/kali/Desktop/Cpp_Advance/src/simulation/../astronomy/../core/Vector3.hpp \
  /home/kali/Desktop/Cpp_Advance/src/simulation/../physics/Body.hpp \
  /home/kali/Desktop/Cpp_Advance/src/simulation/../physics/../core/Color.hpp \
- /home/kali/Desktop/Cpp_Advance/src/simulation/../physics/../core/Vector3.hpp \
  /home/kali/Desktop/Cpp_Advance/src/simulation/../physics/PhysicsEngine.hpp \
+ /home/kali/Desktop/Cpp_Advance/src/simulation/../telemetry/TelemetryTypes.hpp \
  /home/kali/Desktop/Cpp_Advance/src/simulation/SimulationSettings.hpp \
  /usr/include/c++/15/algorithm /usr/include/c++/15/bits/stl_algo.h \
  /usr/include/c++/15/bits/algorithmfwd.h \
@@ -235,8 +239,7 @@ CMakeFiles/planets.dir/src/simulation/Simulation.cpp.o: \
  /home/kali/Desktop/Cpp_Advance/src/simulation/../core/Logger.hpp \
  /home/kali/Desktop/Cpp_Advance/src/simulation/../data/BodyFactory.hpp \
  /home/kali/Desktop/Cpp_Advance/src/simulation/../data/DataResult.hpp \
- /usr/include/c++/15/optional \
- /usr/include/c++/15/bits/enable_special_members.h \
  /usr/include/c++/15/utility /usr/include/c++/15/bits/stl_relops.h \
  /home/kali/Desktop/Cpp_Advance/src/simulation/../data/ScenarioLoader.hpp \
- /home/kali/Desktop/Cpp_Advance/src/simulation/../data/ScenarioSerializer.hpp
+ /home/kali/Desktop/Cpp_Advance/src/simulation/../data/ScenarioSerializer.hpp \
+ /home/kali/Desktop/Cpp_Advance/src/simulation/../telemetry/TelemetryExporter.hpp

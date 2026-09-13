@@ -107,3 +107,11 @@ must not be below the minimum timestep.
 Phase 2 snapshots use the `bagsolar_simulation_snapshot_v1` format. They store
 scenario metadata, simulation time, settings, display flags, and current body
 states for future save/load extensions.
+
+## Ephemeris state
+
+Phase 6 `EphemerisState` is separate from `Body`: it carries body ID, Julian
+Date, explicit frame and origin, SI position/velocity, provider/source
+provenance, and status. `EphemerisSnapshot` enforces common epoch/frame/origin
+before states can initialize existing simulation bodies. It does not infer
+masses, perform interpolation, or claim an astronomical frame transformation.

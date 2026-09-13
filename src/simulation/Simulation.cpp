@@ -7,6 +7,7 @@
 #include "../data/BodyFactory.hpp"
 #include "../data/ScenarioLoader.hpp"
 #include "../data/ScenarioSerializer.hpp"
+#include "../telemetry/TelemetryExporter.hpp"
 
 namespace bag {
 namespace {
@@ -46,10 +47,45 @@ bool Simulation::loadScenario(const std::string& id) {
     nextTimestep = settings.timestepSeconds;
     timestepHistory.clear();
     lastStepResult = {};
+    telemetry.clear();
+    ephemerisEpoch.reset();
+    ephemerisFrame = Frame::heliocentric();
+    ephemerisSource.clear();
+    ephemerisProvider.clear();
+    ephemerisUnits = "SI";
     initialEnergy = 0.0;
     refreshScientificState();
     paused = false;
     challengeScore = 0.0;
+    return true;
+}
+
+bool Simulation::initializeFromEphemeris(const EphemerisSnapshot& snapshot) {
+    if (!snapshot.valid()) return false;
+    for (const EphemerisState& state : snapshot.states) {
+        const auto body = std::find_if(bodies.begin(), bodies.end(), [&](const Body& candidate) { return candidate.id == state.bodyId; });
+        if (body == bodies.end() || !state.valid()) return false;
+    }
+    for (const EphemerisState& state : snapshot.states) {
+        auto body = std::find_if(bodies.begin(), bodies.end(), [&](const Body& candidate) { return candidate.id == state.bodyId; });
+        body->position = state.positionM;
+        body->velocity = state.velocityMps;
+        body->trail.clear();
+    }
+    ephemerisEpoch = snapshot.epoch;
+    ephemerisFrame = snapshot.frame;
+    ephemerisSource = snapshot.states.front().source;
+    ephemerisProvider = snapshot.states.front().provider;
+    ephemerisUnits = snapshot.states.front().units;
+    simTime = 0.0;
+    accumulator = 0.0;
+    actualTimestep = settings.timestepSeconds;
+    nextTimestep = settings.timestepSeconds;
+    timestepHistory.clear();
+    lastStepResult = {};
+    initialEnergy = 0.0;
+    refreshScientificState();
+    telemetry.clear();
     return true;
 }
 
@@ -78,6 +114,15 @@ void Simulation::integrate(double realDeltaSeconds) {
         }
         if (!lastStepResult.success) {
             logError("physics step failed: " + lastStepResult.error);
+            if (telemetry.active) {
+                telemetry.recordPhysicsEvents(simTime, step, lastStepResult, bodies);
+                TelemetryConfig config;
+                config.enabled = true;
+                config.samplingIntervalSeconds = telemetry.metadata.samplingIntervalSeconds;
+                config.referenceBodyId = telemetry.metadata.referenceBodyId;
+                config.closeApproach.minimumSafeSeparation = settings.minimumSafeSeparationMeters;
+                telemetry.observe(bodies, simTime, 0.0, step, integrator, TelemetryStatus::INTEGRATION_FAILURE, config, true);
+            }
             break;
         }
         actualTimestep = lastStepResult.timestepUsed;
@@ -86,6 +131,17 @@ void Simulation::integrate(double realDeltaSeconds) {
         simTime += lastStepResult.timestepUsed;
         accumulator -= lastStepResult.timestepUsed;
         refreshScientificState();
+        if (telemetry.active) {
+            TelemetryConfig config;
+            config.enabled = true;
+            config.samplingIntervalSeconds = telemetry.metadata.samplingIntervalSeconds;
+            config.referenceBodyId = telemetry.metadata.referenceBodyId;
+            config.closeApproach.minimumSafeSeparation = settings.minimumSafeSeparationMeters;
+            const TelemetryStatus status = !lastStepResult.interactions.collisions.empty() ? TelemetryStatus::COLLISION :
+                (lastStepResult.interactions.closeApproach.triggered ? TelemetryStatus::WARNING : TelemetryStatus::OK);
+            telemetry.recordPhysicsEvents(simTime, step, lastStepResult, bodies);
+            telemetry.observe(bodies, simTime, lastStepResult.timestepUsed, step, integrator, status, config);
+        }
     }
 
     if (!paused) {
@@ -178,8 +234,51 @@ bool Simulation::loadSnapshot(const std::filesystem::path& path) {
     initialEnergy = 0.0;
     refreshScientificState();
     selected = -1;
+    telemetry.clear();
     return true;
 }
+
+bool Simulation::startTelemetry(double intervalSeconds, const std::string& referenceBodyId) {
+    Integrator integrator = Integrator::VelocityVerlet;
+    if (!parseIntegrator(settings.integrator, integrator)) return false;
+    TelemetryConfig config;
+    config.enabled = true;
+    config.samplingIntervalSeconds = intervalSeconds;
+    config.referenceBodyId = referenceBodyId;
+    config.closeApproach.minimumSafeSeparation = settings.minimumSafeSeparationMeters;
+    TelemetrySessionMetadata metadata;
+    metadata.sessionId = scenarioId + "-telemetry";
+    metadata.scenarioId = scenarioMetadata.id;
+    metadata.scenarioName = scenarioMetadata.name;
+    metadata.epoch = scenarioMetadata.epoch;
+    metadata.referenceFrame = ephemerisEpoch ? ephemerisFrame.orientation : scenarioMetadata.referenceFrame;
+    metadata.referenceBodyId = referenceBodyId;
+    metadata.ephemerisProvider = ephemerisProvider;
+    metadata.ephemerisSource = ephemerisSource;
+    metadata.ephemerisOriginBodyId = ephemerisFrame.originBodyId;
+    metadata.ephemerisUnits = ephemerisUnits;
+    metadata.ephemerisEpochJulianDate = ephemerisEpoch ? ephemerisEpoch->value : TELEMETRY_UNAVAILABLE;
+    metadata.integrator = integratorName(integrator);
+    metadata.initialTimestepSeconds = settings.timestepSeconds;
+    return telemetry.start(metadata, intervalSeconds, bodies, simTime, config);
+}
+
+void Simulation::stopTelemetry(TelemetryStatus status) {
+    if (!telemetry.active) return;
+    TelemetryConfig config;
+    config.enabled = true;
+    config.samplingIntervalSeconds = telemetry.metadata.samplingIntervalSeconds;
+    config.referenceBodyId = telemetry.metadata.referenceBodyId;
+    config.closeApproach.minimumSafeSeparation = settings.minimumSafeSeparationMeters;
+    Integrator integrator = Integrator::VelocityVerlet;
+    parseIntegrator(settings.integrator, integrator);
+    telemetry.observe(bodies, simTime, actualTimestep, actualTimestep, integrator, status, config, true);
+    telemetry.stop(simTime, status);
+}
+
+void Simulation::clearTelemetry() { telemetry.clear(); }
+bool Simulation::exportTelemetryCsv(const std::filesystem::path& path) const { return writeTelemetryCsv(path, telemetry); }
+bool Simulation::exportTelemetryJson(const std::filesystem::path& path) const { return writeTelemetryJson(path, telemetry); }
 
 void Simulation::setSpeed(double value) {
     speed = std::max(0.01, std::min(100000.0, value));

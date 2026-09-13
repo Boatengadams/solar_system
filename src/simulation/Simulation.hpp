@@ -1,13 +1,16 @@
 #pragma once
 
 #include <filesystem>
+#include <optional>
 #include <random>
 #include <string>
 #include <vector>
 
 #include "../core/Star.hpp"
+#include "../astronomy/EphemerisTypes.hpp"
 #include "../physics/Body.hpp"
 #include "../physics/PhysicsEngine.hpp"
+#include "../telemetry/TelemetryTypes.hpp"
 #include "SimulationSettings.hpp"
 
 namespace bag {
@@ -30,6 +33,7 @@ public:
     double energyDrift = 0.0;
     Vec3 totalMomentum;
     PhysicsStepResult lastStepResult;
+    TelemetrySession telemetry;
     double speed = 1.0;
     bool paused = false;
     bool showOrbits = true;
@@ -42,11 +46,17 @@ public:
     int experiment = 0;
     int challenge = 0;
     double challengeScore = 0.0;
+    std::optional<Epoch> ephemerisEpoch;
+    Frame ephemerisFrame = Frame::heliocentric();
+    std::string ephemerisSource;
+    std::string ephemerisProvider;
+    std::string ephemerisUnits = "SI";
 
     explicit Simulation(std::filesystem::path dataRoot = "data");
 
     void reset();
     bool loadScenario(const std::string& id);
+    bool initializeFromEphemeris(const EphemerisSnapshot& snapshot);
     void integrate(double realDeltaSeconds);
     void launchProbe(double delta);
     int addBody(const Body& body);
@@ -54,6 +64,12 @@ public:
     void setSpeed(double value);
     bool saveSnapshot(const std::filesystem::path& path) const;
     bool loadSnapshot(const std::filesystem::path& path);
+    bool startTelemetry(double intervalSeconds, const std::string& referenceBodyId = {});
+    void stopTelemetry(TelemetryStatus status = TelemetryStatus::COMPLETED);
+    void clearTelemetry();
+    bool telemetryEnabled() const { return telemetry.active; }
+    bool exportTelemetryCsv(const std::filesystem::path& path) const;
+    bool exportTelemetryJson(const std::filesystem::path& path) const;
 
     double distanceFromSun(const Body& body) const;
     double specificEnergy(const Body& body) const;

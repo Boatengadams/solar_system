@@ -23,3 +23,16 @@ Each lesson should contain:
 9. Gravity assists
 
 Lessons should encourage experimentation rather than only displaying text.
+
+## Phase 9 implementation
+
+The lesson catalog now includes gravity, orbit, escape, eccentricity, Kepler,
+conservation, numerical methods, Hohmann transfers, and gravity assists.
+Experiments include escape velocity, Kepler scaling, gravity, orbital energy,
+Hohmann transfers, and gravity assists. `EducationProgress` tracks completed
+lessons, completed experiments, free-form student observations, and a
+deterministic completion report without depending on raylib or wall-clock
+state.
+
+Challenge workflows and numerical-method comparison scoring are intentionally
+not claimed complete yet.

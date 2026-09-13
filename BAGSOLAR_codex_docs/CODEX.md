@@ -23,6 +23,15 @@ Implement BAGSOLAR incrementally according to PROJECT.md, ARCHITECTURE.md and RO
 17. Keep public APIs documented where behavior is non-obvious.
 18. Do not delete existing functionality merely to make compilation easier.
 
+SPICE-specific rule: CSPICE and kernel files are optional external resources.
+The default build must remain offline and must return
+`PROVIDER_UNAVAILABLE` rather than fabricate astronomical states when CSPICE
+is absent.
+
+SPICE verification rule: a compile-only or disabled-provider test is not real
+SPICE verification. Phase 8 can be marked complete only after a CSPICE-linked
+build loads user-provided kernels and extracts at least one real state.
+
 ## Implementation Order
 When beginning work:
 1. Inspect repository.

@@ -1,0 +1,21 @@
+name: BAGSOLAR CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build dependencies
+        run: sudo apt-get update && sudo apt-get install -y g++ cmake pkg-config libraylib-dev
+      - name: Configure
+        run: cmake --preset debug
+      - name: Build
+        run: cmake --build --preset debug --parallel 2
+      - name: Test
+        run: ctest --preset debug
+      - name: Package
+        run: cmake --build build --target package

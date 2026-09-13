@@ -1,0 +1,22 @@
+# Local build trees and generated binaries
+/build/
+/build-spice/
+/build-release/
+/planets
+/bagsolar_validation
+/bagsolar_*
+
+# Generated packages, logs, and local test output
+*.tar.gz
+*.log
+
+# External SPICE resources and machine-local manifests
+*.bsp
+*.spk
+*.tls
+*.lsk
+*.tpc
+*.tf
+*.bc
+*.bpc
+*spice-manifest*.json

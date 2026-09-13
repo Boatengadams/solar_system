@@ -190,6 +190,8 @@ CMakeFiles/planets.dir/src/app/main.cpp.o: \
  /usr/include/c++/15/bits/unique_ptr.h \
  /usr/include/c++/15/ext/aligned_buffer.h \
  /usr/include/c++/15/bits/fs_dir.h /usr/include/c++/15/bits/fs_ops.h \
+ /usr/include/c++/15/optional \
+ /usr/include/c++/15/bits/enable_special_members.h \
  /usr/include/c++/15/random /usr/include/c++/15/cmath /usr/include/math.h \
  /usr/include/x86_64-linux-gnu/bits/math-vector.h \
  /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h \
@@ -226,9 +228,11 @@ CMakeFiles/planets.dir/src/app/main.cpp.o: \
  /usr/include/c++/15/pstl/execution_defs.h \
  /home/kali/Desktop/Cpp_Advance/src/app/../input/../rendering/../simulation/../core/Star.hpp \
  /home/kali/Desktop/Cpp_Advance/src/app/../input/../rendering/../simulation/../core/Vector2.hpp \
+ /home/kali/Desktop/Cpp_Advance/src/app/../input/../rendering/../simulation/../astronomy/EphemerisTypes.hpp \
+ /home/kali/Desktop/Cpp_Advance/src/app/../input/../rendering/../simulation/../astronomy/../core/Vector3.hpp \
  /home/kali/Desktop/Cpp_Advance/src/app/../input/../rendering/../simulation/../physics/Body.hpp \
  /home/kali/Desktop/Cpp_Advance/src/app/../input/../rendering/../simulation/../physics/../core/Color.hpp \
- /home/kali/Desktop/Cpp_Advance/src/app/../input/../rendering/../simulation/../physics/../core/Vector3.hpp \
  /home/kali/Desktop/Cpp_Advance/src/app/../input/../rendering/../simulation/../physics/PhysicsEngine.hpp \
+ /home/kali/Desktop/Cpp_Advance/src/app/../input/../rendering/../simulation/../telemetry/TelemetryTypes.hpp \
  /home/kali/Desktop/Cpp_Advance/src/app/../input/../rendering/../simulation/SimulationSettings.hpp \
  /home/kali/Desktop/Cpp_Advance/src/app/../ui/HUD.hpp

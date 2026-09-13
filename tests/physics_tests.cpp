@@ -192,8 +192,10 @@ int main() {
         assert(metrics.valid);
         assert(metrics.integrationSteps == 24);
         assert(std::isfinite(metrics.energyDrift));
+        assert(std::isfinite(metrics.angularMomentumDrift));
         assert(std::isfinite(metrics.positionError));
         assert(std::isfinite(metrics.velocityError));
+        assert(std::isfinite(metrics.orbitalPeriodError));
     }
 
     return 0;
