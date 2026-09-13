@@ -25,7 +25,7 @@ provider, integrator, timestep, initial state, and sample epochs. Controlled
 analytical/two-body comparisons can measure numerical integration accuracy. A
 SPICE/Horizons comparison measures prediction/reference disagreement and may
 also contain dynamical/model mismatch; it is not automatically pure numerical
-error or observational truth. See `docs/PREDICTION_VS_REFERENCE.md`.
+error or observational truth. See `PREDICTION_VS_REFERENCE.md`.
 
 ## Example Report
 

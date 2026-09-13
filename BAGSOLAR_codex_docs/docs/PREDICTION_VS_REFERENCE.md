@@ -1,7 +1,5 @@
 # Prediction vs Reference
 
-# Prediction vs Reference
-
 BAGSOLAR compares a deterministic numerical prediction with an explicit
 reference ephemeris state. A reference is a model or data source, not
 observational truth; the feature is intentionally called **Prediction vs

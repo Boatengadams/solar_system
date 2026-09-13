@@ -1,29 +1,55 @@
 # BAGSOLAR
 
-Interactive C++17 [raylib](https://www.raylib.com/) astrodynamics laboratory.
+BAGSOLAR is an interactive C++17 orbital-mechanics laboratory and scientific-
+computing portfolio project. It combines a raylib visualization with a
+raylib-free Newtonian simulator, explicit SI units, numerical integration,
+scientific telemetry, validation, ephemeris/reference-provider boundaries, and
+a guided education system.
 
-The application is in the prototype-to-engineering transition. The original
-BAGSOLAR behavior is preserved while the code is organized into raylib-free
-physics/simulation modules and raylib-facing rendering, UI, and input modules.
+The project is technically interesting because it makes scientific contracts
+visible: epochs, coordinate origins, frame orientation, units, integrators,
+timesteps, provider provenance, numerical failure states, and prediction/reference
+comparisons are represented explicitly rather than hidden in the UI.
 
-Project specifications and the Phase 0/1 implementation plan are in
-`BAGSOLAR_codex_docs/`. This is the canonical documentation tree for the
-project; the root `docs/` path is retained only for the public
-Prediction vs Reference entry point.
+The current implementation provides:
+
+- Newtonian N-body gravity with Euler, semi-implicit Euler, Velocity Verlet, and RK4.
+- Orbital elements, energy, angular momentum, conservation diagnostics, adaptive
+  timestep handling, close-approach reporting, and collision reporting.
+- Deterministic analytical validation for circular and elliptical orbits,
+  hyperbolic classification, Hohmann transfers, conservation, and timestep
+  convergence.
+- Telemetry sessions with orbital quantities, numerical status, CSV/JSON export,
+  metadata, and compatibility checks.
+- Local deterministic, JSON, optional JPL Horizons, and optional CSPICE ephemeris
+  provider boundaries.
+- Nine lessons, guided experiments, scored challenges, progress persistence,
+  learner reports, recommendations, and Prediction vs Reference education.
+
+BAGSOLAR is a Newtonian educational/scientific simulator. It is not a
+high-fidelity production astrodynamics propagator. Prediction vs Reference
+compares BAGSOLAR's numerical prediction with an explicit reference ephemeris;
+it is not a claim that either result is observational truth. Finite burns
+currently use mass-flow accounting and apply the resulting velocity change as
+an impulse. Gravity-assist support is patched-conic turn-angle analysis.
+Mission Tools provide an analytical/API foundation for spacecraft, maneuver,
+Hohmann, gravity-assist, and trajectory calculations; they are not a complete
+mission editor.
+
+The default application is deterministic and offline. It uses the bundled local
+fixture and data files without network access, CSPICE, or external kernels.
+JPL Horizons is an explicitly selected optional network provider and reports
+network or service failures without silently falling back to local data.
+CSPICE and kernels such as DE440 are optional external inputs; they are not
+bundled or downloaded by BAGSOLAR and require an explicit manifest and build
+configuration.
 
 BAGSOLAR source code is released under the MIT License in `LICENSE`.
 Bundled and optional external components are summarized in
 `BAGSOLAR_codex_docs/THIRD_PARTY_LICENSES.md`.
 
-Validation uses an offline-capable [Prediction vs Reference](BAGSOLAR_codex_docs/docs/PREDICTION_VS_REFERENCE.md)
-comparison with explicit Julian Date, frame/origin, SI-unit, provider, integrator,
-and timestep contracts. Reference disagreement is not treated as observational truth
-or automatically attributed solely to numerical integration.
-
-The education workflow uses an application-configured `EphemerisProvider` and
-defaults offline to the deterministic local fixture. The comparison runs during
-the normal select/start/observe/evaluate sequence; optional SPICE/Horizons
-providers use the same interface and are never silently substituted.
+The canonical Prediction vs Reference documentation is
+[`BAGSOLAR_codex_docs/docs/PREDICTION_VS_REFERENCE.md`](BAGSOLAR_codex_docs/docs/PREDICTION_VS_REFERENCE.md).
 
 The application has discoverable top navigation for Simulation, Education,
 Scenarios, Telemetry, Mission Tools, Settings, and Help. `Tab` cycles views;
@@ -46,7 +72,7 @@ used by the data layer. CSPICE, external kernels, and network access are
 optional; the Horizons command-line transport additionally uses a local
 `curl` executable.
 
-to configure this and build follow this process:
+To configure and build the application with CMake:
 
 ```sh
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
@@ -80,12 +106,19 @@ Run it with:
 ./build/planets
 ```
 
+The CMake application target and installed executable retain the historical
+`planets` name for compatibility; the public project and package identity is
+BAGSOLAR.
+
 The application resolves runtime data relative to the executable, so the
 source-tree build can be launched from another working directory when given
 its path. Required resources are `data/bodies/` and `data/scenarios/`; a
 missing resource is reported as an initialization error.
 
-For the Makefile build, run `./planets` instead.
+For the Makefile build, run `./planets` from the repository root. The Makefile
+builds the compatibility executable; its `test` target configures and builds
+the CMake Debug tree before running CTest, so Makefile testing does not depend
+on a previously configured build directory.
 
 ## Source layout
 
@@ -112,13 +145,14 @@ Celestial body definitions are stored in `data/bodies/` and scenario files in
 Use `F1` for the default solar system, `F2` for Earth Orbit, and `F3` for Empty
 Space. Reset reloads the currently selected scenario from its JSON source.
 
-Phase 2 also provides `Simulation::saveSnapshot()` and
-`Simulation::loadSnapshot()` as the foundation for future save/load UI.
+The source also provides snapshot and education-progress persistence APIs;
+these are currently programmatic foundations rather than a complete in-app
+save/load workflow.
 
 In VS Code, run **Tasks: Run Build Task** after configuring, or use the included
 debug launch configuration.
 
-Release/education tools:
+Release, validation, and education tools:
 
 ```sh
 cmake --preset debug
@@ -143,7 +177,7 @@ cmake --install build --prefix /tmp/bagsolar-install
 ```
 
 The generated TGZ package contains the same data tree and resource check. The
-normal CTest suite runs both install and package smoke tests offline.
+normal CTest suite includes install and package smoke tests, all offline.
 
 The development build is under `build/`; an installed tree places executables
 under `bin/` and runtime data under `share/bagsolar/data`; a TGZ package
@@ -156,3 +190,17 @@ CSPICE and compatible kernels are supplied. Enable it with
 `-DBAGSOLAR_ENABLE_SPICE=ON`, `CSPICE_INCLUDE_DIR`, and `CSPICE_LIBRARY`; use
 `bagsolar_ephemeris --spice MANIFEST BODY JULIAN_DATE FRAME` for an explicit
 query.
+
+## Engineering evidence
+
+The repository includes CTest coverage for physics, data, validation,
+telemetry, ephemeris, spacecraft, education, resource discovery, installation,
+and package smoke tests. `bagsolar_validation`, the education test executable,
+and the local ephemeris CLI provide deterministic offline checks. Linux CI
+configures, builds, tests, validates, installs, packages, and exercises the
+package outside the source tree. `tools/release_smoke.sh` repeats the same
+fresh-checkout workflow without network access or external scientific data.
+
+The full project documentation is in `BAGSOLAR_codex_docs/`, including build,
+architecture, physics, validation, telemetry, ephemeris, spacecraft, mission,
+education, UI, integration, and third-party licensing notes.

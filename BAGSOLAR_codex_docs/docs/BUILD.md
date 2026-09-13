@@ -18,8 +18,9 @@ is used only by the data layer for JSON parsing and serialization.
 - Prefer reproducible builds.
 - Keep Debug and Release configurations.
 
-The Phase 1 CMake build defines the `planets` application and a CTest target
-named `bagsolar_physics_tests`. Run both with:
+The CMake build defines the BAGSOLAR application and retains the historical
+`planets` executable target for compatibility. It also defines CTest targets,
+including `bagsolar_physics_tests`. Run them with:
 
 ```sh
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON
@@ -27,8 +28,10 @@ cmake --build build --parallel
 ctest --test-dir build --output-on-failure
 ```
 
-The Makefile remains available as a second Linux build path and compiles the
-same `src/` sources.
+The Makefile remains available as a second Linux application build path and
+compiles the same `src/` sources. Its `test` target invokes the CMake Debug
+preset, builds that CTest tree, and then runs CTest; it is not a separate test
+implementation.
 
 The application requires this runtime data tree:
 
@@ -52,8 +55,8 @@ tests work without network access.
 Phase 8 SPICE support is deliberately optional and reports an explicit
 unavailable status unless CSPICE is supplied through `CSPICE_INCLUDE_DIR` and
 `CSPICE_LIBRARY`. The official NAIF static archive `cspice.a` is supported.
-Phase 10 provides `CMakePresets.json`, Linux GitHub Actions, install rules, and
-CPack TGZ packaging:
+The current build provides `CMakePresets.json`, Linux GitHub Actions, install
+rules, and CPack TGZ packaging:
 
 ```sh
 cmake --preset debug

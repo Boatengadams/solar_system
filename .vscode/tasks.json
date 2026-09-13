@@ -22,7 +22,7 @@
         {
             "type": "cppbuild",
             "label": "C/C++: g++-15 build active file",
-            "command": "/usr/bin/g++-15",
+            "command": "g++",
             "args": [
                 "-std=c++17",
                 "-fdiagnostics-color=always",

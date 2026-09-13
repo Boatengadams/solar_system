@@ -1,11 +1,16 @@
 # BAGSOLAR Project Health
 
-## Completed phases
+## Current status
 
-Phases 0 through 8 are complete for their documented scope. Phase 3 is
-preserved by the `phase-3-complete` tag. Phase 8 has additionally passed a
-real CSPICE verification using the NAIF CSPICE N0067 toolkit and the external
-NAIF `de440.bsp` planetary kernel.
+The repository is clean at the `phase-10.5-complete` checkpoint. BAGSOLAR is a
+public release candidate for its documented offline Linux scope. The default
+build is deterministic and does not require network access, CSPICE, or external
+kernels. Optional Horizons and CSPICE paths remain explicitly configured
+integrations rather than default dependencies.
+
+Phases 0 through 10.5 are complete for their documented scope. Historical
+phase sections remain useful as implementation history; this document describes
+the current repository rather than an unfinished working tree.
 
 ## Phase 8 real verification
 
@@ -30,7 +35,7 @@ Barycenter are observer/origin semantics; changing the observer does not claim
 a coordinate rotation. The current supported ephemeris model does not perform
 arbitrary frame rotations.
 
-## Current Phase 9 status
+## Education status
 
 ### Implemented
 
@@ -66,7 +71,7 @@ rejected before scoring.
 - Broader optional challenge/content authoring.
 - Additional presentation polish beyond the compact documented UI.
 
-## Current Phase 10 status
+## Release engineering status
 
 ### Implemented
 
@@ -78,15 +83,15 @@ rejected before scoring.
 
 ### Remaining
 
-- Published release binaries.
+- Public screenshots, demo video, and release media.
 - Cross-platform CI and packages.
-- Installer formats beyond the current TGZ package.
-- Screenshots, demo video, and release media.
+- Installer formats beyond the current Linux TGZ package.
 - Release signing, artifact publication, and a formal 1.0 process.
+- Final manual UI/release-candidate testing.
 
-Phase 10 release preparation is in progress. Repository hygiene, licensing,
-documentation consistency, installed-resource discovery, and release/demo
-work are tracked separately from the completed feature phases.
+Repository hygiene, licensing, documentation consistency, installed-resource
+discovery, and offline package smoke validation are implemented in the current
+checkpoint.
 
 ## Architecture health
 
@@ -96,11 +101,10 @@ and CSPICE is isolated in the astronomy provider implementation behind the
 ephemeris abstraction. No direct CSPICE dependency appears in physics,
 simulation, telemetry, spacecraft, missions, or rendering.
 
-The main remaining architectural concern is that the repository historically
-contains tracked generated build files. A `.gitignore` now prevents new build
-trees, binaries, packages, kernels, and local manifests from being added, but
-removing already tracked generated files should be handled as a separate
-repository-hygiene change.
+The main remaining architectural concern is the breadth of `Simulation`, which
+coordinates physics, education, telemetry, ephemeris, and application state.
+That coupling is accepted for the current release scope and is not being
+refactored in the public-release cleanup.
 
 ## Scientific health
 
@@ -116,25 +120,24 @@ using Horizons or SPICE reference states.
 
 ## Testing health
 
-The normal CMake suite passes 8/8 tests. The SPICE-enabled suite passes 9/9,
-including the real kernel-backed live test. The live test verifies kernel
-loading, `spkezr_c` extraction, finite state values, SI-scale conversion,
-frame/origin metadata, simulation initialization, and telemetry provenance.
+The default CMake configuration registers 12 tests, including resource,
+installation, and package smoke tests. The deterministic scientific,
+education, and local-ephemeris executables are also available offline. The
+optional SPICE live test requires a user-supplied CSPICE installation, kernel
+manifest, and external kernels; it is not part of the normal offline CI path.
+The Makefile application path uses the same warning flags, while `make test`
+delegates to the CMake Debug preset so that CTest is configured consistently.
+Linux CI covers configure, build, CTest, validation, education, local
+ephemeris, installation, and package smoke execution.
 
-The Makefile targets `make`, `make test`, `make validation`, `make education`,
-and `make ephemeris` pass. The CMake and Make builds compile with
-`-Wall -Wextra -Wpedantic` and completed without new warnings. The SPICE build
-and live test also pass with the same warning flags. `git diff --check` passes
-for the current source and documentation changes. Historically tracked
-generated build files remain in the repository, while `.gitignore` prevents
-future build artifacts from being added.
+## Current release work
 
-## Release blockers
+- Phase 11.1 covers public README, documentation consistency, and repository
+  identity cleanup.
+- Phase 11.2 covers screenshots, demonstration media, and public presentation.
+- Phase 11.3 covers manual UI and release-candidate testing.
+- Phase 11.4 covers final release packaging, publication, and release process.
 
-- The working tree contains uncommitted Phase 4–10 implementation changes.
-- Generated build files are historically tracked and need a separate cleanup
-  decision before a clean release commit; they currently prevent an exact
-  clean `git diff --check` after verification.
-- Phase 10 publication/media and release-readiness work remain.
-- External CSPICE and kernels remain optional runtime/build inputs and are not
-  distributed by BAGSOLAR.
+External CSPICE and kernels remain optional runtime/build inputs and are not
+distributed by BAGSOLAR. The default offline release path does not depend on
+them.

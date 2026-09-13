@@ -30,8 +30,10 @@ education: $(SOURCES)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) tests/education_tests.cpp src/astronomy/EphemerisTypes.cpp src/education/EducationChallenges.cpp src/education/ExperimentEvaluation.cpp src/education/EducationContent.cpp src/education/EducationCatalog.cpp src/education/EducationProgress.cpp src/education/EducationWorkflow.cpp src/education/LearnerReport.cpp src/missions/Mission.cpp src/spacecraft/Spacecraft.cpp src/physics/PhysicsEngine.cpp src/physics/IntegratorBenchmark.cpp src/validation/PredictionComparison.cpp -o bagsolar_education_tests
 	./bagsolar_education_tests
 
-test: planets
-	ctest --test-dir build --output-on-failure
+test:
+	cmake --preset debug
+	cmake --build --preset debug --parallel 2
+	ctest --preset debug --output-on-failure
 
 clean:
 	rm -f planets bagsolar_validation

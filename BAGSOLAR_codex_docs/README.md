@@ -1,12 +1,16 @@
 # BAGSOLAR
 
-Interactive C++/raylib astrodynamics laboratory.
+Interactive C++17/raylib orbital-mechanics laboratory and scientific-computing
+portfolio project.
 
 ## Vision
-BAGSOLAR lets users simulate, visualize and experiment with orbital mechanics using real scientific units, numerical integration, telemetry and eventually real astronomical ephemerides.
+BAGSOLAR lets users simulate, visualize, validate, and experiment with orbital
+mechanics using real scientific units, numerical integration, telemetry,
+deterministic reference data, and optional external ephemeris providers.
 
 ## Status
-Active development / prototype-to-engineering transition.
+Public release candidate; optional advanced providers and broader release
+media remain outside the default offline build.
 
 ## Architecture and documentation
 
@@ -18,7 +22,7 @@ Active development / prototype-to-engineering transition.
 - `ROADMAP.md`
 - `docs/BUILD.md`
 - `docs/VALIDATION.md`
-- `docs/PREDICTION_VS_REFERENCE.md`
+- `docs/PREDICTION_VS_REFERENCE.md` (canonical)
 - `THIRD_PARTY_LICENSES.md`
 
 ## Development
