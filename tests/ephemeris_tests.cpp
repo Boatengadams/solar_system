@@ -73,6 +73,17 @@ void testHorizonsProviderAndParser() {
 
 void testSimulationInitialization() {
     Simulation simulation("data");
+    assert(simulation.screen == AppScreen::Simulation);
+    simulation.setScreen(AppScreen::Telemetry);
+    assert(simulation.screen == AppScreen::Telemetry && !simulation.educationScreen);
+    simulation.setScreen(AppScreen::Education);
+    assert(simulation.screen == AppScreen::Education && simulation.educationScreen);
+    simulation.setScreen(AppScreen::Simulation);
+    const double originalTimestep = simulation.settings.timestepSeconds;
+    simulation.adjustTimestep(2.0);
+    assert(simulation.settings.timestepSeconds == originalTimestep * 2.0);
+    simulation.cycleIntegrator();
+    assert(simulation.settings.integrator == "rk4");
     LocalEphemerisProvider provider = LocalEphemerisProvider::deterministicFixture();
     EphemerisSnapshot snapshot;
     assert(snapshot.add(provider.getState({"sun", Epoch::julianDate(2451545.0), Frame::heliocentric()}).state));

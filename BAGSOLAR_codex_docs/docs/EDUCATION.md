@@ -173,6 +173,12 @@ learner report while leaving the simulation HUD and domain workflow intact.
 `A`/`D` select lessons, `Enter` starts, `B` begins observation, `Y` completes
 a lesson or evaluates an experiment, `N` follows the recommendation, and
 Backspace returns to simulation.
+
+The dedicated Education view presents the report summary, lesson catalog,
+objectives, difficulty, duration, linked activities, completion state, and
+recommended next activity. It uses `LearnerReport` and `EducationProgress`
+directly; it does not create a second progress model or change recommendation
+logic. `L` opens Education and `Esc` returns to Simulation.
 # Prediction vs Reference experiment
 
 The `prediction-reference` experiment records comparison metrics while teaching

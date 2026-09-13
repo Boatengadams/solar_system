@@ -17,6 +17,19 @@ namespace {
 constexpr double MAX_FRAME_DELTA = 1.0 / 30.0;
 }
 
+const char* appScreenName(AppScreen screen) {
+    switch (screen) {
+    case AppScreen::Simulation: return "SIMULATION";
+    case AppScreen::Education: return "EDUCATION";
+    case AppScreen::ScenarioBrowser: return "SCENARIOS";
+    case AppScreen::MissionDesigner: return "MISSION TOOLS";
+    case AppScreen::Telemetry: return "TELEMETRY";
+    case AppScreen::Settings: return "SETTINGS";
+    case AppScreen::Help: return "HELP";
+    }
+    return "SCREEN";
+}
+
 Simulation::Simulation(std::filesystem::path root)
     : educationProgress(lessonCount(), experimentCount(), challengeCount()),
       educationWorkflow(educationProgress, lessonCount(), experimentCount(), challengeCount()),
@@ -500,6 +513,30 @@ bool Simulation::loadEducationProgress(const std::filesystem::path& path) {
 void Simulation::setSpeed(double value) {
     speed = std::max(0.01, std::min(100000.0, value));
     settings.timeScale = speed;
+}
+
+void Simulation::adjustTimestep(double factor) {
+    if (!std::isfinite(factor) || factor <= 0.0) return;
+    settings.timestepSeconds = std::clamp(settings.timestepSeconds * factor, 1.0, PhysicsEngine::DAY);
+    actualTimestep = settings.timestepSeconds;
+    nextTimestep = settings.timestepSeconds;
+    lastPredictionComparison.reset();
+}
+
+void Simulation::cycleIntegrator(int direction) {
+    constexpr const char* integrators[] = {"euler", "semi_implicit_euler", "velocity_verlet", "rk4"};
+    int current = 0;
+    for (int index = 0; index < 4; ++index) {
+        if (settings.integrator == integrators[index]) current = index;
+    }
+    current = (current + (direction >= 0 ? 1 : -1) + 4) % 4;
+    settings.integrator = integrators[current];
+    lastPredictionComparison.reset();
+}
+
+void Simulation::setScreen(AppScreen next) {
+    screen = next;
+    educationScreen = next == AppScreen::Education;
 }
 
 double Simulation::distanceFromSun(const Body& body) const { return PhysicsEngine::distanceFromSun(body); }

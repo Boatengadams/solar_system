@@ -21,6 +21,12 @@ private:
     void experimentPanel(const Simulation& simulation) const;
     void challengePanel(const Simulation& simulation) const;
     void educationScreenPanel(const Simulation& simulation) const;
+    void navigation(const Simulation& simulation) const;
+    void scenarioScreen(const Simulation& simulation) const;
+    void telemetryScreen(const Simulation& simulation) const;
+    void missionScreen(const Simulation& simulation) const;
+    void settingsScreen(const Simulation& simulation) const;
+    void helpScreen(const Simulation& simulation) const;
 };
 
 } // namespace bag

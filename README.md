@@ -19,6 +19,13 @@ defaults offline to the deterministic local fixture. The comparison runs during
 the normal select/start/observe/evaluate sequence; optional SPICE/Horizons
 providers use the same interface and are never silently substituted.
 
+The application has discoverable top navigation for Simulation, Education,
+Scenarios, Telemetry, Mission Tools, Settings, and Help. `Tab` cycles views;
+`L`, `F5`, `F6`, `F7`, `F8`, and `H` open the corresponding views, and `Esc`
+returns to Simulation. Mission Tools is intentionally an honest API/status
+view until a dedicated editor exists. Telemetry uses the existing session and
+export APIs without changing the telemetry schema.
+
 ## Build and run
 
 Install the system dependency once by using the following command in your terminal :

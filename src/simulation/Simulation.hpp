@@ -24,6 +24,18 @@ namespace bag {
 
 struct CustomBodyData;
 
+enum class AppScreen {
+    Simulation,
+    Education,
+    ScenarioBrowser,
+    MissionDesigner,
+    Telemetry,
+    Settings,
+    Help,
+};
+
+const char* appScreenName(AppScreen screen);
+
 class Simulation {
 public:
     std::vector<Body> bodies;
@@ -49,6 +61,8 @@ public:
     bool showGrid = false;
     bool education = true;
     bool educationScreen = false;
+    AppScreen screen = AppScreen::Simulation;
+    int scenarioBrowserSelection = 0;
     int selected = -1;
     int lesson = 0;
     int experiment = 0;
@@ -77,6 +91,9 @@ public:
     int addBody(const Body& body);
     bool addCustomBody(const CustomBodyData& data);
     void setSpeed(double value);
+    void adjustTimestep(double factor);
+    void cycleIntegrator(int direction = 1);
+    void setScreen(AppScreen next);
     bool saveSnapshot(const std::filesystem::path& path) const;
     bool loadSnapshot(const std::filesystem::path& path);
     bool startTelemetry(double intervalSeconds, const std::string& referenceBodyId = {});

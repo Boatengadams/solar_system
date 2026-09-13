@@ -101,3 +101,18 @@ Dear ImGui may be used for developer/scientific panels where appropriate.
 Education mode labels Prediction vs Reference and reports provider/source,
 epoch, frame/origin, integrator, timestep, errors, status, and evaluation.
 Disagreement is not labeled as pure numerical error.
+
+## Phase 9.7 navigation
+
+The application has compact top navigation for Simulation, Education,
+Scenarios, Telemetry, Mission Tools, Settings, and Help. The same views are
+keyboard-accessible with `Tab`, `L`, `F5`, `F6`, `F7`, `F8`, and `H`; `Esc`
+returns to Simulation. The simulation remains the visual centerpiece.
+
+The scenario browser loads the existing data scenarios. Telemetry shows the
+latest existing sample, reports a useful empty state, and exposes the existing
+session/export APIs (`K`, `J`, and `C`). Mission Tools honestly describes the
+available raylib-free mission API; it does not present a fake mission editor.
+Settings exposes only current integrator, timestep, speed, trail, vector,
+orbit, and grid state. Help documents the implemented keyboard and mouse
+controls, and modal screens stop simulation input from leaking through.

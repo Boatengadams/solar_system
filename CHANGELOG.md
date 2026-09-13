@@ -1,5 +1,13 @@
 # Changelog
 
+## Phase 9.7
+
+- Added compact application navigation, Help/Controls, scenario discovery,
+  telemetry presentation, live settings, and an honest Mission Tools status
+  view without changing scientific or telemetry calculations.
+- Improved Education home hierarchy while keeping activity scoring and learner
+  reporting in the existing education domain layer.
+
 ## Phase 9.6
 
 - Added deterministic Prediction vs Reference propagation, metrics, education evaluation, and offline validation coverage.
