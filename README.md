@@ -89,9 +89,12 @@ sudo apt install g++ cmake pkg-config git \
   libxrandr-dev libxi-dev libx11-dev libwayland-dev libxkbcommon-dev
 git clone --depth 1 --branch 5.5 https://github.com/raysan5/raylib.git /tmp/raylib
 cmake -S /tmp/raylib -B /tmp/raylib/build \
-  -DCMAKE_BUILD_TYPE=Release -DBUILD_EXAMPLES=OFF -DBUILD_GAMES=OFF
+  -DCMAKE_BUILD_TYPE=Release -DBUILD_EXAMPLES=OFF -DBUILD_GAMES=OFF \
+  -DGLFW_BUILD_X11=OFF -DGLFW_BUILD_WAYLAND=ON
 cmake --build /tmp/raylib/build --parallel 2
 sudo cmake --install /tmp/raylib/build
+sudo ldconfig
+export PKG_CONFIG_PATH="/usr/local/lib/pkgconfig:/usr/local/lib/x86_64-linux-gnu:${PKG_CONFIG_PATH}"
 ```
 
 Ubuntu 24.04 does not provide `libraylib-dev` in its default repositories, so
