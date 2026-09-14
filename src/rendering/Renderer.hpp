@@ -3,6 +3,7 @@
 #include <raylib.h>
 
 #include "../simulation/Simulation.hpp"
+#include "Selection.hpp"
 
 namespace bag {
 
@@ -26,6 +27,8 @@ private:
 
     Vector2 worldToScreen(Vec3 position) const;
     Vector2 worldToScene(Vec3 position) const;
+    float displayRadius(const Body& body) const;
+    float selectionRadius(const Body& body) const;
     void glow(Vector2 position, float radius, Color color, int layers = 8) const;
     void drawBody(const Body& body, const Simulation& simulation) const;
 };

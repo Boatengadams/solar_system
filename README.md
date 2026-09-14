@@ -36,6 +36,20 @@ Mission Tools provide an analytical/API foundation for spacecraft, maneuver,
 Hohmann, gravity-assist, and trajectory calculations; they are not a complete
 mission editor.
 
+| Capability | Current evidence | Default availability |
+| --- | --- | --- |
+| Numerical physics | Raylib-free Newtonian core with four integrators and adaptive timestep support | Offline |
+| Scientific validation | Analytical orbit, conservation, Hohmann, and timestep-convergence checks | Offline |
+| Telemetry | Orbital state, energy, angular momentum, numerical status, CSV/JSON export | Offline |
+| Reference data | Local deterministic fixture and schema-validated JSON provider | Offline |
+| Prediction vs Reference | Provider-aware position/velocity/energy comparison with epoch/frame/origin/unit checks | Offline local fixture |
+| Education | Lessons, experiments, challenges, scoring, progress, and learner reports | Offline |
+| Advanced ephemerides | Explicit JPL Horizons adapter and optional CSPICE provider | Optional |
+
+The scientific core is independent of raylib, so validation, telemetry, education,
+and provider-contract checks can run without opening a window. The application
+then presents those results through the interactive laboratory UI.
+
 The default application is deterministic and offline. It uses the bundled local
 fixture and data files without network access, CSPICE, or external kernels.
 JPL Horizons is an explicitly selected optional network provider and reports
@@ -204,3 +218,30 @@ fresh-checkout workflow without network access or external scientific data.
 The full project documentation is in `BAGSOLAR_codex_docs/`, including build,
 architecture, physics, validation, telemetry, ephemeris, spacecraft, mission,
 education, UI, integration, and third-party licensing notes.
+
+## See BAGSOLAR in action
+
+This checkout does not include screenshots or screen recordings. The current
+capture environment cannot establish a usable raylib/X display, so no image
+assets or placeholder image links are included. The following sequence is the
+recommended real capture plan for Phase 11.2:
+
+1. Launch `./build/planets` and capture the default Simulation view with the
+   solar system, orbits, trails, and a selected Earth.
+2. Press `I` in Settings to cycle the integrator and `+`/`-` to change the
+   timestep; return to Simulation and capture the active numerical settings.
+3. From Simulation, use `E` or `Up`/`Down` to select an experiment, then
+   `Enter`, `B`, and `Y` to show the existing education workflow and result.
+   Use `L` to show the dedicated Education screen with catalog progress and the
+   learner report.
+4. Select the `Prediction vs Reference` experiment and repeat
+   `Enter` → `B` → `Y`. Capture the provider, Julian Date, frame/origin,
+   integrator, timestep, comparison status, and position/velocity metrics.
+5. Select Earth, press `F6`, and press `K` to start telemetry. Capture the
+   scientific state panel, then use `J` or `C` for the existing JSON/CSV export.
+
+The application also provides `F5` for Scenarios, `F7` for Mission Tools,
+`F8` for Settings, `H` for Help, and `Esc` to return to Simulation. Mouse
+selection and right-drag camera panning are available in Simulation. This
+sequence uses only current functionality and does not treat reference data as
+observational truth.

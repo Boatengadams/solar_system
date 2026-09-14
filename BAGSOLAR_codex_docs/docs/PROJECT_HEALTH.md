@@ -2,15 +2,19 @@
 
 ## Current status
 
-The repository is clean at the `phase-10.5-complete` checkpoint. BAGSOLAR is a
-public release candidate for its documented offline Linux scope. The default
-build is deterministic and does not require network access, CSPICE, or external
-kernels. Optional Horizons and CSPICE paths remain explicitly configured
-integrations rather than default dependencies.
+The last clean tagged checkpoint is `phase-11.1-complete`. The current working
+tree contains the Phase 11.2 public-presentation documentation updates and
+follow-up interaction/rendering improvements covered by the automated checks
+below. BAGSOLAR is a public release candidate for its documented offline Linux
+scope. The default build is deterministic and does not require network access,
+CSPICE, or external kernels.
+Optional Horizons and CSPICE paths remain explicitly configured integrations
+rather than default dependencies.
 
-Phases 0 through 10.5 are complete for their documented scope. Historical
-phase sections remain useful as implementation history; this document describes
-the current repository rather than an unfinished working tree.
+Phases 0 through 11.1 are complete for their documented scope. Historical
+phase sections remain useful as implementation history; this document
+distinguishes automated verification, GUI/manual verification, and screenshot
+capture status.
 
 ## Phase 8 real verification
 
@@ -135,6 +139,9 @@ ephemeris, installation, and package smoke execution.
 - Phase 11.1 covers public README, documentation consistency, and repository
   identity cleanup.
 - Phase 11.2 covers screenshots, demonstration media, and public presentation.
+  The README capture sequence is documented, but no screenshots were captured
+  in the current environment because the raylib window could not establish a
+  usable display. Phase 11.2 is therefore not complete.
 - Phase 11.3 covers manual UI and release-candidate testing.
 - Phase 11.4 covers final release packaging, publication, and release process.
 

@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cctype>
 
 #include "../education/EducationContent.hpp"
 
@@ -16,15 +17,15 @@ void selectScreen(Simulation& simulation, AppScreen screen) {
 }
 
 bool navigationClick(Simulation& simulation) {
-    if (!IsMouseButtonPressed(MOUSE_LEFT_BUTTON) || GetMousePosition().y > 58.0f) return false;
+    if (!IsMouseButtonPressed(MOUSE_LEFT_BUTTON) || GetMousePosition().y > 70.0f) return false;
     const float x = GetMousePosition().x;
-    if (x >= 280.0f && x < 370.0f) selectScreen(simulation, AppScreen::Simulation);
-    else if (x >= 370.0f && x < 460.0f) selectScreen(simulation, AppScreen::Education);
-    else if (x >= 460.0f && x < 570.0f) selectScreen(simulation, AppScreen::ScenarioBrowser);
-    else if (x >= 570.0f && x < 680.0f) selectScreen(simulation, AppScreen::Telemetry);
-    else if (x >= 680.0f && x < 820.0f) selectScreen(simulation, AppScreen::MissionDesigner);
-    else if (x >= 820.0f && x < 930.0f) selectScreen(simulation, AppScreen::Settings);
-    else if (x >= 930.0f && x < 1030.0f) selectScreen(simulation, AppScreen::Help);
+    if (x >= 290.0f && x < 385.0f) selectScreen(simulation, AppScreen::Simulation);
+    else if (x >= 385.0f && x < 480.0f) selectScreen(simulation, AppScreen::Education);
+    else if (x >= 480.0f && x < 585.0f) selectScreen(simulation, AppScreen::ScenarioBrowser);
+    else if (x >= 585.0f && x < 690.0f) selectScreen(simulation, AppScreen::Telemetry);
+    else if (x >= 690.0f && x < 790.0f) selectScreen(simulation, AppScreen::MissionDesigner);
+    else if (x >= 790.0f && x < 895.0f) selectScreen(simulation, AppScreen::Settings);
+    else if (x >= 895.0f && x < 975.0f) selectScreen(simulation, AppScreen::Help);
     else return false;
     return true;
 }
@@ -34,10 +35,72 @@ void cycleScreen(Simulation& simulation) {
     simulation.setScreen(static_cast<AppScreen>(next));
 }
 
+bool keyboardSelectSimulationBody(Simulation& simulation, bool selectionMode) {
+    if (simulation.screen != AppScreen::Simulation) return false;
+    if (!selectionMode) return false;
+
+    int direction = 0;
+    if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_UP)) direction = -1;
+    if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_DOWN)) direction = 1;
+    if (direction == 0) return false;
+
+    std::vector<int> activeIndices;
+    activeIndices.reserve(simulation.bodies.size());
+    for (int i = 0; i < static_cast<int>(simulation.bodies.size()); ++i) {
+        if (simulation.bodies[static_cast<std::size_t>(i)].active) activeIndices.push_back(i);
+    }
+    simulation.selected = cycleActiveBody(simulation.selected, activeIndices, direction);
+    return true;
+}
+
+bool letterSelectSimulationBody(Simulation& simulation, bool selectionMode) {
+    if (simulation.screen != AppScreen::Simulation || !selectionMode) return false;
+
+    struct KeyBody { KeyboardKey key; char initial; };
+    constexpr KeyBody keys[] = {
+        {KEY_B, 'b'}, {KEY_E, 'e'}, {KEY_J, 'j'}, {KEY_M, 'm'},
+        {KEY_N, 'n'}, {KEY_S, 's'}, {KEY_U, 'u'}, {KEY_V, 'v'},
+    };
+    char pressedInitial = 0;
+    for (const KeyBody& key : keys) {
+        if (IsKeyPressed(key.key)) {
+            pressedInitial = key.initial;
+            break;
+        }
+    }
+    if (pressedInitial == 0) return false;
+
+    std::vector<int> matches;
+    for (int i = 0; i < static_cast<int>(simulation.bodies.size()); ++i) {
+        const Body& body = simulation.bodies[static_cast<std::size_t>(i)];
+        if (body.active && !body.name.empty() &&
+            static_cast<char>(std::tolower(static_cast<unsigned char>(body.name.front()))) == pressedInitial) {
+            matches.push_back(i);
+        }
+    }
+    if (matches.empty()) return false;
+
+    // Repeated initials cycle through duplicates, e.g. M: Mercury -> Mars.
+    const auto current = std::find(matches.begin(), matches.end(), simulation.selected);
+    const int next = current == matches.end()
+        ? matches.front()
+        : matches[static_cast<std::size_t>((std::distance(matches.begin(), current) + 1) % matches.size())];
+    simulation.selected = next;
+    return true;
+}
+
 } // namespace
 
-void InputController::update(Simulation& simulation, Renderer& renderer) const {
+void InputController::update(Simulation& simulation, Renderer& renderer) {
     if (simulation.screen == AppScreen::Simulation) renderer.update(simulation);
+    const bool controlDown = IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL);
+    if (simulation.screen == AppScreen::Simulation && controlDown && IsKeyPressed(KEY_S)) {
+        selectionMode = true;
+        simulation.selected = simulation.bodies.empty() ? -1 : 0;
+        return;
+    }
+    if (keyboardSelectSimulationBody(simulation, selectionMode)) return;
+    if (letterSelectSimulationBody(simulation, selectionMode)) return;
     if (navigationClick(simulation)) return;
     if (IsKeyPressed(KEY_TAB)) cycleScreen(simulation);
     if (IsKeyPressed(KEY_H)) selectScreen(simulation, AppScreen::Help);
@@ -49,6 +112,8 @@ void InputController::update(Simulation& simulation, Renderer& renderer) const {
     if (IsKeyPressed(KEY_F7)) selectScreen(simulation, AppScreen::MissionDesigner);
     if (IsKeyPressed(KEY_F8)) selectScreen(simulation, AppScreen::Settings);
     if (IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_BACKSPACE)) {
+        selectionMode = false;
+        simulation.selected = -1;
         if (simulation.screen != AppScreen::Simulation) selectScreen(simulation, AppScreen::Simulation);
     }
 
@@ -136,10 +201,6 @@ void InputController::update(Simulation& simulation, Renderer& renderer) const {
     if (IsKeyPressed(KEY_EQUAL) || IsKeyPressed(KEY_KP_ADD)) simulation.setSpeed(simulation.speed * 2.0);
     if (IsKeyPressed(KEY_MINUS) || IsKeyPressed(KEY_KP_SUBTRACT)) simulation.setSpeed(simulation.speed / 2.0);
     if (IsKeyPressed(KEY_P) && simulation.bodies.size() > 9) simulation.launchProbe(11000.0);
-    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-        const int selected = renderer.hitTest(simulation, GetMousePosition());
-        if (selected >= 0) simulation.selected = selected;
-    }
 }
 
 } // namespace bag

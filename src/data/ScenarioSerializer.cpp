@@ -119,7 +119,7 @@ DataResult<SimulationSnapshot> ScenarioSerializer::load(const std::filesystem::p
         snapshot.settings.labelsEnabled = simulation.value("labels_enabled", false);
         snapshot.settings.referenceFrame = snapshot.metadata.referenceFrame;
         snapshot.paused = simulation.value("paused", false);
-        snapshot.showOrbits = simulation.value("show_orbits", true);
+        snapshot.showOrbits = simulation.value("show_orbits", false);
         snapshot.showTrails = simulation.value("show_trails", true);
         snapshot.showVectors = simulation.value("show_vectors", false);
         snapshot.showGrid = simulation.value("show_grid", false);

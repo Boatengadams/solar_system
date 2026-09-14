@@ -26,6 +26,11 @@ CMakeUserPresets.json
 # Generated packages, logs, and local test output
 *.tar.gz
 *.log
+telemetry.csv
+telemetry.json
+
+# Local design references are not application screenshots or runtime assets
+/BAGSOLAR_codex_docs/design.png
 
 # External SPICE resources and machine-local manifests
 *.bsp

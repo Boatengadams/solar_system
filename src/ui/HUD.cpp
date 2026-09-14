@@ -67,36 +67,42 @@ void HUD::line(const char* label, const char* value, float x, float y) const {
 }
 
 void HUD::top(const Simulation& simulation) const {
-    DrawRectangle(0, 0, GetScreenWidth(), 58, alpha({4, 10, 20, 255}, 0.96f));
-    text("BAGSOLAR", 22, 10, 26, {110, 220, 255, 255});
-    text("ASTRONOMICAL LABORATORY", 154, 16, 13, alpha(RAYWHITE, 0.65f));
-    text(simulation.paused ? "● PAUSED" : "● LIVE", GetScreenWidth() - 160, 17, 13,
+    DrawRectangle(0, 0, GetScreenWidth(), 70, alpha({3, 9, 18, 255}, 0.97f));
+    DrawLine(0, 69, GetScreenWidth(), 69, alpha({55, 170, 230, 255}, 0.35f));
+    text("BAGSOLAR", 22, 11, 25, {110, 220, 255, 255});
+    text("C++17 ORBITAL MECHANICS LABORATORY", 24, 40, 9, alpha(RAYWHITE, 0.52f));
+    text(simulation.paused ? "PAUSED" : "RUNNING", GetScreenWidth() - 300, 15, 11,
          simulation.paused ? RED : Color{80, 235, 150, 255});
+    text("SIM TIME", GetScreenWidth() - 218, 11, 9, alpha(RAYWHITE, 0.48f));
+    text(time(simulation.simTime).c_str(), GetScreenWidth() - 218, 28, 16, {100, 220, 255, 255});
+    text(("×" + format(simulation.speed, 1)).c_str(), GetScreenWidth() - 92, 28, 14, RAYWHITE);
 }
 
 void HUD::navigation(const Simulation& simulation) const {
     const struct Tab { const char* label; AppScreen screen; float x; float width; } tabs[] = {
-        {"SIMULATION", AppScreen::Simulation, 280.0f, 88.0f},
-        {"EDUCATION", AppScreen::Education, 370.0f, 90.0f},
-        {"SCENARIOS", AppScreen::ScenarioBrowser, 460.0f, 108.0f},
-        {"TELEMETRY", AppScreen::Telemetry, 570.0f, 108.0f},
-        {"MISSION", AppScreen::MissionDesigner, 680.0f, 112.0f},
-        {"SETTINGS", AppScreen::Settings, 792.0f, 106.0f},
-        {"HELP", AppScreen::Help, 900.0f, 76.0f},
+        {"SIMULATION", AppScreen::Simulation, 290.0f, 95.0f},
+        {"EDUCATION", AppScreen::Education, 385.0f, 95.0f},
+        {"SCENARIOS", AppScreen::ScenarioBrowser, 480.0f, 105.0f},
+        {"TELEMETRY", AppScreen::Telemetry, 585.0f, 105.0f},
+        {"MISSION", AppScreen::MissionDesigner, 690.0f, 100.0f},
+        {"SETTINGS", AppScreen::Settings, 790.0f, 105.0f},
+        {"HELP", AppScreen::Help, 895.0f, 80.0f},
     };
     for (const Tab& tab : tabs) {
         const bool active = simulation.screen == tab.screen;
-        if (active) DrawRectangleRounded({tab.x, 9.0f, tab.width - 6.0f, 38.0f}, 0.18f, 8, {28, 70, 98, 255});
-        text(tab.label, tab.x + 10.0f, 23.0f, 11, active ? RAYWHITE : alpha(RAYWHITE, 0.62f));
+        if (active) DrawRectangleRec({tab.x, 67.0f, tab.width - 5.0f, 3.0f}, {30, 200, 255, 255});
+        text(tab.label, tab.x + 7.0f, 29.0f, 10, active ? RAYWHITE : alpha(RAYWHITE, 0.62f));
     }
 }
 
 void HUD::selectedInfo(const Simulation& simulation) const {
     if (simulation.selected < 0 || simulation.selected >= static_cast<int>(simulation.bodies.size())) return;
     const Body& body = simulation.bodies[simulation.selected];
-    const Rectangle box = panel(GetScreenWidth() - 340, 76, 320, 330);
-    text(body.name.c_str(), box.x + 18, box.y + 16, 23, {body.accent.r, body.accent.g, body.accent.b, body.accent.a});
-    text(body.type.c_str(), box.x + 18, box.y + 45, 12, alpha(RAYWHITE, 0.55f));
+    const float boxWidth = std::min(300.0f, GetScreenWidth() - 40.0f);
+    const Rectangle box = panel(18, GetScreenHeight() - 270, boxWidth, 236);
+    text("SELECTED BODY", box.x + 16, box.y + 14, 9, {100, 220, 255, 255});
+    text(body.name.c_str(), box.x + 16, box.y + 31, 20, {body.accent.r, body.accent.g, body.accent.b, body.accent.a});
+    text(body.type.c_str(), box.x + 16, box.y + 57, 11, alpha(RAYWHITE, 0.55f));
     const std::string mass = scientific(body.mass) + " kg";
     const std::string radius = distance(body.realRadius);
     const std::string bodyDistance = distance(simulation.distanceFromSun(body));
@@ -108,19 +114,17 @@ void HUD::selectedInfo(const Simulation& simulation) const {
     const double kineticEnergy = 0.5 * length(body.velocity) * length(body.velocity);
     const double potentialEnergy = -PhysicsEngine::G * PhysicsEngine::SOLAR_MASS /
                                    std::max(simulation.distanceFromSun(body), 1.0);
-    line("Mass", mass.c_str(), box.x + 18, box.y + 75);
-    line("Radius", radius.c_str(), box.x + 18, box.y + 98);
-    line("Distance", bodyDistance.c_str(), box.x + 18, box.y + 121);
-    line("Velocity", velocity.c_str(), box.x + 18, box.y + 144);
-    line("Escape", escape.c_str(), box.x + 18, box.y + 167);
-    line("Gravity", gravity.c_str(), box.x + 18, box.y + 190);
-    line("Eccentricity", eccentricity.c_str(), box.x + 18, box.y + 213);
-    line("Energy", energy.c_str(), box.x + 18, box.y + 236);
-    text("ORBIT STATE", box.x + 18, box.y + 267, 11, alpha({160, 190, 220, 255}, 0.8f));
-    text(simulation.specificEnergy(body) < 0 ? "BOUND ORBIT" : "ESCAPE TRAJECTORY", box.x + 18, box.y + 286, 15,
+    line("Mass", mass.c_str(), box.x + 16, box.y + 78);
+    line("Radius", radius.c_str(), box.x + 16, box.y + 98);
+    line("Distance", bodyDistance.c_str(), box.x + 16, box.y + 118);
+    line("Velocity", velocity.c_str(), box.x + 16, box.y + 138);
+    line("Eccentricity", eccentricity.c_str(), box.x + 16, box.y + 158);
+    line("Energy", energy.c_str(), box.x + 16, box.y + 178);
+    text("ORBIT", box.x + 16, box.y + 204, 9, alpha({160, 190, 220, 255}, 0.8f));
+    text(simulation.specificEnergy(body) < 0 ? "BOUND" : "ESCAPE TRAJECTORY", box.x + 65, box.y + 201, 11,
          simulation.specificEnergy(body) < 0 ? Color{80, 235, 150, 255} : ORANGE);
-    text(("KE/PE: " + format(kineticEnergy / std::max(std::abs(potentialEnergy), 1.0), 3)).c_str(),
-         box.x + 18, box.y + 308, 12, alpha(RAYWHITE, 0.7f));
+    text(("KE/PE " + format(kineticEnergy / std::max(std::abs(potentialEnergy), 1.0), 3)).c_str(),
+         box.x + 16, box.y + 218, 10, alpha(RAYWHITE, 0.7f));
 }
 
 void HUD::lessonPanel(const Simulation& simulation) const {
@@ -152,21 +156,15 @@ void HUD::lessonPanel(const Simulation& simulation) const {
 }
 
 void HUD::bottom(const Simulation& simulation) const {
-    DrawRectangle(0, GetScreenHeight() - 54, GetScreenWidth(), 54, alpha({4, 10, 20, 255}, 0.97f));
-    text("SPACE", 20, GetScreenHeight() - 36, 12, alpha(RAYWHITE, 0.65f));
-    text(simulation.paused ? "Resume" : "Pause", 75, GetScreenHeight() - 36, 12);
-    text("+ / -  Time", 155, GetScreenHeight() - 36, 12);
-    text("L Education", 270, GetScreenHeight() - 36, 12);
-    text("V Vectors", 380, GetScreenHeight() - 36, 12);
-    text("O Orbits", 480, GetScreenHeight() - 36, 12);
-    text("T Trails", 570, GetScreenHeight() - 36, 12);
-    text("F Fullscreen", 650, GetScreenHeight() - 36, 12);
-    text("H Help • F5 Scenarios • F6 Telemetry", 780, GetScreenHeight() - 36, 12, alpha(RAYWHITE, 0.65f));
-    text("Right-drag Pan • Wheel Zoom • HOME Reset Camera • Click Select", 20, GetScreenHeight() - 16, 11, alpha(RAYWHITE, 0.65f));
-    text("F1 Solar • F2 Earth • F3 Empty", 560, GetScreenHeight() - 16, 11, alpha({150, 210, 240, 255}, 0.7f));
-    text("SIM TIME", GetScreenWidth() - 220, 72, 10, alpha(RAYWHITE, 0.45f));
-    text(time(simulation.simTime).c_str(), GetScreenWidth() - 220, 87, 17, {100, 220, 255, 255});
-    text(("×" + format(simulation.speed, 1)).c_str(), GetScreenWidth() - 120, 87, 15);
+    const float y = GetScreenHeight() - 28.0f;
+    DrawRectangle(0, y - 6, GetScreenWidth(), 34, alpha({3, 9, 18, 255}, 0.90f));
+    text("SPACE pause", 18, y + 2, 10, alpha(RAYWHITE, 0.72f));
+    text("+/- time", 112, y + 2, 10, alpha(RAYWHITE, 0.72f));
+    text("V vectors  O orbits  T trails  G grid", 188, y + 2, 10, alpha(RAYWHITE, 0.72f));
+    text("Right-drag pan  •  Wheel zoom  •  Ctrl+S select mode", 470, y + 2, 10, {150, 220, 245, 255});
+    text(("Integrator " + std::string(integratorName([&] { Integrator value = Integrator::VelocityVerlet; parseIntegrator(simulation.settings.integrator, value); return value; }())) +
+          "  dt " + format(simulation.settings.timestepSeconds, 0) + " s  •  Display scale: enhanced").c_str(),
+         GetScreenWidth() - 520, y + 2, 10, alpha(RAYWHITE, 0.62f));
 }
 
 void HUD::experimentPanel(const Simulation& simulation) const {
@@ -191,7 +189,7 @@ void HUD::experimentPanel(const Simulation& simulation) const {
         const bool predictionReference = std::string(experiment.id) == "prediction-reference" && simulation.lastPredictionComparison.has_value();
         if (predictionReference) {
             const PredictionComparisonResult& comparison = *simulation.lastPredictionComparison;
-            text(("Comparison " + std::string(predictionComparisonStatusName(comparison.status)) +
+            text(("PREDICTION VS REFERENCE  " + std::string(predictionComparisonStatusName(comparison.status)) +
                   "  " + comparison.referenceProvider).c_str(), box.x + 18, box.y + 220, 9, alpha(RAYWHITE, 0.78f));
             text(("Body " + comparison.bodyId + "  Epoch JD " + format(comparison.finalEpoch.value, 6)).c_str(),
                  box.x + 18, box.y + 234, 9, alpha(RAYWHITE, 0.72f));
@@ -271,9 +269,6 @@ void HUD::draw(const Simulation& simulation) const {
     case AppScreen::Simulation:
         top(simulation);
         navigation(simulation);
-        lessonPanel(simulation);
-        experimentPanel(simulation);
-        challengePanel(simulation);
         selectedInfo(simulation);
         bottom(simulation);
         break;
@@ -472,7 +467,7 @@ void HUD::helpScreen(const Simulation& simulation) const {
     text("V vectors   O orbits   T trails   G grid", 64, 388, 15, RAYWHITE);
     text("F fullscreen   HOME reset camera   C focus", 64, 416, 15, RAYWHITE);
     text("F1 solar   F2 Earth orbit   F3 empty space", 64, 444, 15, RAYWHITE);
-    text("Mouse click selects a body; right-drag pans.", 64, 486, 14, alpha(RAYWHITE, 0.72f));
+    text("Ctrl+S activates selection mode; arrows or initials select bodies.", 64, 486, 14, alpha(RAYWHITE, 0.72f));
     text("EDUCATION", 634, 190, 11, {255, 205, 105, 255});
     text("A/D lessons   E/Up/Down experiments", 634, 222, 15, RAYWHITE);
     text("Z/X challenges   Enter start   B observe", 634, 250, 15, RAYWHITE);
@@ -480,9 +475,12 @@ void HUD::helpScreen(const Simulation& simulation) const {
     text("N next activity   [/] adjust answer   I method", 634, 306, 15, RAYWHITE);
     text("TELEMETRY", 634, 356, 11, {255, 205, 105, 255});
     text("K start/stop   J JSON export   C CSV export", 634, 388, 15, RAYWHITE);
-    text("SCENARIOS / SETTINGS", 634, 438, 11, {255, 205, 105, 255});
-    text("Up/Down choose scenario; Enter loads it.", 634, 470, 15, RAYWHITE);
-    text("I changes integrator; +/- changes timestep.", 634, 498, 15, RAYWHITE);
+    text("PREDICTION VS REFERENCE", 634, 438, 11, {255, 205, 105, 255});
+    text("Provider, epoch, frame, origin, integrator, timestep", 634, 470, 14, RAYWHITE);
+    text("Position error • velocity error • status", 634, 498, 14, alpha(RAYWHITE, 0.78f));
+    text("SCENARIOS / SETTINGS", 634, 542, 11, {255, 205, 105, 255});
+    text("Up/Down choose scenario; Enter loads it.", 634, 574, 14, RAYWHITE);
+    text("I changes integrator; +/- changes timestep.", 634, 602, 14, RAYWHITE);
     text("ESC return", 42, GetScreenHeight() - 34, 13, alpha(RAYWHITE, 0.68f));
 }
 

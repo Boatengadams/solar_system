@@ -55,7 +55,7 @@ public:
     TelemetrySession telemetry;
     double speed = 1.0;
     bool paused = false;
-    bool showOrbits = true;
+    bool showOrbits = false;
     bool showTrails = true;
     bool showVectors = false;
     bool showGrid = false;

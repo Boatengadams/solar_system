@@ -7,7 +7,10 @@ namespace bag {
 
 class InputController {
 public:
-    void update(Simulation& simulation, Renderer& renderer) const;
+    void update(Simulation& simulation, Renderer& renderer);
+
+private:
+    bool selectionMode = false;
 };
 
 } // namespace bag

@@ -312,6 +312,14 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 endif()
 
 if(BUILD_TESTING)
+    add_executable(bagsolar_selection_tests tests/selection_tests.cpp)
+    target_include_directories(bagsolar_selection_tests PRIVATE src)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        target_compile_options(bagsolar_selection_tests PRIVATE -Wall -Wextra -Wpedantic)
+    endif()
+    add_test(NAME bagsolar_selection_tests COMMAND bagsolar_selection_tests)
+    set_tests_properties(bagsolar_selection_tests PROPERTIES LABELS "unit;rendering;input")
+
     add_executable(bagsolar_resource_root_tests
         tests/resource_root_tests.cpp
         src/data/ResourceRoot.cpp
