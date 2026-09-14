@@ -26,6 +26,22 @@ CMakeUserPresets.json
 # Generated packages, logs, and local test output
 *.tar.gz
 *.log
+
+# Local text and document files
+*.txt
+*.doc
+*.docx
+*.rtf
+*.odt
+*.md
+!/CMakeLists.txt
+
+# Project documentation is kept locally, but is not part of the app push
+/BAGSOLAR_codex_docs/
+/README.md
+/CHANGELOG.md
+/third_party/README.md
+
 telemetry.csv
 telemetry.json
 
