@@ -47,6 +47,8 @@ telemetry.json
 
 # Local design references are not application screenshots or runtime assets
 /BAGSOLAR_codex_docs/design.png
+/img1.png
+/img2.png
 
 # External SPICE resources and machine-local manifests
 *.bsp
