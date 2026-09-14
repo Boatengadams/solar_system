@@ -38,7 +38,7 @@ CMakeUserPresets.json
 
 # Project documentation is kept locally, but is not part of the app push
 /BAGSOLAR_codex_docs/
-/README.md
+!/README.md
 /CHANGELOG.md
 /third_party/README.md
 
@@ -47,8 +47,8 @@ telemetry.json
 
 # Local design references are not application screenshots or runtime assets
 /BAGSOLAR_codex_docs/design.png
-/img1.png
-/img2.png
+!/img1.png
+!/img2.png
 
 # External SPICE resources and machine-local manifests
 *.bsp
