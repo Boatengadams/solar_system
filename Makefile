@@ -8,7 +8,7 @@ CPPFLAGS := -Isrc -Ithird_party/nlohmann-json3-dev/usr/include
 .PHONY: all run test validation ephemeris education clean
 
 ifeq ($(strip $(RAYLIB_LIBS)),)
-$(error raylib is not installed; run: sudo apt install g++ cmake pkg-config libraylib-dev)
+$(error raylib is not installed; follow the raylib installation commands in README.md)
 endif
 
 all: planets

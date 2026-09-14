@@ -80,17 +80,25 @@ export APIs without changing the telemetry schema.
 
 ## Build and run
 
-Install the system dependency once by using the following command in your terminal :
+Install the compiler and raylib build dependencies once:
 
 ```sh
 sudo apt update
-sudo apt install g++ cmake pkg-config libraylib-dev
+sudo apt install g++ cmake pkg-config git \
+  libasound2-dev libgl1-mesa-dev libxcursor-dev libxinerama-dev \
+  libxrandr-dev libxi-dev libx11-dev libwayland-dev libxkbcommon-dev
+git clone --depth 1 --branch 5.5 https://github.com/raysan5/raylib.git /tmp/raylib
+cmake -S /tmp/raylib -B /tmp/raylib/build \
+  -DCMAKE_BUILD_TYPE=Release -DBUILD_EXAMPLES=OFF -DBUILD_GAMES=OFF
+cmake --build /tmp/raylib/build --parallel 2
+sudo cmake --install /tmp/raylib/build
 ```
 
-The application build requires raylib. The bundled nlohmann/json package is
-used by the data layer. CSPICE, external kernels, and network access are
-optional; the Horizons command-line transport additionally uses a local
-`curl` executable.
+Ubuntu 24.04 does not provide `libraylib-dev` in its default repositories, so
+the commands above build the pinned raylib 5.5 release from the official
+source. The bundled nlohmann/json package is used by the data layer. CSPICE,
+external kernels, and network access are optional; the Horizons command-line
+transport additionally uses a local `curl` executable.
 
 To configure and build the application with CMake:
 

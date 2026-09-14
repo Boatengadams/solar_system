@@ -10,7 +10,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install build dependencies
-        run: sudo apt-get update && sudo apt-get install -y g++ cmake pkg-config libraylib-dev
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++ cmake pkg-config git \
+            libasound2-dev libgl1-mesa-dev libxcursor-dev libxinerama-dev \
+            libxrandr-dev libxi-dev libx11-dev libwayland-dev libxkbcommon-dev
+          git clone --depth 1 --branch 5.5 https://github.com/raysan5/raylib.git /tmp/raylib
+          cmake -S /tmp/raylib -B /tmp/raylib/build \
+            -DCMAKE_BUILD_TYPE=Release -DBUILD_EXAMPLES=OFF -DBUILD_GAMES=OFF
+          cmake --build /tmp/raylib/build --parallel 2
+          sudo cmake --install /tmp/raylib/build
       - name: Configure
         run: cmake --preset debug
       - name: Build
