@@ -135,7 +135,13 @@ void Renderer::background(const Simulation& simulation) {
         const float brightness = 0.25f + 0.75f * star.brightness;
         DrawCircleV(position, star.radius, alpha({190, 215, 255, 255}, brightness));
     }
-    DrawCircleGradient({0.0f, 0.0f}, 4300.0f, alpha({50, 65, 100, 255}, 0.035f), alpha({3, 6, 14, 255}, 0.0f));
+#if RAYLIB_VERSION_MAJOR >= 6
+    DrawCircleGradient(Vector2{0.0f, 0.0f}, 4300.0f,
+                       alpha({50, 65, 100, 255}, 0.035f), alpha({3, 6, 14, 255}, 0.0f));
+#else
+    DrawCircleGradient(0, 0, 4300.0f,
+                       alpha({50, 65, 100, 255}, 0.035f), alpha({3, 6, 14, 255}, 0.0f));
+#endif
     EndMode2D();
 }
 
@@ -155,7 +161,12 @@ void Renderer::drawBody(const Body& body, const Simulation& simulation) const {
     const Color accentColor = color(body.accent);
     if (body.luminous) {
         glow(position, radius * 1.8f, bodyColor, 14);
+#if RAYLIB_VERSION_MAJOR >= 6
         DrawCircleGradient(position, radius * 2.0f, accentColor, alpha(bodyColor, 0.0f));
+#else
+        DrawCircleGradient(static_cast<int>(position.x), static_cast<int>(position.y),
+                           radius * 2.0f, accentColor, alpha(bodyColor, 0.0f));
+#endif
         DrawCircleV(position, radius, bodyColor);
         DrawCircleV({position.x - radius * 0.25f, position.y - radius * 0.28f}, radius * 0.22f, alpha(WHITE, 0.35f));
         return;
