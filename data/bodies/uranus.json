@@ -2,11 +2,42 @@
   "id": "uranus",
   "name": "Uranus",
   "type": "Planet",
-  "mass_kg": 8.6810e25,
-  "radius_m": 2.5362e7,
-  "initial_position_m": [2738008550898.9482, 0.0, 0.0],
-  "initial_velocity_mps": [0.0, 7121.5265218799022, 0.0],
+  "mass_kg": 8.681e+25,
+  "radius_m": 25362000.0,
+  "initial_position_m": [
+    2738008550898.948,
+    0.0,
+    0.0
+  ],
+  "initial_velocity_mps": [
+    0.0,
+    7121.526521879902,
+    0.0
+  ],
   "parent_id": "sun",
-  "visual": {"color_rgba": [115, 205, 215, 255], "accent_rgba": [190, 255, 255, 255], "display_radius_px": 3.0, "ringed": true},
-  "orbital": {"semi_major_axis_m": 2870658000000.0, "eccentricity": 0.0463, "orbital_period_s": 2651374879.2}
+  "visual": {
+    "color_rgba": [
+      115,
+      205,
+      215,
+      255
+    ],
+    "accent_rgba": [
+      190,
+      255,
+      255,
+      255
+    ],
+    "display_radius_px": 3.0,
+    "ringed": true
+  },
+  "orbital": {
+    "semi_major_axis_m": 2870658000000.0,
+    "eccentricity": 0.0463,
+    "orbital_period_s": 2651374879.2
+  },
+  "rotation": {
+    "sidereal_period_s": -62064.0,
+    "axial_tilt_deg": 97.77
+  }
 }

@@ -1,0 +1,88 @@
+{
+  "questions": [
+    {
+      "id": "q_b1_ss_001",
+      "grade": "B1",
+      "subject": "Science",
+      "strand": "Cycles",
+      "subStrand": "Earth Science",
+      "curriculumReference": "B1.2.1.1.1",
+      "alignment": "official",
+      "objective": "Select objects that belong in the sky.",
+      "difficulty": "introductory",
+      "questionType": "multiple_select",
+      "questionKey": "question.q_b1_ss_001.text",
+      "explanationKey": "question.q_b1_ss_001.explanation",
+      "activityId": "b1_ss_001",
+      "options": [
+        {"id": "sun", "labelKey": "solarSystem.sun", "correct": true},
+        {"id": "moon", "labelKey": "solarSystem.moon", "correct": true},
+        {"id": "stars", "labelKey": "solarSystem.stars", "correct": true},
+        {"id": "tree", "labelKey": "object.tree", "correct": false},
+        {"id": "house", "labelKey": "object.house", "correct": false},
+        {"id": "car", "labelKey": "object.car", "correct": false}
+      ]
+    },
+    {
+      "id": "q_b1_ss_002",
+      "grade": "B1",
+      "subject": "Science",
+      "strand": "Cycles",
+      "subStrand": "Earth Science",
+      "curriculumReference": "B1.2.1.1.1",
+      "alignment": "official",
+      "objective": "Decide whether a place facing the Sun is in day or night.",
+      "difficulty": "introductory",
+      "questionType": "multiple_choice",
+      "questionKey": "question.q_b1_ss_002.text",
+      "explanationKey": "question.q_b1_ss_002.explanation",
+      "activityId": "b1_ss_002",
+      "options": [
+        {"id": "day", "labelKey": "time.day", "correct": true},
+        {"id": "night", "labelKey": "time.night", "correct": false}
+      ]
+    },
+    {
+      "id": "q_b2_ss_001",
+      "grade": "B2",
+      "subject": "Science",
+      "strand": "Systems",
+      "subStrand": "The Solar System",
+      "curriculumReference": "B2.3.2.1.1",
+      "alignment": "official",
+      "objective": "Identify the Moon.",
+      "difficulty": "introductory",
+      "questionType": "multiple_choice",
+      "questionKey": "question.q_b2_ss_001.text",
+      "explanationKey": "question.q_b2_ss_001.explanation",
+      "activityId": "b2_ss_001",
+      "options": [
+        {"id": "moon", "labelKey": "solarSystem.moon", "correct": true},
+        {"id": "sun", "labelKey": "solarSystem.sun", "correct": false},
+        {"id": "earth", "labelKey": "solarSystem.earth", "correct": false}
+      ]
+    },
+    {
+      "id": "q_b3_ss_001",
+      "grade": "B3",
+      "subject": "Science",
+      "strand": "Forces and Energy",
+      "subStrand": "Sources and Forms of Energy",
+      "curriculumReference": "B3.4.1.1.1",
+      "alignment": "official",
+      "objective": "Choose which objects give their own light.",
+      "difficulty": "introductory",
+      "questionType": "multiple_select",
+      "questionKey": "question.q_b3_ss_001.text",
+      "explanationKey": "question.q_b3_ss_001.explanation",
+      "misconceptionId": "mc_moon_own_light",
+      "activityId": "b3_ss_001",
+      "options": [
+        {"id": "sun", "labelKey": "solarSystem.sun", "correct": true},
+        {"id": "stars", "labelKey": "solarSystem.stars", "correct": true},
+        {"id": "moon", "labelKey": "solarSystem.moon", "correct": false},
+        {"id": "earth", "labelKey": "solarSystem.earth", "correct": false}
+      ]
+    }
+  ]
+}

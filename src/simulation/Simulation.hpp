@@ -18,6 +18,12 @@
 #include "../education/ExperimentEvaluation.hpp"
 #include "../education/EducationProgress.hpp"
 #include "../education/EducationWorkflow.hpp"
+#include "../curriculum/AssessmentEngine.hpp"
+#include "../curriculum/CurriculumLoader.hpp"
+#include "../curriculum/LearningLabSession.hpp"
+#include "../curriculum/Localization.hpp"
+#include "../curriculum/MisconceptionEngine.hpp"
+#include "../curriculum/GradeIds.hpp"
 #include "SimulationSettings.hpp"
 
 namespace bag {
@@ -27,6 +33,7 @@ struct CustomBodyData;
 enum class AppScreen {
     Simulation,
     Education,
+    LearningLab,
     ScenarioBrowser,
     MissionDesigner,
     Telemetry,
@@ -61,6 +68,7 @@ public:
     bool showGrid = false;
     bool education = true;
     bool educationScreen = false;
+    bool soloStudy = false; // isolate selected body for focused learning
     AppScreen screen = AppScreen::Simulation;
     int scenarioBrowserSelection = 0;
     int selected = -1;
@@ -72,6 +80,16 @@ public:
     Integrator challengeIntegrator = Integrator::VelocityVerlet;
     EducationProgress educationProgress;
     EducationWorkflow educationWorkflow;
+    CurriculumCatalog curriculumCatalog;
+    LocalizationTable curriculumI18n;
+    LearningLabSession learningLabSession;
+    GradeId learnerGrade = GradeId::JHS1;
+    int curriculumActivityIndex = 0;
+    bool curriculumReady = false;
+    std::string curriculumLoadError;
+    std::vector<std::string> curriculumAnswerSelection;
+    std::optional<AssessmentResult> lastCurriculumAssessment;
+    std::optional<MisconceptionTrigger> lastCurriculumMisconception;
     std::optional<ChallengeResult> lastChallengeResult;
     std::optional<ExperimentEvaluation> lastExperimentEvaluation;
     std::optional<PredictionComparisonResult> lastPredictionComparison;
@@ -87,10 +105,18 @@ public:
     bool loadScenario(const std::string& id);
     bool initializeFromEphemeris(const EphemerisSnapshot& snapshot);
     void integrate(double realDeltaSeconds);
-    void launchProbe(double delta);
+    bool launchProbe(double deltaV = 3500.0);
     int addBody(const Body& body);
     bool addCustomBody(const CustomBodyData& data);
     void setSpeed(double value);
+    void adjustSpeed(int direction);
+    bool selectBody(int index);
+    bool isolateSelected();
+    void exitIsolation();
+    void clearSelection();
+    bool stepBack();
+    bool bodyVisibleInView(int index) const;
+    std::string selectedBodyLesson() const;
     void adjustTimestep(double factor);
     void cycleIntegrator(int direction = 1);
     void setScreen(AppScreen next);
@@ -119,6 +145,21 @@ public:
     bool continueEducationActivity();
     bool saveEducationProgress(const std::filesystem::path& path) const;
     bool loadEducationProgress(const std::filesystem::path& path);
+
+    bool setLearnerGrade(GradeId grade);
+    bool cycleLearnerGrade(int direction);
+    PresentationLayer learnerPresentationLayer() const;
+    std::vector<const CurriculumActivity*> activitiesForLearnerGrade() const;
+    const CurriculumActivity* selectedCurriculumActivity() const;
+    const CurriculumQuestion* selectedCurriculumQuestion() const;
+    bool selectCurriculumActivity(int index);
+    bool startCurriculumActivity();
+    bool advanceCurriculumActivity();
+    bool recordCurriculumPrediction(std::string text);
+    bool recordCurriculumObservation(std::string text);
+    bool toggleCurriculumAnswerOption(int optionIndex);
+    bool submitCurriculumAssessment();
+    void applyLearnerPresentationMode();
 
     double distanceFromSun(const Body& body) const;
     double specificEnergy(const Body& body) const;

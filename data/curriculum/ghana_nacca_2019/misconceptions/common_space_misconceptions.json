@@ -1,0 +1,12 @@
+{
+  "misconceptions": [
+    {
+      "id": "mc_moon_own_light",
+      "statementKey": "misconception.moon_own_light.statement",
+      "responseKey": "misconception.moon_own_light.response",
+      "experimentActivityId": "b5_ss_luminous",
+      "correctionKey": "misconception.moon_own_light.correction",
+      "triggerAnswerIds": ["moon"]
+    }
+  ]
+}

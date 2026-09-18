@@ -10,34 +10,33 @@
 #include "../education/EducationCatalog.hpp"
 #include "../education/LearnerReport.hpp"
 #include "../physics/PhysicsEngine.hpp"
+#include "UiTheme.hpp"
 
 namespace bag {
 namespace {
 
-Color alpha(Color color, float amount) {
-    color.a = static_cast<unsigned char>(std::clamp(amount * 255.0f, 0.0f, 255.0f));
-    return color;
-}
+using ui::theme;
+using ui::withAlpha;
 
 std::string format(double value, int digits = 2) {
-    if (!std::isfinite(value)) return "Unavailable";
+    if (!std::isfinite(value)) return "—";
     std::ostringstream output;
     output << std::fixed << std::setprecision(digits) << value;
     return output.str();
 }
 
 std::string scientific(double value, int digits = 3) {
-    if (!std::isfinite(value)) return "Unavailable";
+    if (!std::isfinite(value)) return "—";
     std::ostringstream output;
     output << std::scientific << std::setprecision(digits) << value;
     return output.str();
 }
 
 std::string distance(double meters) {
-    if (!std::isfinite(meters)) return "Unavailable";
+    if (!std::isfinite(meters)) return "—";
     const double au = std::abs(meters) / PhysicsEngine::AU;
     if (au >= 0.01) return format(meters / PhysicsEngine::AU, 3) + " AU";
-    if (std::abs(meters) >= 1e9) return format(meters / 1e9, 2) + " billion km";
+    if (std::abs(meters) >= 1e9) return format(meters / 1e9, 2) + " ×10⁹ km";
     return format(meters / 1000.0, 0) + " km";
 }
 
@@ -45,234 +44,172 @@ std::string time(double seconds) {
     const double absolute = std::abs(seconds);
     if (absolute < 60) return format(absolute, 1) + " s";
     if (absolute < PhysicsEngine::DAY) return format(absolute / 3600.0, 1) + " h";
-    if (absolute < PhysicsEngine::YEAR) return format(absolute / PhysicsEngine::DAY, 1) + " days";
-    return format(absolute / PhysicsEngine::YEAR, 2) + " years";
+    if (absolute < PhysicsEngine::YEAR) return format(absolute / PhysicsEngine::DAY, 1) + " d";
+    return format(absolute / PhysicsEngine::YEAR, 2) + " y";
+}
+
+std::string dayLengthLabel(double periodSeconds) {
+    if (!std::isfinite(periodSeconds) || periodSeconds == 0.0) return "—";
+    const double absolute = std::abs(periodSeconds);
+    if (absolute < PhysicsEngine::DAY * 2.5) return format(absolute / 3600.0, 1) + " h";
+    return format(absolute / PhysicsEngine::DAY, 1) + " Earth days";
+}
+
+std::string spinDirectionLabel(const Body& body) {
+    if (!std::isfinite(body.rotationPeriod) || body.rotationPeriod == 0.0) return "—";
+    if (std::abs(body.axialTilt) >= 80.0) return "Sideways";
+    if (body.rotationPeriod < 0.0) return "Retrograde";
+    return "Prograde";
+}
+
+std::string formatSpeed(double speed) {
+    if (speed >= 1000.0) return "×" + format(speed, 0);
+    if (speed < 1.0) return "×" + format(speed, 2);
+    if (speed < 10.0) return "×" + format(speed, 1);
+    return "×" + format(speed, 0);
+}
+
+void drawWrapped(const std::string& content, float x, float y, float maxWidth, int size, Color color, int maxLines = 4) {
+    if (content.empty() || maxLines <= 0) return;
+    std::string line;
+    int linesDrawn = 0;
+    auto flush = [&]() {
+        DrawText(line.c_str(), static_cast<int>(x), static_cast<int>(y + linesDrawn * (size + 4)), size, color);
+        ++linesDrawn;
+        line.clear();
+    };
+    std::string word;
+    for (std::size_t i = 0; i <= content.size(); ++i) {
+        const bool end = i == content.size();
+        const char ch = end ? ' ' : content[i];
+        if (ch == ' ' || ch == '\n' || end) {
+            if (!word.empty()) {
+                const std::string candidate = line.empty() ? word : line + " " + word;
+                if (MeasureText(candidate.c_str(), size) > static_cast<int>(maxWidth) && !line.empty()) {
+                    flush();
+                    if (linesDrawn >= maxLines) return;
+                    line = word;
+                } else {
+                    line = candidate;
+                }
+                word.clear();
+            }
+            if (ch == '\n') {
+                flush();
+                if (linesDrawn >= maxLines) return;
+            }
+        } else {
+            word.push_back(ch);
+        }
+    }
+    if (!line.empty() && linesDrawn < maxLines) flush();
 }
 
 } // namespace
-
-Rectangle HUD::panel(float x, float y, float width, float height) const {
-    DrawRectangleRounded({x, y, width, height}, 0.12f, 12, alpha({10, 18, 32, 255}, 0.94f));
-    DrawRectangleRoundedLines({x, y, width, height}, 0.12f, 12, alpha({90, 160, 220, 255}, 0.28f));
-    return {x, y, width, height};
-}
 
 void HUD::text(const char* value, float x, float y, float size, Color colorValue) const {
     DrawText(value, static_cast<int>(x), static_cast<int>(y), static_cast<int>(size), colorValue);
 }
 
-void HUD::line(const char* label, const char* value, float x, float y) const {
-    text(label, x, y, 13, alpha({165, 190, 215, 255}, 0.85f));
-    text(value, x + 112, y, 13);
+void HUD::pageChrome(const Simulation& simulation, const char* title, const char* subtitle) const {
+    const auto& t = theme();
+    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), t.bg);
+    // Soft atmospheric wash
+    DrawRectangleGradientV(0, 0, GetScreenWidth(), GetScreenHeight(),
+                           withAlpha(ui::rgba(18, 36, 48), 0.55f), t.bg);
+    topBar(simulation);
+    text(title, ui::pagePad(), ui::contentTop(), 28, t.text);
+    text(subtitle, ui::pagePad(), ui::contentTop() + 34.0f, 14, t.textMuted);
 }
 
-void HUD::top(const Simulation& simulation) const {
-    DrawRectangle(0, 0, GetScreenWidth(), 70, alpha({3, 9, 18, 255}, 0.97f));
-    DrawLine(0, 69, GetScreenWidth(), 69, alpha({55, 170, 230, 255}, 0.35f));
-    text("BAGSOLAR", 22, 11, 25, {110, 220, 255, 255});
-    text("C++17 ORBITAL MECHANICS LABORATORY", 24, 40, 9, alpha(RAYWHITE, 0.52f));
-    text(simulation.paused ? "PAUSED" : "RUNNING", GetScreenWidth() - 300, 15, 11,
-         simulation.paused ? RED : Color{80, 235, 150, 255});
-    text("SIM TIME", GetScreenWidth() - 218, 11, 9, alpha(RAYWHITE, 0.48f));
-    text(time(simulation.simTime).c_str(), GetScreenWidth() - 218, 28, 16, {100, 220, 255, 255});
-    text(("×" + format(simulation.speed, 1)).c_str(), GetScreenWidth() - 92, 28, 14, RAYWHITE);
-}
+void HUD::topBar(const Simulation& simulation) const {
+    const auto& t = theme();
+    const float barH = ui::topBarHeight();
+    DrawRectangle(0, 0, GetScreenWidth(), static_cast<int>(barH), withAlpha(t.bgElevated, 0.96f));
+    DrawRectangle(0, static_cast<int>(barH) - 1, GetScreenWidth(), 1, withAlpha(t.border, 0.7f));
 
-void HUD::navigation(const Simulation& simulation) const {
-    const struct Tab { const char* label; AppScreen screen; float x; float width; } tabs[] = {
-        {"SIMULATION", AppScreen::Simulation, 290.0f, 95.0f},
-        {"EDUCATION", AppScreen::Education, 385.0f, 95.0f},
-        {"SCENARIOS", AppScreen::ScenarioBrowser, 480.0f, 105.0f},
-        {"TELEMETRY", AppScreen::Telemetry, 585.0f, 105.0f},
-        {"MISSION", AppScreen::MissionDesigner, 690.0f, 100.0f},
-        {"SETTINGS", AppScreen::Settings, 790.0f, 105.0f},
-        {"HELP", AppScreen::Help, 895.0f, 80.0f},
-    };
-    for (const Tab& tab : tabs) {
-        const bool active = simulation.screen == tab.screen;
-        if (active) DrawRectangleRec({tab.x, 67.0f, tab.width - 5.0f, 3.0f}, {30, 200, 255, 255});
-        text(tab.label, tab.x + 7.0f, 29.0f, 10, active ? RAYWHITE : alpha(RAYWHITE, 0.62f));
+    text("BAGS_LAB", 24, 14, 24, t.accentStrong);
+    text("Orbital lab", 26, 40, 11, t.textDim);
+
+    const ui::NavLayout nav = ui::buildNavLayout(static_cast<float>(GetScreenWidth()));
+    for (std::size_t index = 0; index < ui::kNavTabs.size(); ++index) {
+        const bool active = simulation.screen == ui::kNavTabs[index].screen;
+        ui::drawChip(nav.hits[index], ui::kNavTabs[index].label, active);
     }
+
+    const float right = static_cast<float>(GetScreenWidth());
+    const Rectangle status = {right - 250.0f, 14.0f, 100.0f, 36.0f};
+    ui::drawChip(status, simulation.paused ? "Paused" : "Live", !simulation.paused,
+                 simulation.paused ? t.warn : t.success);
+
+    text(time(simulation.simTime).c_str(), right - 138.0f, 16.0f, 16, t.accentStrong);
+    text(formatSpeed(simulation.speed).c_str(), right - 138.0f, 36.0f, 13, t.textMuted);
+}
+
+void HUD::bottomBar(const Simulation& simulation) const {
+    (void)simulation;
+    const auto& t = theme();
+    const float y = static_cast<float>(GetScreenHeight()) - ui::bottomBarHeight();
+    DrawRectangle(0, static_cast<int>(y), GetScreenWidth(), static_cast<int>(ui::bottomBarHeight()),
+                  withAlpha(t.bgElevated, 0.94f));
+    DrawRectangle(0, static_cast<int>(y), GetScreenWidth(), 1, withAlpha(t.border, 0.55f));
+    text("Drag orbit  ·  Right/Middle pan  ·  Wheel zoom  ·  Click select  ·  Z zoom  ·  Q back",
+         24, y + 14.0f, 13, t.textMuted);
+    text("Space pause   P pulse probe   ± speed   5/6 fast",
+         static_cast<float>(GetScreenWidth()) - 390.0f, y + 14.0f, 13, t.textDim);
 }
 
 void HUD::selectedInfo(const Simulation& simulation) const {
     if (simulation.selected < 0 || simulation.selected >= static_cast<int>(simulation.bodies.size())) return;
-    const Body& body = simulation.bodies[simulation.selected];
-    const float boxWidth = std::min(300.0f, GetScreenWidth() - 40.0f);
-    const Rectangle box = panel(18, GetScreenHeight() - 270, boxWidth, 236);
-    text("SELECTED BODY", box.x + 16, box.y + 14, 9, {100, 220, 255, 255});
-    text(body.name.c_str(), box.x + 16, box.y + 31, 20, {body.accent.r, body.accent.g, body.accent.b, body.accent.a});
-    text(body.type.c_str(), box.x + 16, box.y + 57, 11, alpha(RAYWHITE, 0.55f));
-    const std::string mass = scientific(body.mass) + " kg";
-    const std::string radius = distance(body.realRadius);
-    const std::string bodyDistance = distance(simulation.distanceFromSun(body));
-    const std::string velocity = format(length(body.velocity) / 1000.0, 2) + " km/s";
-    const std::string escape = format(simulation.escapeVelocity(body) / 1000.0, 2) + " km/s";
-    const std::string gravity = format(simulation.surfaceGravity(body), 2) + " m/s²";
-    const std::string eccentricity = format(body.eccentricity, 4);
-    const std::string energy = scientific(simulation.specificEnergy(body)) + " J/kg";
-    const double kineticEnergy = 0.5 * length(body.velocity) * length(body.velocity);
-    const double potentialEnergy = -PhysicsEngine::G * PhysicsEngine::SOLAR_MASS /
-                                   std::max(simulation.distanceFromSun(body), 1.0);
-    line("Mass", mass.c_str(), box.x + 16, box.y + 78);
-    line("Radius", radius.c_str(), box.x + 16, box.y + 98);
-    line("Distance", bodyDistance.c_str(), box.x + 16, box.y + 118);
-    line("Velocity", velocity.c_str(), box.x + 16, box.y + 138);
-    line("Eccentricity", eccentricity.c_str(), box.x + 16, box.y + 158);
-    line("Energy", energy.c_str(), box.x + 16, box.y + 178);
-    text("ORBIT", box.x + 16, box.y + 204, 9, alpha({160, 190, 220, 255}, 0.8f));
-    text(simulation.specificEnergy(body) < 0 ? "BOUND" : "ESCAPE TRAJECTORY", box.x + 65, box.y + 201, 11,
-         simulation.specificEnergy(body) < 0 ? Color{80, 235, 150, 255} : ORANGE);
-    text(("KE/PE " + format(kineticEnergy / std::max(std::abs(potentialEnergy), 1.0), 3)).c_str(),
-         box.x + 16, box.y + 218, 10, alpha(RAYWHITE, 0.7f));
-}
+    const Body& body = simulation.bodies[static_cast<std::size_t>(simulation.selected)];
+    const auto& t = theme();
+    const float boxWidth = std::min(340.0f, GetScreenWidth() - 40.0f);
+    const float boxHeight = simulation.soloStudy ? 400.0f : 300.0f;
+    const Rectangle box = {
+        20.0f,
+        static_cast<float>(GetScreenHeight()) - ui::bottomBarHeight() - boxHeight - 16.0f,
+        boxWidth,
+        boxHeight,
+    };
+    ui::drawPanel(box, true);
+    DrawRectangleRounded({box.x, box.y, 5.0f, box.height}, 0.2f, 8,
+                         {body.accent.r, body.accent.g, body.accent.b, 255});
 
-void HUD::lessonPanel(const Simulation& simulation) const {
-    if (!simulation.education) return;
-    const Rectangle box = panel(20, 76, 360, 250);
-    const Lesson& lesson = lessonAt(simulation.lesson);
-    text("LEARN", box.x + 18, box.y + 16, 11, {100, 220, 255, 255});
-    text(lesson.title, box.x + 18, box.y + 39, 19);
-    DrawTextEx(GetFontDefault(), lesson.body, {box.x + 18, box.y + 73}, 15, 2, alpha(RAYWHITE, 0.82f));
-    text("EDUCATION HOME", box.x + 18, box.y + 174, 10, {255, 205, 105, 255});
-    const EducationReport report = simulation.educationProgress.report();
-    text(("Lessons " + std::to_string(report.completedLessons) + "/" + std::to_string(report.totalLessons) +
-          "  Experiments " + std::to_string(report.completedExperiments) + "/" + std::to_string(report.totalExperiments)).c_str(),
-         box.x + 18, box.y + 192, 10, alpha(RAYWHITE, 0.75f));
-    text(("Challenges " + std::to_string(report.completedChallenges) + "/" + std::to_string(report.totalChallenges) +
-          "  " + std::string(EducationWorkflow::stateName(simulation.educationWorkflow.state()))).c_str(),
-         box.x + 18, box.y + 208, 10, alpha(RAYWHITE, 0.75f));
-    std::string selectedProgress = "Selected activity";
-    for (const EducationActivityProgress& item : simulation.educationWorkflow.home()) {
-        const EducationActivity& current = simulation.educationWorkflow.activity();
-        if (item.activity.type == current.type && item.activity.index == current.index &&
-            current.type != EducationActivityType::Lesson) {
-            selectedProgress = "Selected attempts " + std::to_string(item.attempts) +
-                "  best " + format(item.bestScore, 1) + "  latest " + format(item.latestScore, 1);
-            break;
-        }
-    }
-    text(selectedProgress.c_str(), box.x + 18, box.y + 224, 10, alpha(RAYWHITE, 0.72f));
-}
+    text(simulation.soloStudy ? "STUDY" : "SELECTED", box.x + 18, box.y + 14, 11,
+         simulation.soloStudy ? t.accent : t.textDim);
+    text(body.name.c_str(), box.x + 18, box.y + 32, 22, t.text);
+    text(body.type.c_str(), box.x + 18, box.y + 58, 12, t.textMuted);
 
-void HUD::bottom(const Simulation& simulation) const {
-    const float y = GetScreenHeight() - 28.0f;
-    DrawRectangle(0, y - 6, GetScreenWidth(), 34, alpha({3, 9, 18, 255}, 0.90f));
-    text("SPACE pause", 18, y + 2, 10, alpha(RAYWHITE, 0.72f));
-    text("+/- time", 112, y + 2, 10, alpha(RAYWHITE, 0.72f));
-    text("V vectors  O orbits  T trails  G grid", 188, y + 2, 10, alpha(RAYWHITE, 0.72f));
-    text("Right-drag pan  •  Wheel zoom  •  Ctrl+S select mode", 470, y + 2, 10, {150, 220, 245, 255});
-    text(("Integrator " + std::string(integratorName([&] { Integrator value = Integrator::VelocityVerlet; parseIntegrator(simulation.settings.integrator, value); return value; }())) +
-          "  dt " + format(simulation.settings.timestepSeconds, 0) + " s  •  Display scale: enhanced").c_str(),
-         GetScreenWidth() - 520, y + 2, 10, alpha(RAYWHITE, 0.62f));
-}
+    ui::drawLabelValue("Mass", (scientific(body.mass) + " kg").c_str(), box.x + 18, box.y + 88);
+    ui::drawLabelValue("Radius", distance(body.realRadius).c_str(), box.x + 18, box.y + 110);
+    ui::drawLabelValue("Distance", distance(simulation.distanceFromSun(body)).c_str(), box.x + 18, box.y + 132);
+    ui::drawLabelValue("Velocity", (format(length(body.velocity) / 1000.0, 2) + " km/s").c_str(), box.x + 18, box.y + 154);
+    ui::drawLabelValue("Day length", dayLengthLabel(body.rotationPeriod).c_str(), box.x + 18, box.y + 176);
+    ui::drawLabelValue("Axial tilt", (format(body.axialTilt, 1) + " deg").c_str(), box.x + 18, box.y + 198);
+    ui::drawLabelValue("Spin", spinDirectionLabel(body).c_str(), box.x + 18, box.y + 220);
 
-void HUD::experimentPanel(const Simulation& simulation) const {
-    if (!simulation.education) return;
-    const Rectangle box = panel(20, 345, 360, 330);
-    const Experiment& experiment = experimentAt(simulation.experiment);
-    text("EXPERIMENT", box.x + 18, box.y + 16, 11, {100, 220, 255, 255});
-    text(experiment.title, box.x + 18, box.y + 39, 19);
-    DrawTextEx(GetFontDefault(), experiment.prompt, {box.x + 18, box.y + 74}, 15, 2, alpha(RAYWHITE, 0.82f));
-    text(experiment.equation, box.x + 18, box.y + 137, 21, {150, 225, 255, 255});
-    const bool selectedExperiment = simulation.educationWorkflow.activity().type == EducationActivityType::Experiment &&
-        simulation.educationWorkflow.activity().index == simulation.experiment;
-    const std::string workflowState = (selectedExperiment ? std::string("STATE ") : "STATE SELECT ACTIVITY: ") +
-        EducationWorkflow::stateName(simulation.educationWorkflow.state());
-    text(workflowState.c_str(),
-         box.x + 18, box.y + 161, 10, alpha(RAYWHITE, 0.62f));
-    text("ENTER start  B observe  Y evaluate  Q retry  N next", box.x + 18, box.y + 184, 10, alpha(RAYWHITE, 0.48f));
-    if (simulation.lastExperimentEvaluation) {
-        const ExperimentEvaluation& result = *simulation.lastExperimentEvaluation;
-        text((std::string(experimentEvaluationStatusName(result.status)) + "  " + result.grade + "  " + format(result.score, 1) + "/100").c_str(),
-             box.x + 18, box.y + 204, 12, result.passed ? Color{80, 235, 150, 255} : ORANGE);
-        const bool predictionReference = std::string(experiment.id) == "prediction-reference" && simulation.lastPredictionComparison.has_value();
-        if (predictionReference) {
-            const PredictionComparisonResult& comparison = *simulation.lastPredictionComparison;
-            text(("PREDICTION VS REFERENCE  " + std::string(predictionComparisonStatusName(comparison.status)) +
-                  "  " + comparison.referenceProvider).c_str(), box.x + 18, box.y + 220, 9, alpha(RAYWHITE, 0.78f));
-            text(("Body " + comparison.bodyId + "  Epoch JD " + format(comparison.finalEpoch.value, 6)).c_str(),
-                 box.x + 18, box.y + 234, 9, alpha(RAYWHITE, 0.72f));
-            text(("Frame " + std::string(referenceFrameName(comparison.frame.type)) + "/" + comparison.frame.originBodyId).c_str(),
-                 box.x + 18, box.y + 248, 9, alpha(RAYWHITE, 0.72f));
-            text((std::string("Integrator ") + integratorName(comparison.integrator) +
-                  "  dt " + format(comparison.requestedTimestepSeconds, 2) + " s  samples " +
-                  std::to_string(comparison.samples.size())).c_str(), box.x + 18, box.y + 262, 9, alpha(RAYWHITE, 0.72f));
-            if (comparison.success()) {
-                text(("Position " + format(comparison.positionErrorMagnitudeM, 3) + " m  Velocity " +
-                      format(comparison.velocityErrorMagnitudeMps, 3) + " m/s").c_str(), box.x + 18, box.y + 276, 9, alpha(RAYWHITE, 0.78f));
-                if (comparison.energyDefined) text(("Energy Δ " + format(comparison.absoluteEnergyDifferenceJPerKg, 3) +
-                    " J/kg  relative " + format(comparison.relativeEnergyDifference, 6)).c_str(),
-                    box.x + 18, box.y + 290, 9, alpha(RAYWHITE, 0.72f));
-            } else {
-                DrawTextEx(GetFontDefault(), comparison.explanation.c_str(), {box.x + 18, box.y + 276}, 9, 1, alpha(ORANGE, 0.82f));
-            }
-        } else if (std::isfinite(result.metrics.measuredPrimaryValue)) {
-            const std::string measured = "Measured: " + format(result.metrics.measuredPrimaryValue, 2) +
-                (std::isfinite(result.metrics.referencePrimaryValue)
-                    ? "  Ref: " + format(result.metrics.referencePrimaryValue, 2) : "");
-            text(measured.c_str(), box.x + 18, box.y + 220, 10, alpha({190, 215, 235, 255}, 0.78f));
-        } else if (std::isfinite(result.metrics.normalizedError)) {
-            text(("Normalized error: " + format(result.metrics.normalizedError, 4)).c_str(),
-                 box.x + 18, box.y + 220, 10, alpha({190, 215, 235, 255}, 0.78f));
-        } else if (std::isfinite(result.metrics.energyDrift)) {
-            text(("Drift E/L: " + format(result.metrics.energyDrift, 4) + " / " +
-                  format(result.metrics.angularMomentumDrift, 4)).c_str(),
-                 box.x + 18, box.y + 220, 10, alpha({190, 215, 235, 255}, 0.78f));
-        }
-        if (predictionReference) {
-            DrawTextEx(GetFontDefault(), result.feedback.c_str(), {box.x + 18, static_cast<float>(box.y + 304)}, 9, 1, alpha(RAYWHITE, 0.75f));
-        } else {
-            DrawTextEx(GetFontDefault(), result.feedback.c_str(), {box.x + 18, box.y + 236}, 10, 1, alpha(RAYWHITE, 0.75f));
-            DrawTextEx(GetFontDefault(), ("Next: " + result.nextStep).c_str(), {box.x + 18, box.y + 251}, 9, 1, alpha({190, 215, 235, 255}, 0.72f));
-            DrawTextEx(GetFontDefault(), ("Why: " + result.explanation).c_str(), {box.x + 18, box.y + 266}, 9, 1, alpha({190, 215, 235, 255}, 0.68f));
-        }
+    if (simulation.soloStudy) {
+        text("Learn", box.x + 18, box.y + 252, 11, t.accent);
+        drawWrapped(simulation.selectedBodyLesson(), box.x + 18, box.y + 272, box.width - 36.0f, 13, t.textMuted, 4);
+        text("Amber axis = tilt · cyan equator · orange tick = spin", box.x + 18, box.y + 348, 11, t.textDim);
+        text("Spin motion exaggerated for study · Q exit", box.x + 18, box.y + 368, 11, t.textDim);
     } else {
-        text("P  launch probe at escape velocity", box.x + 18, box.y + 204, 11, alpha(RAYWHITE, 0.65f));
-    }
-}
-
-void HUD::challengePanel(const Simulation& simulation) const {
-    if (!simulation.education) return;
-    const ChallengeDefinition& challenge = challengeAt(simulation.challenge);
-    const Rectangle box = panel(400, 76, 420, 250);
-    text("CHALLENGE", box.x + 18, box.y + 16, 11, {255, 205, 105, 255});
-    text(challenge.title.c_str(), box.x + 18, box.y + 39, 19);
-    DrawTextEx(GetFontDefault(), challenge.description.c_str(), {box.x + 18, box.y + 73}, 14, 2, alpha(RAYWHITE, 0.82f));
-    text(("Objective: " + challenge.learningObjective).c_str(), box.x + 18, box.y + 125, 11, alpha({190, 215, 235, 255}, 0.82f));
-    text(("State: " + std::string(EducationWorkflow::stateName(simulation.educationWorkflow.state()))).c_str(),
-         box.x + 18, box.y + 140, 10, alpha(RAYWHITE, 0.62f));
-    if (challenge.kind == ChallengeKind::IntegratorComparison) {
-        text(("Method: " + std::string(integratorName(simulation.challengeIntegrator))).c_str(), box.x + 18, box.y + 150, 14, {150, 225, 255, 255});
-    } else {
-        text(("Answer: " + format(simulation.challengeAnswer, 2) + " SI").c_str(), box.x + 18, box.y + 150, 14, {150, 225, 255, 255});
-    }
-    if (simulation.lastChallengeResult) {
-        const ChallengeResult& result = *simulation.lastChallengeResult;
-        text((result.grade + "  " + format(result.score, 1) + "/100").c_str(), box.x + 18, box.y + 177, 15,
-             result.passed ? Color{80, 235, 150, 255} : ORANGE);
-        DrawTextEx(GetFontDefault(), result.feedback.c_str(), {box.x + 18, box.y + 201}, 12, 2, alpha(RAYWHITE, 0.75f));
-        if (challenge.kind == ChallengeKind::HohmannTransfer) {
-            text(("Burns: " + format(result.metrics.referenceDepartureDeltaV / 1000.0, 2) + " + " +
-                  format(result.metrics.referenceArrivalDeltaV / 1000.0, 2) + " km/s").c_str(),
-                 box.x + 18, box.y + 225, 11, alpha({190, 215, 235, 255}, 0.78f));
+        text("Z fills the screen with this body   ·   Q back", box.x + 18, box.y + 252, 12, t.textDim);
+        if (body.id == "earth" || body.id == "moon" || body.type == "Moon") {
+            text("Earth study also keeps the Moon nearby", box.x + 18, box.y + 272, 12, t.textDim);
         }
-        DrawTextEx(GetFontDefault(), ("Next: " + result.nextStep).c_str(), {box.x + 18, box.y + 240}, 9, 1, alpha({190, 215, 235, 255}, 0.72f));
-        DrawTextEx(GetFontDefault(), ("Why: " + result.explanation).c_str(), {box.x + 18, box.y + 255}, 9, 1, alpha({190, 215, 235, 255}, 0.68f));
-    } else {
-        text("ENTER start  B observe  [ / ] adjust  I method  C submit", box.x + 18, box.y + 188, 11, alpha(RAYWHITE, 0.58f));
     }
 }
 
 void HUD::draw(const Simulation& simulation) const {
     switch (simulation.screen) {
     case AppScreen::Simulation:
-        top(simulation);
-        navigation(simulation);
+        topBar(simulation);
         selectedInfo(simulation);
-        bottom(simulation);
+        bottomBar(simulation);
         break;
     case AppScreen::Education: educationScreenPanel(simulation); break;
+    case AppScreen::LearningLab: learningLabScreenPanel(simulation); break;
     case AppScreen::ScenarioBrowser: scenarioScreen(simulation); break;
     case AppScreen::Telemetry: telemetryScreen(simulation); break;
     case AppScreen::MissionDesigner: missionScreen(simulation); break;
@@ -282,206 +219,367 @@ void HUD::draw(const Simulation& simulation) const {
 }
 
 void HUD::educationScreenPanel(const Simulation& simulation) const {
-    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), {5, 12, 24, 255});
-    top(simulation);
-    navigation(simulation);
+    const auto& t = theme();
+    pageChrome(simulation, "Learn", "Guided orbital-mechanics lessons, experiments, and challenges");
     const LearnerReport report = buildLearnerReport(simulation.educationProgress);
     const AuthoredLesson& lesson = authoredLessonAt(simulation.lesson);
-    text("BAGSOLAR EDUCATION", 36, 78, 28, {110, 220, 255, 255});
-    text("An interactive orbital-mechanics laboratory", 38, 105, 13, alpha(RAYWHITE, 0.62f));
 
-    text("PROGRESS", 38, 108, 12, {255, 205, 105, 255});
-    text(("Lessons      " + std::to_string(report.completedLessons) + " / " + std::to_string(report.totalLessons)).c_str(), 38, 132, 14);
-    text(("Experiments  " + std::to_string(report.completedExperiments) + " / " + std::to_string(report.totalExperiments)).c_str(), 38, 154, 14);
-    text(("Challenges   " + std::to_string(report.completedChallenges) + " / " + std::to_string(report.totalChallenges)).c_str(), 38, 176, 14);
-    DrawRectangle(38, 202, 250, 12, {30, 55, 80, 255});
-    DrawRectangle(38, 202, report.totalLessons == 0 ? 0 : 250 * report.completedLessons / report.totalLessons, 12, {80, 200, 255, 255});
-    text("Lesson completion", 38, 222, 11, alpha(RAYWHITE, 0.58f));
+    const Rectangle left = {ui::pagePad(), ui::contentTop() + 70.0f, 340.0f, 560.0f};
+    const Rectangle mid = {ui::pagePad() + 360.0f, ui::contentTop() + 70.0f, 420.0f, 560.0f};
+    const Rectangle right = {ui::pagePad() + 800.0f, ui::contentTop() + 70.0f, 340.0f, 560.0f};
+    ui::drawPanel(left);
+    ui::drawPanel(mid);
+    ui::drawPanel(right);
 
-    text("LESSONS", 38, 270, 12, {255, 205, 105, 255});
+    text("Progress", left.x + 20, left.y + 18, 12, t.accent);
+    text(("Lessons  " + std::to_string(report.completedLessons) + " / " + std::to_string(report.totalLessons)).c_str(),
+         left.x + 20, left.y + 44, 14, t.text);
+    text(("Experiments  " + std::to_string(report.completedExperiments) + " / " + std::to_string(report.totalExperiments)).c_str(),
+         left.x + 20, left.y + 68, 14, t.text);
+    text(("Challenges  " + std::to_string(report.completedChallenges) + " / " + std::to_string(report.totalChallenges)).c_str(),
+         left.x + 20, left.y + 92, 14, t.text);
+    DrawRectangleRounded({left.x + 20, left.y + 126, 300, 8}, 0.5f, 8, t.surfaceAlt);
+    const float fill = report.totalLessons == 0 ? 0.0f
+        : 300.0f * static_cast<float>(report.completedLessons) / static_cast<float>(report.totalLessons);
+    DrawRectangleRounded({left.x + 20, left.y + 126, fill, 8}, 0.5f, 8, t.accent);
+
+    text("Lessons", left.x + 20, left.y + 160, 12, t.textDim);
     for (int index = 0; index < authoredLessonCount(); ++index) {
         const AuthoredLesson& item = authoredLessonAt(index);
         const bool selected = index == simulation.lesson;
         const bool complete = simulation.educationProgress.lessonComplete(index);
-        if (selected) DrawRectangleRounded({32, 292.0f + index * 28.0f, 300, 24}, 0.2f, 8, {35, 82, 112, 255});
-        text((std::string(complete ? "✓ " : "• ") + item.title).c_str(), 44, 297.0f + index * 28.0f, 12,
-             selected ? RAYWHITE : alpha(RAYWHITE, 0.68f));
+        const float y = left.y + 186.0f + index * 34.0f;
+        if (selected) DrawRectangleRounded({left.x + 12, y - 6, 316, 30}, 0.2f, 8, withAlpha(t.accent, 0.18f));
+        text((std::string(complete ? "● " : "○ ") + item.title).c_str(), left.x + 22, y, 14,
+             selected ? t.text : t.textMuted);
     }
 
-    text(lesson.title.c_str(), 380, 108, 25, {150, 225, 255, 255});
-    text(lesson.shortDescription.c_str(), 382, 142, 13, alpha(RAYWHITE, 0.82f));
-    text("OBJECTIVES", 382, 184, 11, {255, 205, 105, 255});
-    for (std::size_t index = 0; index < lesson.objectives.size() && index < 3; ++index)
-        text(("• " + lesson.objectives[index]).c_str(), 390, 207.0f + index * 20.0f, 12, alpha(RAYWHITE, 0.78f));
-    text(("Difficulty: " + std::string(educationDifficultyName(lesson.difficulty)) +
-          "   Duration: " + std::to_string(lesson.estimatedMinutes) + " min").c_str(), 382, 274, 12, alpha(RAYWHITE, 0.65f));
-    text("LINKED ACTIVITIES", 382, 314, 11, {255, 205, 105, 255});
-    const std::string experiment = lesson.experimentIds.empty() ? "none" : lesson.experimentIds.front();
-    const std::string challenge = lesson.challengeIds.empty() ? "none" : lesson.challengeIds.front();
-    text(("Experiment: " + experiment).c_str(), 390, 337, 12, alpha(RAYWHITE, 0.78f));
-    text(("Challenge: " + challenge).c_str(), 390, 359, 12, alpha(RAYWHITE, 0.78f));
-    text(("Status: " + std::string(simulation.educationProgress.lessonComplete(simulation.lesson) ? "COMPLETED" : "NOT COMPLETED")).c_str(), 382, 399, 13,
-         simulation.educationProgress.lessonComplete(simulation.lesson) ? Color{80, 235, 150, 255} : ORANGE);
+    text(lesson.title.c_str(), mid.x + 22, mid.y + 22, 24, t.text);
+    text(lesson.shortDescription.c_str(), mid.x + 22, mid.y + 56, 14, t.textMuted);
+    text("Objectives", mid.x + 22, mid.y + 100, 12, t.accent);
+    for (std::size_t index = 0; index < lesson.objectives.size() && index < 4; ++index) {
+        text(("• " + lesson.objectives[index]).c_str(), mid.x + 22, mid.y + 126.0f + index * 24.0f, 14, t.text);
+    }
+    text(("Difficulty  " + std::string(educationDifficultyName(lesson.difficulty))).c_str(),
+         mid.x + 22, mid.y + 250, 13, t.textMuted);
+    text(("Duration  " + std::to_string(lesson.estimatedMinutes) + " min").c_str(),
+         mid.x + 22, mid.y + 274, 13, t.textMuted);
+    text(simulation.educationProgress.lessonComplete(simulation.lesson) ? "Completed" : "In progress",
+         mid.x + 22, mid.y + 310, 16,
+         simulation.educationProgress.lessonComplete(simulation.lesson) ? t.success : t.warn);
 
-    text("LEARNER REPORT", 760, 108, 12, {255, 205, 105, 255});
-    text(report.hasAverageScore ? ("Average score: " + format(report.averageScore, 1)).c_str() : "Average score: no scored activities", 760, 134, 12);
-    text("Strongest areas", 760, 174, 11, alpha(RAYWHITE, 0.6f));
-    if (report.strongestAreas.empty()) text("None yet", 770, 196, 12, alpha(RAYWHITE, 0.7f));
-    for (std::size_t index = 0; index < report.strongestAreas.size() && index < 3; ++index) text(("• " + report.strongestAreas[index]).c_str(), 770, 196.0f + index * 20.0f, 12);
-    text("Needs practice", 760, 272, 11, alpha(RAYWHITE, 0.6f));
-    if (report.areasNeedingImprovement.empty()) text("None identified", 770, 294, 12, alpha(RAYWHITE, 0.7f));
-    for (std::size_t index = 0; index < report.areasNeedingImprovement.size() && index < 3; ++index) text(("• " + report.areasNeedingImprovement[index]).c_str(), 770, 294.0f + index * 20.0f, 12);
-    text("RECOMMENDED NEXT", 760, 370, 11, {255, 205, 105, 255});
-    text(report.recommendation.available ? report.recommendation.title.c_str() : "None", 760, 394, 14, {150, 225, 255, 255});
-    if (report.recommendation.available) DrawTextEx(GetFontDefault(), report.recommendation.reason.c_str(), {760, 420}, 11, 1, alpha(RAYWHITE, 0.72f));
-    text("A / D browse lessons   ENTER start   B observe   Y evaluate   N next   ESC return", 38, GetScreenHeight() - 34, 12, alpha(RAYWHITE, 0.65f));
+    text("Learner report", right.x + 20, right.y + 18, 12, t.accent);
+    text(report.hasAverageScore ? ("Avg score  " + format(report.averageScore, 1)).c_str() : "Avg score  —",
+         right.x + 20, right.y + 48, 14, t.text);
+    text("Strongest", right.x + 20, right.y + 90, 12, t.textDim);
+    if (report.strongestAreas.empty()) text("None yet", right.x + 20, right.y + 114, 13, t.textMuted);
+    for (std::size_t i = 0; i < report.strongestAreas.size() && i < 3; ++i)
+        text(("• " + report.strongestAreas[i]).c_str(), right.x + 20, right.y + 114.0f + i * 22.0f, 13, t.text);
+    text("Practice next", right.x + 20, right.y + 200, 12, t.textDim);
+    if (report.areasNeedingImprovement.empty()) text("None identified", right.x + 20, right.y + 224, 13, t.textMuted);
+    for (std::size_t i = 0; i < report.areasNeedingImprovement.size() && i < 3; ++i)
+        text(("• " + report.areasNeedingImprovement[i]).c_str(), right.x + 20, right.y + 224.0f + i * 22.0f, 13, t.text);
+    text("Recommended", right.x + 20, right.y + 320, 12, t.accent);
+    text(report.recommendation.available ? report.recommendation.title.c_str() : "None",
+         right.x + 20, right.y + 348, 15, t.accentStrong);
+
+    text("A / D browse   Enter start   B observe   Y evaluate   N next   Esc back",
+         ui::pagePad(), static_cast<float>(GetScreenHeight()) - 28.0f, 13, t.textDim);
+}
+
+void HUD::learningLabScreenPanel(const Simulation& simulation) const {
+    const auto& t = theme();
+    pageChrome(simulation, "Learning Lab", "Ghana curriculum activities on the shared simulation engine");
+
+    if (!simulation.curriculumReady) {
+        const Rectangle box = {ui::pagePad(), ui::contentTop() + 70.0f, 900.0f, 140.0f};
+        ui::drawPanel(box);
+        text("Curriculum pack failed to load", box.x + 24, box.y + 36, 20, t.warn);
+        DrawTextEx(GetFontDefault(), simulation.curriculumLoadError.c_str(),
+                   {box.x + 24, box.y + 74}, 14, 1, t.textMuted);
+        return;
+    }
+
+    const std::string gradeKey = std::string("grade.") + gradeIdString(simulation.learnerGrade);
+    const std::string gradeLabel = simulation.curriculumI18n.translate(gradeKey, gradeIdString(simulation.learnerGrade));
+    text((gradeLabel + "  ·  " + presentationLayerName(simulation.learnerPresentationLayer()) +
+          "  ·  " + simulation.curriculumCatalog.manifest.curriculumVersion).c_str(),
+         ui::pagePad(), ui::contentTop() + 58.0f, 14, t.textMuted);
+
+    const auto activities = simulation.activitiesForLearnerGrade();
+    const Rectangle left = {ui::pagePad(), ui::contentTop() + 90.0f, 360.0f, 520.0f};
+    const Rectangle right = {ui::pagePad() + 380.0f, ui::contentTop() + 90.0f, 760.0f, 520.0f};
+    ui::drawPanel(left);
+    ui::drawPanel(right);
+
+    text("Activities", left.x + 20, left.y + 18, 12, t.accent);
+    if (activities.empty()) text("No activities for this grade.", left.x + 20, left.y + 54, 14, t.textMuted);
+    const int visible = std::min(static_cast<int>(activities.size()), 14);
+    for (int index = 0; index < visible; ++index) {
+        const CurriculumActivity* activity = activities[static_cast<std::size_t>(index)];
+        const bool selected = index == simulation.curriculumActivityIndex;
+        const float y = left.y + 52.0f + index * 30.0f;
+        if (selected) DrawRectangleRounded({left.x + 12, y - 5, 336, 28}, 0.2f, 8, withAlpha(t.accent, 0.18f));
+        const std::string title = simulation.curriculumI18n.translate(activity->titleKey, activity->id);
+        text(ui::shorten(title, 34).c_str(), left.x + 22, y, 14, selected ? t.text : t.textMuted);
+    }
+
+    const CurriculumActivity* activity = simulation.selectedCurriculumActivity();
+    if (!activity) {
+        text("Select a grade activity to begin.", right.x + 24, right.y + 28, 16, t.textMuted);
+        return;
+    }
+
+    const std::string title = simulation.curriculumI18n.translate(activity->titleKey, activity->id);
+    text(title.c_str(), right.x + 24, right.y + 22, 22, t.text);
+    text((std::string(curriculumAlignmentName(activity->alignment)) + "  ·  " + activity->curriculumReference).c_str(),
+         right.x + 24, right.y + 52, 13,
+         activity->alignment == CurriculumAlignment::Official ? t.success : t.warn);
+    text((activity->subject + " / " + activity->strand + " / " + activity->subStrand).c_str(),
+         right.x + 24, right.y + 74, 13, t.textMuted);
+    DrawTextEx(GetFontDefault(), activity->learningObjective.c_str(),
+               {right.x + 24, right.y + 104}, 14, 1, t.text);
+
+    const LearningLabState& lab = simulation.learningLabSession.state();
+    text(("Session  " + std::string(LearningLabSession::stepName(lab.step))).c_str(),
+         right.x + 24, right.y + 170, 12, t.accent);
+
+    if (lab.step == LearningLabStep::Selecting) {
+        text("Press Enter to start the inquiry sequence.", right.x + 24, right.y + 198, 14, t.textMuted);
+        DrawTextEx(GetFontDefault(),
+                   simulation.curriculumI18n.translate(activity->instructionsKey, activity->instructionsKey).c_str(),
+                   {right.x + 24, right.y + 228}, 14, 1, t.text);
+    } else if (const CurriculumActivity* active = simulation.learningLabSession.activity()) {
+        if (lab.stepIndex >= 0 && lab.stepIndex < static_cast<int>(active->steps.size())) {
+            const ActivityStep& step = active->steps[static_cast<std::size_t>(lab.stepIndex)];
+            text(simulation.curriculumI18n.translate(step.titleKey, LearningLabSession::stepName(lab.step)).c_str(),
+                 right.x + 24, right.y + 198, 16, t.text);
+            if (!step.bodyKey.empty()) {
+                DrawTextEx(GetFontDefault(),
+                           simulation.curriculumI18n.translate(step.bodyKey, step.bodyKey).c_str(),
+                           {right.x + 24, right.y + 228}, 14, 1, t.textMuted);
+            }
+        }
+
+        if (lab.step == LearningLabStep::Assess) {
+            const CurriculumQuestion* question = simulation.selectedCurriculumQuestion();
+            if (question) {
+                DrawTextEx(GetFontDefault(),
+                           simulation.curriculumI18n.translate(question->questionKey, question->id).c_str(),
+                           {right.x + 24, right.y + 280}, 14, 1, t.text);
+                for (std::size_t index = 0; index < question->options.size() && index < 6; ++index) {
+                    const QuestionOption& option = question->options[index];
+                    const bool chosen = std::find(simulation.curriculumAnswerSelection.begin(),
+                                                  simulation.curriculumAnswerSelection.end(),
+                                                  option.id) != simulation.curriculumAnswerSelection.end();
+                    const float y = right.y + 316.0f + static_cast<float>(index) * 24.0f;
+                    text((std::to_string(index + 1) + "  " + (chosen ? "● " : "○ ") +
+                          simulation.curriculumI18n.translate(option.labelKey, option.id)).c_str(),
+                         right.x + 24, y, 14, chosen ? t.accentStrong : t.textMuted);
+                }
+            }
+        }
+
+        if ((lab.step == LearningLabStep::Feedback || lab.step == LearningLabStep::Complete) &&
+            simulation.lastCurriculumAssessment) {
+            const AssessmentResult& result = *simulation.lastCurriculumAssessment;
+            text((std::string(result.correct ? "Passed" : "Try again") + "  " + format(result.score, 0) + "/100").c_str(),
+                 right.x + 24, right.y + 280, 18, result.correct ? t.success : t.warn);
+            text(simulation.curriculumI18n.translate(result.feedbackKey, result.feedbackKey).c_str(),
+                 right.x + 24, right.y + 312, 14, t.text);
+            if (simulation.lastCurriculumMisconception) {
+                text(simulation.curriculumI18n.translate(simulation.lastCurriculumMisconception->responseKey,
+                                                         simulation.lastCurriculumMisconception->responseKey).c_str(),
+                     right.x + 24, right.y + 348, 14, t.warn);
+            }
+        }
+    }
+
+    text("[ ] grade   A/D activity   Enter start   N next   1–6 answers   C submit   Esc back",
+         ui::pagePad(), static_cast<float>(GetScreenHeight()) - 28.0f, 13, t.textDim);
 }
 
 void HUD::scenarioScreen(const Simulation& simulation) const {
-    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), {5, 12, 24, 255});
-    top(simulation);
-    navigation(simulation);
-    text("SCENARIO BROWSER", 40, 94, 28, {110, 220, 255, 255});
-    text("Choose a data-driven starting system for the simulation.", 42, 124, 14, alpha(RAYWHITE, 0.68f));
+    const auto& t = theme();
+    pageChrome(simulation, "Scenes", "Choose a starting system for the laboratory");
+
     const struct Scenario { const char* id; const char* title; const char* description; const char* bodies; } scenarios[] = {
-        {"default_solar_system", "Default Solar System", "The Sun, planets, and BAGSOLAR-1.", "10 bodies"},
-        {"earth_orbit", "Earth Orbit", "A focused two-body Sun/Earth study.", "2 bodies"},
-        {"empty_space", "Empty Space", "An empty scene for custom systems.", "0 bodies"},
+        {"default_solar_system", "Solar System", "Sun, planets, Moon, and BAGSOLAR-1.", "11 bodies"},
+        {"earth_orbit", "Earth Orbit", "Focused Sun–Earth–Moon study.", "3 bodies"},
+        {"empty_space", "Empty Space", "Blank scene for custom systems.", "0 bodies"},
     };
+
     for (int index = 0; index < 3; ++index) {
-        const float y = 180.0f + index * 96.0f;
-        const bool selectedScenario = index == simulation.scenarioBrowserSelection;
-        if (selectedScenario) DrawRectangleRounded({40, y - 12, 650, 76}, 0.08f, 8, {28, 70, 98, 255});
-        text((std::string(selectedScenario ? "▸ " : "  ") + scenarios[index].title).c_str(), 58, y, 19,
-             selectedScenario ? RAYWHITE : alpha(RAYWHITE, 0.72f));
-        text(scenarios[index].description, 82, y + 27, 13, alpha(RAYWHITE, 0.72f));
-        text(scenarios[index].bodies, 560, y + 27, 12, {150, 225, 255, 255});
+        const float y = ui::contentTop() + 80.0f + index * 110.0f;
+        const Rectangle card = {ui::pagePad(), y, 720.0f, 92.0f};
+        const bool selected = index == simulation.scenarioBrowserSelection;
+        ui::drawPanel(card, selected);
+        if (selected) DrawRectangleRoundedLines(card, 0.08f, 16, t.accent);
+        text(scenarios[index].title, card.x + 24, card.y + 22, 22, selected ? t.text : t.textMuted);
+        text(scenarios[index].description, card.x + 24, card.y + 54, 14, t.textMuted);
+        text(scenarios[index].bodies, card.x + 560, card.y + 36, 14, t.accentStrong);
     }
-    panel(760, 160, 420, 220);
-    text("CURRENT SCENARIO", 782, 184, 11, {255, 205, 105, 255});
-    text(simulation.scenarioMetadata.name.c_str(), 782, 211, 21, {150, 225, 255, 255});
-    DrawTextEx(GetFontDefault(), simulation.scenarioMetadata.description.c_str(), {782, 246}, 14, 2, alpha(RAYWHITE, 0.78f));
-    line("Epoch", simulation.scenarioMetadata.epoch.c_str(), 782, 300);
-    line("Frame", simulation.scenarioMetadata.referenceFrame.c_str(), 782, 322);
-    text("UP/DOWN select   ENTER load   ESC return", 42, GetScreenHeight() - 34, 13, alpha(RAYWHITE, 0.68f));
+
+    const Rectangle side = {ui::pagePad() + 760.0f, ui::contentTop() + 80.0f, 380.0f, 320.0f};
+    ui::drawPanel(side);
+    text("Current", side.x + 22, side.y + 22, 12, t.accent);
+    text(simulation.scenarioMetadata.name.c_str(), side.x + 22, side.y + 52, 22, t.text);
+    DrawTextEx(GetFontDefault(), simulation.scenarioMetadata.description.c_str(),
+               {side.x + 22, side.y + 92}, 14, 1, t.textMuted);
+    ui::drawLabelValue("Epoch", simulation.scenarioMetadata.epoch.c_str(), side.x + 22, side.y + 170);
+    ui::drawLabelValue("Frame", simulation.scenarioMetadata.referenceFrame.c_str(), side.x + 22, side.y + 196);
+
+    text("↑↓ select   Enter load   Esc back", ui::pagePad(), static_cast<float>(GetScreenHeight()) - 28.0f, 13, t.textDim);
 }
 
 void HUD::telemetryScreen(const Simulation& simulation) const {
-    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), {5, 12, 24, 255});
-    top(simulation);
-    navigation(simulation);
-    text("TELEMETRY", 40, 94, 28, {110, 220, 255, 255});
-    text(simulation.telemetryEnabled() ? "LIVE SESSION" : "NO ACTIVE SESSION", 42, 124, 13,
-         simulation.telemetryEnabled() ? Color{80, 235, 150, 255} : ORANGE);
+    const auto& t = theme();
+    pageChrome(simulation, "Telemetry", "Deterministic sampling of scientific state");
+
+    const Rectangle main = {ui::pagePad(), ui::contentTop() + 70.0f, 760.0f, 500.0f};
+    const Rectangle side = {ui::pagePad() + 790.0f, ui::contentTop() + 70.0f, 350.0f, 500.0f};
+    ui::drawPanel(main);
+    ui::drawPanel(side);
+
+    text(simulation.telemetryEnabled() ? "Live session" : "No active session",
+         main.x + 24, main.y + 24, 16, simulation.telemetryEnabled() ? t.success : t.warn);
+
     if (simulation.telemetry.samples.empty()) {
-        panel(40, 170, 660, 160);
-        text("No telemetry samples available yet.", 64, 214, 19, RAYWHITE);
-        text("Press K to start a deterministic 60-second sampling session.", 64, 250, 14, alpha(RAYWHITE, 0.72f));
-        text("Select a body in Simulation first to record reference-relative values.", 64, 278, 13, alpha(RAYWHITE, 0.58f));
+        text("No samples yet.", main.x + 24, main.y + 80, 20, t.text);
+        text("Press K to start a 60 s session. Select a body first for relative values.",
+             main.x + 24, main.y + 118, 14, t.textMuted);
     } else {
         const TelemetrySample& sample = simulation.telemetry.samples.back();
-        panel(40, 160, 660, 390);
-        text("LATEST SAMPLE", 64, 188, 11, {255, 205, 105, 255});
-        text(sample.bodyId.c_str(), 64, 216, 23, {150, 225, 255, 255});
-        line("Time", (format(sample.simulationTimeSeconds, 1) + " s").c_str(), 64, 254);
-        line("Position", (format(sample.positionM.x / PhysicsEngine::AU, 5) + ", " +
-            format(sample.positionM.y / PhysicsEngine::AU, 5) + ", " + format(sample.positionM.z / PhysicsEngine::AU, 5) + " AU").c_str(), 64, 278);
-        line("Velocity", (format(length(sample.velocityMps) / 1000.0, 3) + " km/s").c_str(), 64, 302);
-        line("Acceleration", (scientific(length(sample.accelerationMps2)) + " m/s²").c_str(), 64, 326);
-        line("Energy", (scientific(sample.specificEnergyJPerKg) + " J/kg").c_str(), 64, 350);
-        line("Angular momentum", scientific(sample.angularMomentumMagnitudeM2PerS).c_str(), 64, 374);
-        line("Orbital e", format(sample.eccentricity, 5).c_str(), 64, 398);
-        line("Apoapsis", distance(sample.apoapsisM).c_str(), 64, 422);
-        line("Method", integratorName(sample.integrator), 64, 446);
-        line("Status", telemetryStatusName(sample.status), 64, 470);
+        text(sample.bodyId.c_str(), main.x + 24, main.y + 70, 24, t.accentStrong);
+        ui::drawLabelValue("Time", (format(sample.simulationTimeSeconds, 1) + " s").c_str(), main.x + 24, main.y + 120);
+        ui::drawLabelValue("Velocity", (format(length(sample.velocityMps) / 1000.0, 3) + " km/s").c_str(), main.x + 24, main.y + 146);
+        ui::drawLabelValue("Acceleration", (scientific(length(sample.accelerationMps2)) + " m/s²").c_str(), main.x + 24, main.y + 172);
+        ui::drawLabelValue("Energy", (scientific(sample.specificEnergyJPerKg) + " J/kg").c_str(), main.x + 24, main.y + 198);
+        ui::drawLabelValue("Ang. mom.", scientific(sample.angularMomentumMagnitudeM2PerS).c_str(), main.x + 24, main.y + 224);
+        ui::drawLabelValue("Eccentricity", format(sample.eccentricity, 5).c_str(), main.x + 24, main.y + 250);
+        ui::drawLabelValue("Apoapsis", distance(sample.apoapsisM).c_str(), main.x + 24, main.y + 276);
+        ui::drawLabelValue("Method", integratorName(sample.integrator), main.x + 24, main.y + 302);
+        ui::drawLabelValue("Status", telemetryStatusName(sample.status), main.x + 24, main.y + 328);
     }
-    panel(760, 160, 420, 250);
-    text("SESSION", 782, 188, 11, {255, 205, 105, 255});
-    line("Scenario", simulation.telemetry.metadata.scenarioName.c_str(), 782, 218);
-    line("Samples", std::to_string(simulation.telemetry.samples.size()).c_str(), 782, 242);
-    line("Interval", (format(simulation.telemetry.metadata.samplingIntervalSeconds, 1) + " s").c_str(), 782, 266);
-    line("Frame", simulation.telemetry.metadata.referenceFrame.c_str(), 782, 290);
-    line("Integrator", simulation.telemetry.metadata.integrator.c_str(), 782, 314);
-    text("K start/stop   J export JSON   C export CSV   ESC return", 42, GetScreenHeight() - 34, 13, alpha(RAYWHITE, 0.68f));
+
+    text("Session", side.x + 22, side.y + 22, 12, t.accent);
+    ui::drawLabelValue("Scenario", simulation.telemetry.metadata.scenarioName.c_str(), side.x + 22, side.y + 60);
+    ui::drawLabelValue("Samples", std::to_string(simulation.telemetry.samples.size()).c_str(), side.x + 22, side.y + 86);
+    ui::drawLabelValue("Interval", (format(simulation.telemetry.metadata.samplingIntervalSeconds, 1) + " s").c_str(),
+                       side.x + 22, side.y + 112);
+    ui::drawLabelValue("Frame", simulation.telemetry.metadata.referenceFrame.c_str(), side.x + 22, side.y + 138);
+    ui::drawLabelValue("Integrator", simulation.telemetry.metadata.integrator.c_str(), side.x + 22, side.y + 164);
+
+    text("K start/stop   J JSON   C CSV   Esc back",
+         ui::pagePad(), static_cast<float>(GetScreenHeight()) - 28.0f, 13, t.textDim);
 }
 
 void HUD::missionScreen(const Simulation& simulation) const {
     (void)simulation;
-    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), {5, 12, 24, 255});
-    top(simulation);
-    navigation(simulation);
-    text("MISSION TOOLS", 40, 94, 28, {110, 220, 255, 255});
-    text("Mission analysis is available through the raylib-free mission tools API.", 42, 124, 14, alpha(RAYWHITE, 0.68f));
-    panel(40, 170, 720, 300);
-    text("AVAILABLE CAPABILITIES", 64, 198, 11, {255, 205, 105, 255});
-    text("• Maneuver nodes and vector delta-v", 70, 236, 17, RAYWHITE);
-    text("• Hohmann transfer analysis", 70, 270, 17, RAYWHITE);
-    text("• Spacecraft mass and propellant accounting", 70, 304, 17, RAYWHITE);
-    text("• Gravity-assist turn-angle analysis", 70, 338, 17, RAYWHITE);
-    text("• Trajectory prediction and mission metrics", 70, 372, 17, RAYWHITE);
-    text("No mission editor is exposed here yet; nothing is presented as a completed editor.", 70, 422, 13, alpha(ORANGE, 0.85f));
-    panel(820, 170, 360, 180);
-    text("NEXT STEP", 842, 198, 11, {255, 205, 105, 255});
-    DrawTextEx(GetFontDefault(), "Use the mission and spacecraft APIs\nfor deterministic analysis. Return to\nSimulation for visual context.", {842, 230}, 15, 2, alpha(RAYWHITE, 0.78f));
-    text("ESC return", 42, GetScreenHeight() - 34, 13, alpha(RAYWHITE, 0.68f));
+    const auto& t = theme();
+    pageChrome(simulation, "Mission Tools", "Analytical APIs for maneuvers and trajectory studies");
+
+    const Rectangle main = {ui::pagePad(), ui::contentTop() + 70.0f, 820.0f, 420.0f};
+    const Rectangle side = {ui::pagePad() + 850.0f, ui::contentTop() + 70.0f, 290.0f, 420.0f};
+    ui::drawPanel(main);
+    ui::drawPanel(side);
+
+    text("Available capabilities", main.x + 24, main.y + 24, 12, t.accent);
+    const char* items[] = {
+        "Maneuver nodes and vector delta-v",
+        "Hohmann transfer analysis",
+        "Spacecraft mass and propellant accounting",
+        "Gravity-assist turn-angle analysis",
+        "Trajectory prediction and mission metrics",
+    };
+    for (int i = 0; i < 5; ++i) text(("•  " + std::string(items[i])).c_str(), main.x + 28, main.y + 70.0f + i * 36.0f, 16, t.text);
+    text("No full mission editor is exposed yet — this screen stays honest about the API surface.",
+         main.x + 24, main.y + 280, 14, t.warn);
+
+    text("Next step", side.x + 20, side.y + 24, 12, t.accent);
+    DrawTextEx(GetFontDefault(),
+               "Use the mission and spacecraft APIs for deterministic analysis. Return to Sim for visual context.",
+               {side.x + 20, side.y + 60}, 14, 1, t.textMuted);
+
+    text("Esc back", ui::pagePad(), static_cast<float>(GetScreenHeight()) - 28.0f, 13, t.textDim);
 }
 
 void HUD::settingsScreen(const Simulation& simulation) const {
-    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), {5, 12, 24, 255});
-    top(simulation);
-    navigation(simulation);
-    text("SETTINGS", 40, 94, 28, {110, 220, 255, 255});
-    text("Only live simulation settings are shown here.", 42, 124, 14, alpha(RAYWHITE, 0.68f));
-    panel(40, 165, 560, 300);
-    text("SIMULATION", 64, 193, 11, {255, 205, 105, 255});
-    line("Integrator", simulation.settings.integrator.c_str(), 64, 230);
-    line("Timestep", (format(simulation.settings.timestepSeconds, 1) + " s").c_str(), 64, 256);
-    line("Speed", ("×" + format(simulation.speed, 1)).c_str(), 64, 282);
-    line("Trails", simulation.showTrails ? "ON" : "OFF", 64, 308);
-    line("Vectors", simulation.showVectors ? "ON" : "OFF", 64, 334);
-    line("Orbits", simulation.showOrbits ? "ON" : "OFF", 64, 360);
-    line("Grid", simulation.showGrid ? "ON" : "OFF", 64, 386);
-    text("I cycle integrator   +/- change timestep", 64, 430, 13, alpha(RAYWHITE, 0.68f));
-    panel(680, 165, 500, 240);
-    text("DISPLAY CONTROLS", 704, 193, 11, {255, 205, 105, 255});
-    text("V vectors   O orbits   T trails   G grid", 704, 232, 16, RAYWHITE);
-    text("F fullscreen   HOME reset camera", 704, 268, 16, RAYWHITE);
-    text("SPACE pause/resume   1–4 speed presets", 704, 304, 16, RAYWHITE);
-    text("ESC return", 42, GetScreenHeight() - 34, 13, alpha(RAYWHITE, 0.68f));
+    const auto& t = theme();
+    pageChrome(simulation, "Settings", "Live simulation and presentation controls");
+
+    const Rectangle left = {ui::pagePad(), ui::contentTop() + 70.0f, 560.0f, 460.0f};
+    const Rectangle right = {ui::pagePad() + 590.0f, ui::contentTop() + 70.0f, 550.0f, 460.0f};
+    ui::drawPanel(left);
+    ui::drawPanel(right);
+
+    text("Simulation", left.x + 24, left.y + 22, 12, t.accent);
+    ui::drawLabelValue("Integrator", simulation.settings.integrator.c_str(), left.x + 24, left.y + 60);
+    ui::drawLabelValue("Timestep", (format(simulation.settings.timestepSeconds, 1) + " s").c_str(), left.x + 24, left.y + 88);
+    ui::drawLabelValue("Speed", formatSpeed(simulation.speed).c_str(), left.x + 24, left.y + 116);
+    ui::drawLabelValue("Trails", simulation.showTrails ? "On" : "Off", left.x + 24, left.y + 144);
+    ui::drawLabelValue("Vectors", simulation.showVectors ? "On" : "Off", left.x + 24, left.y + 172);
+    ui::drawLabelValue("Orbits", simulation.showOrbits ? "On" : "Off", left.x + 24, left.y + 200);
+    ui::drawLabelValue("Grid", simulation.showGrid ? "On" : "Off", left.x + 24, left.y + 228);
+    ui::drawLabelValue("Highlight", simulation.settings.selectionHighlightEnabled ? "On" : "Off", left.x + 24, left.y + 256);
+    DrawRectangleLinesEx({left.x + 20, left.y + 246, 500, 30}, 1.0f, withAlpha(t.accent, 0.45f));
+    text("Click Highlight row or press H to toggle", left.x + 24, left.y + 300, 13, t.textMuted);
+    text(("Lab grade " + std::string(gradeIdString(simulation.learnerGrade)) + " · " +
+          presentationLayerName(simulation.learnerPresentationLayer())).c_str(),
+         left.x + 24, left.y + 330, 13, t.textMuted);
+    text("I integrator   ± timestep", left.x + 24, left.y + 370, 13, t.textDim);
+
+    text("Camera & display", right.x + 24, right.y + 22, 12, t.accent);
+    text("Left-drag   orbit", right.x + 24, right.y + 60, 15, t.text);
+    text("Right / Middle-drag   pan", right.x + 24, right.y + 90, 15, t.text);
+    text("Wheel   zoom   ·   Shift+Wheel faster", right.x + 24, right.y + 120, 15, t.text);
+    text("Click body   select   ·   Z zoom alone", right.x + 24, right.y + 150, 15, t.text);
+    text("Q back one step   ·   Home system view", right.x + 24, right.y + 180, 15, t.text);
+    text("Double-click   focus body under cursor", right.x + 24, right.y + 210, 15, t.text);
+    text("F fullscreen", right.x + 24, right.y + 240, 15, t.text);
+    text("V O T G   vectors / orbits / trails / grid", right.x + 24, right.y + 290, 14, t.textMuted);
+
+    text("Esc back", ui::pagePad(), static_cast<float>(GetScreenHeight()) - 28.0f, 13, t.textDim);
 }
 
 void HUD::helpScreen(const Simulation& simulation) const {
-    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), {5, 12, 24, 255});
-    top(simulation);
-    navigation(simulation);
-    text("HELP / CONTROLS", 40, 94, 28, {110, 220, 255, 255});
-    text("Every control below is implemented in the current application.", 42, 124, 14, alpha(RAYWHITE, 0.68f));
-    panel(40, 160, 520, 500);
-    panel(610, 160, 570, 500);
-    text("NAVIGATION", 64, 190, 11, {255, 205, 105, 255});
-    text("Tab cycle screens   H help   L education", 64, 222, 15, RAYWHITE);
-    text("F5 scenarios   F6 telemetry   F7 mission", 64, 250, 15, RAYWHITE);
-    text("F8 settings   Esc return to simulation", 64, 278, 15, RAYWHITE);
-    text("SIMULATION", 64, 328, 11, {255, 205, 105, 255});
-    text("Space pause   +/- time scale   R reset", 64, 360, 15, RAYWHITE);
-    text("V vectors   O orbits   T trails   G grid", 64, 388, 15, RAYWHITE);
-    text("F fullscreen   HOME reset camera   C focus", 64, 416, 15, RAYWHITE);
-    text("F1 solar   F2 Earth orbit   F3 empty space", 64, 444, 15, RAYWHITE);
-    text("Ctrl+S activates selection mode; arrows or initials select bodies.", 64, 486, 14, alpha(RAYWHITE, 0.72f));
-    text("EDUCATION", 634, 190, 11, {255, 205, 105, 255});
-    text("A/D lessons   E/Up/Down experiments", 634, 222, 15, RAYWHITE);
-    text("Z/X challenges   Enter start   B observe", 634, 250, 15, RAYWHITE);
-    text("Y evaluate   C submit challenge   Q retry", 634, 278, 15, RAYWHITE);
-    text("N next activity   [/] adjust answer   I method", 634, 306, 15, RAYWHITE);
-    text("TELEMETRY", 634, 356, 11, {255, 205, 105, 255});
-    text("K start/stop   J JSON export   C CSV export", 634, 388, 15, RAYWHITE);
-    text("PREDICTION VS REFERENCE", 634, 438, 11, {255, 205, 105, 255});
-    text("Provider, epoch, frame, origin, integrator, timestep", 634, 470, 14, RAYWHITE);
-    text("Position error • velocity error • status", 634, 498, 14, alpha(RAYWHITE, 0.78f));
-    text("SCENARIOS / SETTINGS", 634, 542, 11, {255, 205, 105, 255});
-    text("Up/Down choose scenario; Enter loads it.", 634, 574, 14, RAYWHITE);
-    text("I changes integrator; +/- changes timestep.", 634, 602, 14, RAYWHITE);
-    text("ESC return", 42, GetScreenHeight() - 34, 13, alpha(RAYWHITE, 0.68f));
+    const auto& t = theme();
+    pageChrome(simulation, "Help", "Controls that exist in the current build");
+
+    const Rectangle left = {ui::pagePad(), ui::contentTop() + 70.0f, 560.0f, 520.0f};
+    const Rectangle right = {ui::pagePad() + 590.0f, ui::contentTop() + 70.0f, 550.0f, 520.0f};
+    ui::drawPanel(left);
+    ui::drawPanel(right);
+
+    text("Navigate", left.x + 24, left.y + 22, 12, t.accent);
+    text("Tab cycle screens", left.x + 24, left.y + 56, 15, t.text);
+    text("L Learn   F9 Lab   F5 Scenes", left.x + 24, left.y + 86, 15, t.text);
+    text("F6 Telemetry   F7 Mission   F8 Settings", left.x + 24, left.y + 116, 15, t.text);
+    text("F1–F3 load scenes   H Help   Esc → Sim", left.x + 24, left.y + 146, 15, t.text);
+
+    text("Simulate", left.x + 24, left.y + 200, 12, t.accent);
+    text("Space pause   ± speed   R reset", left.x + 24, left.y + 234, 15, t.text);
+    text("V O T G overlays   P pulse probe", left.x + 24, left.y + 264, 15, t.text);
+    text("1/2/3/4/5/6 speed ×1 … ×100000", left.x + 24, left.y + 294, 14, t.text);
+    text("Click select · Z zoom · Q back one step", left.x + 24, left.y + 324, 14, t.textMuted);
+
+    text("Camera", left.x + 24, left.y + 370, 12, t.accent);
+    text("Drag orbit · Right/Middle pan · Wheel zoom", left.x + 24, left.y + 404, 14, t.text);
+    text("Z zoom · Q back · Home reset · Click select", left.x + 24, left.y + 434, 14, t.text);
+
+    text("Learn / Lab", right.x + 24, right.y + 22, 12, t.accent);
+    text("A/D lessons   Enter start   B observe", right.x + 24, right.y + 56, 15, t.text);
+    text("Y evaluate   N next   Q retry", right.x + 24, right.y + 86, 15, t.text);
+    text("Lab: [ ] grade · 1–6 answers · C submit", right.x + 24, right.y + 116, 15, t.text);
+
+    text("Telemetry", right.x + 24, right.y + 180, 12, t.accent);
+    text("K start/stop   J JSON   C CSV", right.x + 24, right.y + 214, 15, t.text);
+
+    text("Tips", right.x + 24, right.y + 280, 12, t.accent);
+    text("Keep Sim uncluttered — open Learn or Lab for teaching flows.", right.x + 24, right.y + 314, 14, t.textMuted);
+    text("Selection highlight can be toggled in Settings.", right.x + 24, right.y + 344, 14, t.textMuted);
+
+    text("Esc back", ui::pagePad(), static_cast<float>(GetScreenHeight()) - 28.0f, 13, t.textDim);
 }
 
 } // namespace bag

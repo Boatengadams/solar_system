@@ -2,11 +2,41 @@
   "id": "earth",
   "name": "Earth",
   "type": "Planet",
-  "mass_kg": 5.9722e24,
-  "radius_m": 6.371e6,
-  "initial_position_m": [147099586259.31, 0.0, 0.0],
-  "initial_velocity_mps": [0.0, 30286.777677663151, 0.0],
+  "mass_kg": 5.9722e+24,
+  "radius_m": 6371000.0,
+  "initial_position_m": [
+    147099586259.31,
+    0.0,
+    0.0
+  ],
+  "initial_velocity_mps": [
+    0.0,
+    30286.77767766315,
+    0.0
+  ],
   "parent_id": "sun",
-  "visual": {"color_rgba": [55, 115, 205, 255], "accent_rgba": [110, 210, 255, 255], "display_radius_px": 6.0},
-  "orbital": {"semi_major_axis_m": 149597870700.0, "eccentricity": 0.0167, "orbital_period_s": 31557600.0}
+  "visual": {
+    "color_rgba": [
+      55,
+      115,
+      205,
+      255
+    ],
+    "accent_rgba": [
+      110,
+      210,
+      255,
+      255
+    ],
+    "display_radius_px": 6.0
+  },
+  "orbital": {
+    "semi_major_axis_m": 149597870700.0,
+    "eccentricity": 0.0167,
+    "orbital_period_s": 31557600.0
+  },
+  "rotation": {
+    "sidereal_period_s": 86164.0905,
+    "axial_tilt_deg": 23.44
+  }
 }

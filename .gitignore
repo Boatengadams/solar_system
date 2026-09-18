@@ -1,13 +1,24 @@
-# Local build trees and generated binaries
+# Local build trees
 /build/
-/build-spice/
-/build-release/
-/build-warnings/
+/build-*/
+/out/
+/dist-temp/
+/CMakeFiles/
+/CMakeCache.txt
+/Testing/
+/coverage/
+compile_commands.json
+CMakeUserPresets.json
+
+# Generated binaries at repository root
+/BAGS_LAB
 /planets
 /bagsolar_validation
+/bagsolar_ephemeris
+/bagsolar_education_tests
 /bagsolar_*
 
-# Compiler and IDE-generated files
+# Compiler artifacts
 *.o
 *.obj
 *.a
@@ -20,37 +31,35 @@
 *.gcda
 *.gcno
 *.profraw
-compile_commands.json
-CMakeUserPresets.json
 
-# Generated packages, logs, and local test output
+# Packages and logs
 *.tar.gz
+*.zip
 *.log
 
-# Local text and document files
-*.txt
-*.doc
-*.docx
-*.rtf
-*.odt
-*.md
-!/CMakeLists.txt
-
-# Project documentation is kept locally, but is not part of the app push
-/BAGSOLAR_codex_docs/
-!/README.md
-/CHANGELOG.md
-/third_party/README.md
-
+# Local telemetry dumps
 telemetry.csv
 telemetry.json
 
-# Local design references are not application screenshots or runtime assets
-/BAGSOLAR_codex_docs/design.png
-!/img1.png
-!/img2.png
+# IDE / OS junk
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*~
 
-# External SPICE resources and machine-local manifests
+# Secrets — never commit
+.env
+.env.*
+.netrc
+.git-credentials
+*.pem
+*.key
+*.token
+credentials*
+secrets*
+
+# External SPICE resources (optional, machine-local)
 *.bsp
 *.spk
 *.tls
@@ -60,3 +69,33 @@ telemetry.json
 *.bc
 *.bpc
 *spice-manifest*.json
+
+# Generated portable runtime packages stay on the USB filesystem but are not
+# committed (~hundreds of MB of binaries/libs/assets copies). Keep README stubs.
+/dist/**
+!/dist/README.md
+!/dist/*/
+!/dist/*/README.md
+
+# Keep documentation and source assets trackable (never ignore these trees).
+!/README.md
+!/LICENSE
+!/CHANGELOG.md
+!/CONTRIBUTING.md
+!/PROJECT.md
+!/ARCHITECTURE.md
+!/ROADMAP.md
+!/docs/
+!/docs/**
+!/assets/
+!/assets/**
+!/data/
+!/data/**
+!/launcher/
+!/launcher/**
+!/platform/
+!/platform/**
+!/cmake/
+!/cmake/**
+!/tools/
+!/tools/**

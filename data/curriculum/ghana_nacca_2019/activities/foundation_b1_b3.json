@@ -1,0 +1,147 @@
+{
+  "activities": [
+    {
+      "id": "b1_ss_001",
+      "grade": "B1",
+      "subject": "Science",
+      "strand": "Cycles",
+      "subStrand": "Earth Science",
+      "contentStandard": "B1.2.1.1",
+      "learningIndicator": "B1.2.1.1.1",
+      "curriculumReference": "B1.2.1.1.1",
+      "alignment": "official",
+      "learningObjective": "Identify objects that can be seen in the sky and distinguish them from everyday objects on Earth.",
+      "titleKey": "activity.b1_ss_001.title",
+      "instructionsKey": "activity.b1_ss_001.instructions",
+      "type": "identify",
+      "difficulty": "introductory",
+      "presentationLayer": "foundation",
+      "simulation": "sky_objects",
+      "estimatedMinutes": 10,
+      "learningObjectiveIds": ["identify_sky_objects"],
+      "assessmentIds": ["q_b1_ss_001"],
+      "misconceptionIds": [],
+      "source": {
+        "organization": "NaCCA / Ministry of Education",
+        "document": "Science Curriculum for Primary Schools (Basic 1–3)",
+        "version": "September 2019",
+        "reference": "B1.2.1.1.1 — cyclic appearance of the Sun, Moon and stars",
+        "verifiedAt": "2026-09-16"
+      },
+      "steps": [
+        {"type": "instruction", "titleKey": "activity.b1_ss_001.step.instruction", "bodyKey": "activity.b1_ss_001.step.instruction.body"},
+        {"type": "explore", "titleKey": "activity.b1_ss_001.step.explore", "simulationAction": "show_sky_vs_ground", "payload": ["sun", "moon", "stars", "tree", "house", "car"]},
+        {"type": "question", "titleKey": "activity.b1_ss_001.step.question"},
+        {"type": "assessment"},
+        {"type": "feedback", "bodyKey": "activity.b1_ss_001.step.feedback"}
+      ]
+    },
+    {
+      "id": "b1_ss_002",
+      "grade": "B1",
+      "subject": "Science",
+      "strand": "Cycles",
+      "subStrand": "Earth Science",
+      "contentStandard": "B1.2.1.1",
+      "learningIndicator": "B1.2.1.1.1",
+      "curriculumReference": "B1.2.1.1.1",
+      "alignment": "official",
+      "learningObjective": "Observe that day and night depend on whether a place on Earth faces the Sun.",
+      "titleKey": "activity.b1_ss_002.title",
+      "instructionsKey": "activity.b1_ss_002.instructions",
+      "type": "explore",
+      "difficulty": "introductory",
+      "presentationLayer": "foundation",
+      "simulation": "day_night",
+      "estimatedMinutes": 12,
+      "learningObjectiveIds": ["day_night_cycle"],
+      "assessmentIds": ["q_b1_ss_002"],
+      "source": {
+        "organization": "NaCCA / Ministry of Education",
+        "document": "Science Curriculum for Primary Schools (Basic 1–3)",
+        "version": "September 2019",
+        "reference": "B1.2.1.1.1 — day and night recur cyclically",
+        "verifiedAt": "2026-09-16"
+      },
+      "steps": [
+        {"type": "instruction", "titleKey": "activity.b1_ss_002.step.instruction"},
+        {"type": "predict", "titleKey": "activity.b1_ss_002.step.predict", "bodyKey": "activity.b1_ss_002.step.predict.body"},
+        {"type": "experiment", "simulationAction": "rotate_earth_facing_sun"},
+        {"type": "observe", "titleKey": "activity.b1_ss_002.step.observe"},
+        {"type": "explain", "bodyKey": "activity.b1_ss_002.step.explain"},
+        {"type": "assessment"},
+        {"type": "feedback"}
+      ]
+    },
+    {
+      "id": "b2_ss_001",
+      "grade": "B2",
+      "subject": "Science",
+      "strand": "Systems",
+      "subStrand": "The Solar System",
+      "contentStandard": "B2.3.2.1",
+      "learningIndicator": "B2.3.2.1.1",
+      "curriculumReference": "B2.3.2.1.1",
+      "alignment": "official",
+      "learningObjective": "Find the Moon among different celestial objects and recognise the Sun as Earth's main source of light and warmth.",
+      "titleKey": "activity.b2_ss_001.title",
+      "instructionsKey": "activity.b2_ss_001.instructions",
+      "type": "identify",
+      "difficulty": "introductory",
+      "presentationLayer": "foundation",
+      "simulation": "find_moon",
+      "estimatedMinutes": 10,
+      "learningObjectiveIds": ["identify_moon"],
+      "assessmentIds": ["q_b2_ss_001"],
+      "source": {
+        "organization": "NaCCA / Ministry of Education",
+        "document": "Science Curriculum for Primary Schools (Basic 1–3)",
+        "version": "September 2019",
+        "reference": "B2.3.2.1.1 — identify the sun as the main source of light and warmth on earth",
+        "verifiedAt": "2026-09-16"
+      },
+      "steps": [
+        {"type": "instruction"},
+        {"type": "explore", "simulationAction": "present_celestial_choices", "payload": ["moon", "sun", "star", "earth"]},
+        {"type": "assessment"},
+        {"type": "feedback"}
+      ]
+    },
+    {
+      "id": "b3_ss_001",
+      "grade": "B3",
+      "subject": "Science",
+      "strand": "Forces and Energy",
+      "subStrand": "Sources and Forms of Energy",
+      "contentStandard": "B3.4.1.1",
+      "learningIndicator": "B3.4.1.1.1",
+      "curriculumReference": "B3.4.1.1.1",
+      "alignment": "official",
+      "learningObjective": "Classify familiar sky objects by whether they give light that helps us see, at an age-appropriate level.",
+      "titleKey": "activity.b3_ss_001.title",
+      "instructionsKey": "activity.b3_ss_001.instructions",
+      "type": "classify",
+      "difficulty": "introductory",
+      "presentationLayer": "foundation",
+      "simulation": "light_sources",
+      "estimatedMinutes": 12,
+      "learningObjectiveIds": ["light_or_no_light"],
+      "assessmentIds": ["q_b3_ss_001"],
+      "misconceptionIds": ["mc_moon_own_light"],
+      "source": {
+        "organization": "NaCCA / Ministry of Education",
+        "document": "Science Curriculum for Primary Schools (Basic 1–3)",
+        "version": "September 2019",
+        "reference": "B3.4.1.1.1 — know that light is a form of energy",
+        "verifiedAt": "2026-09-16"
+      },
+      "steps": [
+        {"type": "instruction"},
+        {"type": "explore", "simulationAction": "classify_light", "payload": ["sun", "moon", "earth", "stars"]},
+        {"type": "explain", "bodyKey": "activity.b3_ss_001.step.explain"},
+        {"type": "assessment"},
+        {"type": "feedback"}
+      ]
+    }
+  ]
+}

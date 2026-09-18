@@ -27,7 +27,8 @@ int main() {
         return 1;
     }
 
-    std::cout << "BAGSOLAR runtime data: " << resources.dataRoot.string() << '\n';
-    std::cout << "BAGSOLAR default scenario bodies: " << scenario.value->bodies.size() << '\n';
+    std::cout << "BAGS_LAB runtime data: " << resources.dataRoot.string() << '\n';
+    std::cout << "BAGS_LAB default scenario bodies: " << scenario.value->bodies.size() << '\n';
+    std::cout << "BAGS_LAB assets root: " << resources.assetsRoot().string() << '\n';
     return 0;
 }

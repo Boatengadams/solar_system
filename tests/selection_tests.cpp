@@ -1,6 +1,10 @@
+#ifdef NDEBUG
+#undef NDEBUG
+#endif
 #include <cassert>
 #include <vector>
 
+#include "rendering/RenderTransform.hpp"
 #include "rendering/Selection.hpp"
 
 int main() {
@@ -28,6 +32,10 @@ int main() {
 
     // Empty-space clicks have no candidate and therefore clear selection.
     assert(selectNearestBody({500.0f, 500.0f}, {}) == -1);
+    assert(selectionIndicatorVisible(true, 2, true));
+    assert(!selectionIndicatorVisible(false, 2, true));
+    assert(!selectionIndicatorVisible(true, -1, true));
+    assert(!selectionIndicatorVisible(true, 2, false));
     const std::vector<SelectionCandidate> overlap = {{4, {0.0f, 0.0f}, 10.0f}, {2, {0.0f, 0.0f}, 10.0f}};
     assert(selectNearestBody({0.0f, 0.0f}, overlap) == 2);
 
@@ -38,5 +46,24 @@ int main() {
     assert(cycleActiveBody(5, activeBodies, 1) == 0);
     assert(cycleActiveBody(0, activeBodies, -1) == 5);
     assert(cycleActiveBody(3, activeBodies, 1) == 0);
+
+    const RenderTransform transform{20.0f};
+    const Vector3 renderOrigin = transform.position({0.0, 0.0, 0.0});
+    const Vector3 renderPosition = transform.position({PhysicsEngine::AU, 2.0 * PhysicsEngine::AU, 3.0 * PhysicsEngine::AU});
+    assert(renderOrigin.x == 0.0f && renderOrigin.y == 0.0f && renderOrigin.z == 0.0f);
+    assert(renderPosition.x == 20.0f && renderPosition.y == 60.0f && renderPosition.z == 40.0f);
+
+    const RenderRay ray{{0.0, 0.0, 0.0}, {1.0, 0.0, 0.0}};
+    const std::vector<RaySphereCandidate> rayCandidates = {
+        {5, {10.0, 0.0, 0.0}, 2.0},
+        {2, {4.0, 0.0, 0.0}, 1.0},
+        {9, {0.0, 5.0, 0.0}, 1.0},
+    };
+    assert(selectNearestRaySphere(ray, rayCandidates) == 2);
+    assert(selectNearestRaySphere(ray, {{1, {0.0, 5.0, 0.0}, 1.0}}) == -1);
+    assert(selectNearestRaySphere({{0.0, 0.0, 0.0}, {1.0, 0.0, 0.0}},
+                                  {{1, {20.0, 0.0, 0.0}, 2.0}}) == 1);
+    assert(selectNearestRaySphere({{0.0, 0.0, 0.0}, {1.0, 0.0, 0.0}},
+                                  {{1, {30.0, 5.0, 0.0}, 2.0}}) == -1);
     return 0;
 }

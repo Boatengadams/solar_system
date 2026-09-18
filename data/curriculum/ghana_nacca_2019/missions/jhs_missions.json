@@ -1,0 +1,109 @@
+{
+  "missions": [
+    {
+      "id": "mission_001_inner_planets",
+      "grade": "JHS1",
+      "titleKey": "mission.001.title",
+      "objectiveKey": "mission.001.objective",
+      "instructionsKey": "mission.001.instructions",
+      "simulation": "solar_system",
+      "challengeKey": "mission.001.challenge",
+      "activityIds": ["jhs1_solar_inner_planets_001"],
+      "assessmentIds": ["q_jhs1_inner_planets"],
+      "difficulty": "intermediate",
+      "alignment": "official",
+      "curriculumReference": "B7.3.2.1.1",
+      "source": {
+        "organization": "NaCCA / Ministry of Education",
+        "document": "Science CCP Curriculum (Basic 7–10)",
+        "version": "February 2020",
+        "reference": "B7.3.2.1.1",
+        "verifiedAt": "2026-09-16"
+      }
+    },
+    {
+      "id": "mission_002_planet_order",
+      "grade": "JHS1",
+      "titleKey": "mission.002.title",
+      "objectiveKey": "mission.002.objective",
+      "instructionsKey": "mission.002.instructions",
+      "simulation": "solar_system_construction",
+      "challengeKey": "mission.002.challenge",
+      "activityIds": ["jhs1_solar_construct_001"],
+      "assessmentIds": ["q_jhs1_order"],
+      "difficulty": "intermediate",
+      "alignment": "official",
+      "curriculumReference": "B7.3.2.1.1",
+      "source": {
+        "organization": "NaCCA / Ministry of Education",
+        "document": "Science CCP Curriculum (Basic 7–10)",
+        "version": "February 2020",
+        "reference": "B7.3.2.1.1",
+        "verifiedAt": "2026-09-16"
+      }
+    },
+    {
+      "id": "mission_003_construct",
+      "grade": "JHS1",
+      "titleKey": "mission.003.title",
+      "objectiveKey": "mission.003.objective",
+      "instructionsKey": "mission.003.instructions",
+      "simulation": "solar_system_construction",
+      "challengeKey": "mission.003.challenge",
+      "activityIds": ["jhs1_solar_construct_001"],
+      "assessmentIds": ["q_jhs1_order"],
+      "difficulty": "intermediate",
+      "alignment": "official",
+      "curriculumReference": "B7.3.2.1.1",
+      "source": {
+        "organization": "NaCCA / Ministry of Education",
+        "document": "Science CCP Curriculum (Basic 7–10)",
+        "version": "February 2020",
+        "reference": "B7.3.2.1.1",
+        "verifiedAt": "2026-09-16"
+      }
+    },
+    {
+      "id": "mission_006_orbital_movement",
+      "grade": "JHS1",
+      "titleKey": "mission.006.title",
+      "objectiveKey": "mission.006.objective",
+      "instructionsKey": "mission.006.instructions",
+      "simulation": "orbit_lab",
+      "challengeKey": "mission.006.challenge",
+      "activityIds": ["jhs1_orbit_lab_001"],
+      "assessmentIds": ["q_jhs1_orbit"],
+      "difficulty": "intermediate",
+      "alignment": "official",
+      "curriculumReference": "B7.3.2.1.1",
+      "source": {
+        "organization": "NaCCA / Ministry of Education",
+        "document": "Science CCP Curriculum (Basic 7–10)",
+        "version": "February 2020",
+        "reference": "B7.3.2.1.1 — elliptical orbital paths",
+        "verifiedAt": "2026-09-16"
+      }
+    },
+    {
+      "id": "mission_008_satellite_applications",
+      "grade": "JHS1",
+      "titleKey": "mission.008.title",
+      "objectiveKey": "mission.008.objective",
+      "instructionsKey": "mission.008.instructions",
+      "simulation": "satellite_uses",
+      "challengeKey": "mission.008.challenge",
+      "activityIds": ["b6_ss_artificial_satellites"],
+      "assessmentIds": ["q_b6_satellite_uses"],
+      "difficulty": "introductory",
+      "alignment": "supplementary_enrichment",
+      "curriculumReference": "Supplementary enrichment",
+      "source": {
+        "organization": "BAGSOLAR Learning Lab",
+        "document": "Satellite applications bridge activity (formal B10 indicator exists)",
+        "version": "2026",
+        "reference": "Supplementary enrichment",
+        "verifiedAt": "2026-09-16"
+      }
+    }
+  ]
+}

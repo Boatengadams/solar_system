@@ -1,4 +1,10 @@
-name: BAGSOLAR CI
+# BAGS_LAB CI
+#
+# Current job: Linux x64 developer build/test/package smoke (system raylib).
+# Portable multi-OS matrix (windows-x64, macos-*, linux-arm64, static raylib 6.0)
+# is documented in docs/MULTIPLATFORM_BUILD_ARCHITECTURE.md §12 and is Phase 8.
+# Do not treat configure-only success as platform verification.
+name: BAGS_LAB CI
 
 on:
   push:

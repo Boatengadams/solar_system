@@ -1,21 +1,31 @@
 #include "ResourceRoot.hpp"
 
 #include <array>
+#include <cstdlib>
 #include <system_error>
 #include <utility>
+#include <vector>
 
 #if defined(_WIN32)
 #include <windows.h>
 #elif defined(__APPLE__)
 #include <mach-o/dyld.h>
-#include <vector>
 #elif defined(__linux__)
 #include <unistd.h>
 #include <limits.h>
 #endif
 
-#ifndef BAGSOLAR_INSTALL_DATA_SUBDIR
-#define BAGSOLAR_INSTALL_DATA_SUBDIR "share/bagsolar/data"
+// Install-layout fallbacks. Prefer bags_lab; keep bagsolar for older packages.
+#ifndef BAGS_LAB_INSTALL_DATA_SUBDIR
+#ifdef BAGSOLAR_INSTALL_DATA_SUBDIR
+#define BAGS_LAB_INSTALL_DATA_SUBDIR BAGSOLAR_INSTALL_DATA_SUBDIR
+#else
+#define BAGS_LAB_INSTALL_DATA_SUBDIR "share/bags_lab/data"
+#endif
+#endif
+
+#ifndef BAGS_LAB_LEGACY_INSTALL_DATA_SUBDIR
+#define BAGS_LAB_LEGACY_INSTALL_DATA_SUBDIR "share/bagsolar/data"
 #endif
 
 namespace bag {
@@ -51,6 +61,17 @@ std::filesystem::path absoluteNormalized(const std::filesystem::path& path) {
     return absolute.lexically_normal();
 }
 
+// If executable is .../Something.app/Contents/MacOS/<bin>, return Contents/.
+std::filesystem::path macosBundleContentsDirectory(const std::filesystem::path& executable) {
+    const auto macosDir = executable.parent_path();
+    if (macosDir.filename() != "MacOS") return {};
+    const auto contentsDir = macosDir.parent_path();
+    if (contentsDir.filename() != "Contents") return {};
+    const auto appDir = contentsDir.parent_path();
+    if (appDir.extension() != ".app") return {};
+    return contentsDir;
+}
+
 } // namespace
 
 bool ResourceRoot::isDataRoot(const std::filesystem::path& dataRoot, std::string& error) {
@@ -75,6 +96,26 @@ bool ResourceRoot::isDataRoot(const std::filesystem::path& dataRoot, std::string
 }
 
 ResourceRootResult ResourceRoot::resolve() {
+    // Portable USB launchers may run a temporary ELF copy from /tmp while the
+    // authoritative package (data/assets) remains on the USB. Prefer that root.
+    if (const char* overrideRoot = std::getenv("BAGS_LAB_RESOURCE_ROOT")) {
+        if (overrideRoot[0] != '\0') {
+            const auto root = absoluteNormalized(overrideRoot);
+            if (root.empty()) {
+                return {{}, "BAGS_LAB_RESOURCE_ROOT is set but could not be resolved"};
+            }
+            std::string error;
+            if (isDataRoot(root / "data", error)) {
+                return {root / "data", {}};
+            }
+            // Allow pointing directly at the data directory.
+            if (isDataRoot(root, error)) {
+                return {root, {}};
+            }
+            return {{}, "BAGS_LAB_RESOURCE_ROOT is set but invalid: " + error};
+        }
+    }
+
     const auto executablePath = currentExecutablePath();
     if (executablePath.empty()) {
         return {{}, "unable to determine the current executable path"};
@@ -90,11 +131,23 @@ ResourceRootResult ResourceRoot::resolve(const std::filesystem::path& executable
 
     const auto binDirectory = executable.parent_path();
     const auto prefixDirectory = binDirectory.parent_path();
-    const std::array<std::filesystem::path, 3> candidates = {
+    const auto bundleContents = macosBundleContentsDirectory(executable);
+
+    // Layouts (first match wins):
+    // 1) USB / portable: <package>/BAGS_LAB next to <package>/data
+    // 2) source build:   <repo>/build/BAGS_LAB with <repo>/data
+    // 3) macOS .app:     Contents/MacOS/BAGS_LAB → Contents/Resources/data
+    // 4) install prefix: <prefix>/bin/BAGS_LAB with <prefix>/share/bags_lab/data
+    // 5) legacy install: <prefix>/share/bagsolar/data
+    std::vector<std::filesystem::path> candidates = {
         binDirectory / "data",
         prefixDirectory / "data",
-        prefixDirectory / BAGSOLAR_INSTALL_DATA_SUBDIR,
     };
+    if (!bundleContents.empty()) {
+        candidates.push_back(bundleContents / "Resources" / "data");
+    }
+    candidates.push_back(prefixDirectory / BAGS_LAB_INSTALL_DATA_SUBDIR);
+    candidates.push_back(prefixDirectory / BAGS_LAB_LEGACY_INSTALL_DATA_SUBDIR);
 
     std::string lastError;
     for (const auto& candidate : candidates) {
@@ -103,7 +156,7 @@ ResourceRootResult ResourceRoot::resolve(const std::filesystem::path& executable
         lastError = std::move(error);
     }
 
-    return {{}, "unable to locate BAGSOLAR runtime data for executable '" + executable.string() + "'; " + lastError};
+    return {{}, "unable to locate BAGS_LAB runtime data for executable '" + executable.string() + "': " + lastError};
 }
 
 } // namespace bag

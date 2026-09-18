@@ -1,0 +1,232 @@
+{
+  "questions": [
+    {
+      "id": "q_b4_sun_centre",
+      "grade": "B4",
+      "subject": "Science",
+      "strand": "Systems",
+      "subStrand": "The Solar System",
+      "curriculumReference": "B4.3.2.1.1",
+      "alignment": "official",
+      "objective": "Identify the body at the centre of the Solar System.",
+      "difficulty": "introductory",
+      "questionType": "multiple_choice",
+      "questionKey": "question.q_b4_sun_centre.text",
+      "explanationKey": "question.q_b4_sun_centre.explanation",
+      "activityId": "b4_ss_sun_centre",
+      "options": [
+        {"id": "sun", "labelKey": "solarSystem.sun", "correct": true},
+        {"id": "earth", "labelKey": "solarSystem.earth", "correct": false},
+        {"id": "moon", "labelKey": "solarSystem.moon", "correct": false}
+      ]
+    },
+    {
+      "id": "q_b5_components",
+      "grade": "B5",
+      "subject": "Science",
+      "strand": "Systems",
+      "subStrand": "The Solar System",
+      "curriculumReference": "B5.3.2.1.1",
+      "alignment": "official",
+      "objective": "Select Solar System components.",
+      "difficulty": "introductory",
+      "questionType": "multiple_select",
+      "questionKey": "question.q_b5_components.text",
+      "explanationKey": "question.q_b5_components.explanation",
+      "activityId": "b5_ss_components",
+      "options": [
+        {"id": "sun", "labelKey": "solarSystem.sun", "correct": true},
+        {"id": "earth", "labelKey": "solarSystem.earth", "correct": true},
+        {"id": "moon", "labelKey": "solarSystem.moon", "correct": true},
+        {"id": "planets", "labelKey": "solarSystem.planets", "correct": true},
+        {"id": "satellite", "labelKey": "solarSystem.satellite", "correct": true},
+        {"id": "car", "labelKey": "object.car", "correct": false}
+      ]
+    },
+    {
+      "id": "q_b5_luminous",
+      "grade": "B5",
+      "subject": "Science",
+      "strand": "Systems",
+      "subStrand": "The Solar System",
+      "curriculumReference": "Supplementary enrichment",
+      "alignment": "supplementary_enrichment",
+      "objective": "Classify luminous bodies.",
+      "difficulty": "intermediate",
+      "questionType": "multiple_select",
+      "questionKey": "question.q_b5_luminous.text",
+      "explanationKey": "question.q_b5_luminous.explanation",
+      "misconceptionId": "mc_moon_own_light",
+      "activityId": "b5_ss_luminous",
+      "options": [
+        {"id": "sun", "labelKey": "solarSystem.sun", "correct": true},
+        {"id": "stars", "labelKey": "solarSystem.stars", "correct": true},
+        {"id": "moon", "labelKey": "solarSystem.moon", "correct": false},
+        {"id": "earth", "labelKey": "solarSystem.earth", "correct": false}
+      ]
+    },
+    {
+      "id": "q_b6_roles",
+      "grade": "B6",
+      "subject": "Science",
+      "strand": "Systems",
+      "subStrand": "The Solar System",
+      "curriculumReference": "B6.3.2.1.1",
+      "alignment": "official",
+      "objective": "Match star, planet and satellite definitions.",
+      "difficulty": "intermediate",
+      "questionType": "matching",
+      "questionKey": "question.q_b6_roles.text",
+      "explanationKey": "question.q_b6_roles.explanation",
+      "activityId": "b6_ss_star_planet_satellite",
+      "correctAnswerIds": ["star=own_light", "planet=orbits_star", "satellite=orbits_planet"],
+      "options": [
+        {"id": "star=own_light", "labelKey": "role.star", "correct": true},
+        {"id": "planet=orbits_star", "labelKey": "role.planet", "correct": true},
+        {"id": "satellite=orbits_planet", "labelKey": "role.satellite", "correct": true}
+      ]
+    },
+    {
+      "id": "q_b6_moon_orbit",
+      "grade": "B6",
+      "subject": "Science",
+      "strand": "Systems",
+      "subStrand": "The Solar System",
+      "curriculumReference": "B6.3.2.1.1",
+      "alignment": "official",
+      "objective": "State what the Moon orbits.",
+      "difficulty": "intermediate",
+      "questionType": "multiple_choice",
+      "questionKey": "question.q_b6_moon_orbit.text",
+      "explanationKey": "question.q_b6_moon_orbit.explanation",
+      "activityId": "b6_ss_moon_orbit",
+      "options": [
+        {"id": "earth", "labelKey": "solarSystem.earth", "correct": true},
+        {"id": "sun", "labelKey": "solarSystem.sun", "correct": false},
+        {"id": "mars", "labelKey": "solarSystem.mars", "correct": false}
+      ]
+    },
+    {
+      "id": "q_b6_satellite_uses",
+      "grade": "B6",
+      "subject": "Science",
+      "strand": "Systems",
+      "subStrand": "The Solar System",
+      "curriculumReference": "Supplementary enrichment",
+      "alignment": "supplementary_enrichment",
+      "objective": "Match satellite uses.",
+      "difficulty": "intermediate",
+      "questionType": "matching",
+      "questionKey": "question.q_b6_satellite_uses.text",
+      "explanationKey": "question.q_b6_satellite_uses.explanation",
+      "activityId": "b6_ss_artificial_satellites",
+      "correctAnswerIds": ["communication", "weather", "exploration"],
+      "options": [
+        {"id": "communication", "labelKey": "satellite.use.communication", "correct": true},
+        {"id": "weather", "labelKey": "satellite.use.weather", "correct": true},
+        {"id": "exploration", "labelKey": "satellite.use.exploration", "correct": true}
+      ]
+    },
+    {
+      "id": "q_jhs1_inner_planets",
+      "grade": "JHS1",
+      "subject": "Science",
+      "strand": "Systems",
+      "subStrand": "The Solar System",
+      "curriculumReference": "B7.3.2.1.1",
+      "alignment": "official",
+      "objective": "Select the inner planets.",
+      "difficulty": "intermediate",
+      "questionType": "multiple_select",
+      "questionKey": "question.q_jhs1_inner_planets.text",
+      "explanationKey": "question.q_jhs1_inner_planets.explanation",
+      "activityId": "jhs1_solar_inner_planets_001",
+      "options": [
+        {"id": "mercury", "labelKey": "solarSystem.mercury", "correct": true},
+        {"id": "venus", "labelKey": "solarSystem.venus", "correct": true},
+        {"id": "earth", "labelKey": "solarSystem.earth", "correct": true},
+        {"id": "mars", "labelKey": "solarSystem.mars", "correct": true},
+        {"id": "jupiter", "labelKey": "solarSystem.jupiter", "correct": false},
+        {"id": "saturn", "labelKey": "solarSystem.saturn", "correct": false}
+      ]
+    },
+    {
+      "id": "q_jhs1_order",
+      "grade": "JHS1",
+      "subject": "Science",
+      "strand": "Systems",
+      "subStrand": "The Solar System",
+      "curriculumReference": "B7.3.2.1.1",
+      "alignment": "official",
+      "objective": "Order planets from the Sun.",
+      "difficulty": "intermediate",
+      "questionType": "ordering",
+      "questionKey": "question.q_jhs1_order.text",
+      "explanationKey": "question.q_jhs1_order.explanation",
+      "activityId": "jhs1_solar_construct_001",
+      "correctAnswerIds": ["mercury", "venus", "earth", "mars", "jupiter", "saturn", "uranus", "neptune"]
+    },
+    {
+      "id": "q_jhs1_orbit",
+      "grade": "JHS1",
+      "subject": "Science",
+      "strand": "Systems",
+      "subStrand": "The Solar System",
+      "curriculumReference": "B7.3.2.1.1",
+      "alignment": "official",
+      "objective": "Predict effect of larger orbital radius on period.",
+      "difficulty": "intermediate",
+      "questionType": "prediction",
+      "questionKey": "question.q_jhs1_orbit.text",
+      "explanationKey": "question.q_jhs1_orbit.explanation",
+      "activityId": "jhs1_orbit_lab_001",
+      "options": [
+        {"id": "longer", "labelKey": "orbit.period.longer", "correct": true},
+        {"id": "shorter", "labelKey": "orbit.period.shorter", "correct": false},
+        {"id": "same", "labelKey": "orbit.period.same", "correct": false}
+      ]
+    },
+    {
+      "id": "q_jhs2_outer_planets",
+      "grade": "JHS2",
+      "subject": "Science",
+      "strand": "Systems",
+      "subStrand": "The Solar System",
+      "curriculumReference": "B8.3.2.1.1",
+      "alignment": "official",
+      "objective": "Select the outer planets.",
+      "difficulty": "intermediate",
+      "questionType": "multiple_select",
+      "questionKey": "question.q_jhs2_outer_planets.text",
+      "explanationKey": "question.q_jhs2_outer_planets.explanation",
+      "activityId": "jhs2_outer_planets_001",
+      "options": [
+        {"id": "jupiter", "labelKey": "solarSystem.jupiter", "correct": true},
+        {"id": "saturn", "labelKey": "solarSystem.saturn", "correct": true},
+        {"id": "uranus", "labelKey": "solarSystem.uranus", "correct": true},
+        {"id": "neptune", "labelKey": "solarSystem.neptune", "correct": true},
+        {"id": "mars", "labelKey": "solarSystem.mars", "correct": false}
+      ]
+    },
+    {
+      "id": "q_jhs3_asteroids",
+      "grade": "JHS3",
+      "subject": "Science",
+      "strand": "Systems",
+      "subStrand": "The Solar System",
+      "curriculumReference": "B9.3.2.1.1",
+      "alignment": "official",
+      "objective": "Locate the asteroid belt.",
+      "difficulty": "intermediate",
+      "questionType": "multiple_choice",
+      "questionKey": "question.q_jhs3_asteroids.text",
+      "explanationKey": "question.q_jhs3_asteroids.explanation",
+      "activityId": "jhs3_non_planetary_001",
+      "options": [
+        {"id": "between_mars_jupiter", "labelKey": "asteroid.between_mars_jupiter", "correct": true},
+        {"id": "inside_mercury", "labelKey": "asteroid.inside_mercury", "correct": false},
+        {"id": "beyond_neptune_only", "labelKey": "asteroid.beyond_neptune_only", "correct": false}
+      ]
+    }
+  ]
+}

@@ -1,3 +1,7 @@
+#ifdef NDEBUG
+#undef NDEBUG
+#endif
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <filesystem>
@@ -246,6 +250,75 @@ int main() {
     Simulation simulationWithoutTelemetry(dataRoot);
     simulationWithTelemetry.setSpeed(3600.0);
     simulationWithoutTelemetry.setSpeed(3600.0);
+    assert(simulationWithTelemetry.speed == 3600.0);
+    simulationWithTelemetry.setSpeed(1.0e9);
+    assert(simulationWithTelemetry.speed == 100000.0);
+    simulationWithTelemetry.adjustSpeed(1);
+    assert(simulationWithTelemetry.speed == 100000.0);
+    simulationWithTelemetry.setSpeed(5000.0);
+    simulationWithTelemetry.adjustSpeed(1);
+    assert(simulationWithTelemetry.speed == 10000.0);
+    simulationWithTelemetry.adjustSpeed(1);
+    assert(simulationWithTelemetry.speed == 50000.0);
+    simulationWithTelemetry.adjustSpeed(1);
+    assert(simulationWithTelemetry.speed == 100000.0);
+    assert(!simulationWithTelemetry.bodies.empty());
+    const int earthIndex = [&]() {
+        for (int i = 0; i < static_cast<int>(simulationWithTelemetry.bodies.size()); ++i) {
+            if (simulationWithTelemetry.bodies[static_cast<std::size_t>(i)].id == "earth") return i;
+        }
+        return -1;
+    }();
+    assert(earthIndex >= 0);
+    assert(simulationWithTelemetry.selectBody(earthIndex));
+    assert(!simulationWithTelemetry.soloStudy);
+    assert(simulationWithTelemetry.selected == earthIndex);
+    assert(simulationWithTelemetry.bodyVisibleInView(1)); // selection alone does not isolate
+    assert(simulationWithTelemetry.isolateSelected());
+    assert(simulationWithTelemetry.soloStudy);
+    assert(simulationWithTelemetry.bodyVisibleInView(earthIndex));
+    assert(!simulationWithTelemetry.bodyVisibleInView(0)); // Sun is hidden in isolate (no blur reference)
+    int moonIndex = -1;
+    int bagsolarIndex = -1;
+    for (int i = 0; i < static_cast<int>(simulationWithTelemetry.bodies.size()); ++i) {
+        const auto& body = simulationWithTelemetry.bodies[static_cast<std::size_t>(i)];
+        if (body.id == "moon") moonIndex = i;
+        if (body.id == "bagsolar-1") bagsolarIndex = i;
+    }
+    assert(moonIndex >= 0);
+    assert(simulationWithTelemetry.bodyVisibleInView(moonIndex)); // Earth study keeps Moon
+    if (bagsolarIndex >= 0) {
+        assert(!simulationWithTelemetry.bodyVisibleInView(bagsolarIndex)); // probes stay out of isolate
+    }
+    for (int i = 0; i < static_cast<int>(simulationWithTelemetry.bodies.size()); ++i) {
+        if (i == earthIndex || i == moonIndex) continue;
+        assert(!simulationWithTelemetry.bodyVisibleInView(i));
+    }
+    assert(!simulationWithTelemetry.selectedBodyLesson().empty());
+    assert(simulationWithTelemetry.bodies[static_cast<std::size_t>(earthIndex)].rotationPeriod > 0.0);
+    assert(simulationWithTelemetry.bodies[static_cast<std::size_t>(earthIndex)].axialTilt > 20.0);
+    assert(simulationWithTelemetry.selectedBodyLesson().find("23.5") != std::string::npos ||
+           simulationWithTelemetry.selectedBodyLesson().find("24") != std::string::npos);
+    assert(simulationWithTelemetry.stepBack());
+    assert(!simulationWithTelemetry.soloStudy);
+    assert(simulationWithTelemetry.selected == earthIndex);
+    // Moon study keeps Earth as the companion body.
+    assert(simulationWithTelemetry.selectBody(moonIndex));
+    assert(simulationWithTelemetry.isolateSelected());
+    assert(simulationWithTelemetry.bodyVisibleInView(moonIndex));
+    assert(simulationWithTelemetry.bodyVisibleInView(earthIndex));
+    assert(!simulationWithTelemetry.bodyVisibleInView(0));
+    assert(simulationWithTelemetry.stepBack());
+    assert(simulationWithTelemetry.selected == moonIndex);
+    assert(simulationWithTelemetry.stepBack());
+    assert(simulationWithTelemetry.selected < 0);
+    simulationWithTelemetry.clearSelection();
+    assert(!simulationWithTelemetry.soloStudy);
+    assert(simulationWithTelemetry.selected < 0);
+    if (bagsolarIndex >= 0) {
+        assert(!simulationWithTelemetry.bodies[static_cast<std::size_t>(bagsolarIndex)].active);
+    }
+    simulationWithTelemetry.setSpeed(3600.0);
     assert(simulationWithTelemetry.startTelemetry(3600.0, "sun"));
     simulationWithTelemetry.integrate(1.0);
     simulationWithoutTelemetry.integrate(1.0);
@@ -253,7 +326,10 @@ int main() {
     simulationWithTelemetry.stopTelemetry();
     assert(!simulationWithTelemetry.telemetryEnabled());
     assert(!simulationWithTelemetry.telemetry.samples.empty());
-    assert(simulationWithTelemetry.telemetry.samples.size() >= simulationWithTelemetry.bodies.size());
+    const std::size_t activeBodies = static_cast<std::size_t>(std::count_if(
+        simulationWithTelemetry.bodies.begin(), simulationWithTelemetry.bodies.end(),
+        [](const Body& body) { return body.active; }));
+    assert(simulationWithTelemetry.telemetry.samples.size() >= activeBodies);
     const std::filesystem::path simulationCsv = std::filesystem::temp_directory_path() / "bagsolar_simulation_telemetry.csv";
     const std::filesystem::path simulationJson = std::filesystem::temp_directory_path() / "bagsolar_simulation_telemetry.json";
     assert(simulationWithTelemetry.exportTelemetryCsv(simulationCsv));
@@ -269,6 +345,35 @@ int main() {
         assert(simulationWithTelemetry.bodies[i].velocity.x == simulationWithoutTelemetry.bodies[i].velocity.x);
         assert(simulationWithTelemetry.bodies[i].velocity.y == simulationWithoutTelemetry.bodies[i].velocity.y);
     }
+    // P / launchProbe wakes the dormant spacecraft and applies a visible burn.
+    assert(simulationWithTelemetry.launchProbe(3500.0));
+    assert(simulationWithTelemetry.selected >= 0);
+    const int probeIndex = simulationWithTelemetry.selected;
+    assert(simulationWithTelemetry.bodies[static_cast<std::size_t>(probeIndex)].id == "bagsolar-1");
+    assert(simulationWithTelemetry.bodies[static_cast<std::size_t>(probeIndex)].active);
+    // Active probe must still stay hidden when Z-studying Earth (Moon companion only).
+    assert(simulationWithTelemetry.selectBody(earthIndex));
+    assert(simulationWithTelemetry.isolateSelected());
+    assert(simulationWithTelemetry.bodyVisibleInView(earthIndex));
+    assert(simulationWithTelemetry.bodyVisibleInView(moonIndex));
+    assert(!simulationWithTelemetry.bodyVisibleInView(probeIndex));
+    assert(simulationWithTelemetry.stepBack());
+    assert(simulationWithTelemetry.launchProbe(3500.0));
+    const auto earthAfter = std::find_if(
+        simulationWithTelemetry.bodies.begin(), simulationWithTelemetry.bodies.end(),
+        [](const Body& body) { return body.id == "earth"; });
+    assert(earthAfter != simulationWithTelemetry.bodies.end());
+    const double probeAltitude = length(
+        simulationWithTelemetry.bodies[static_cast<std::size_t>(simulationWithTelemetry.selected)].position -
+        earthAfter->position);
+    assert(probeAltitude > 1.0e8);
+    assert(probeAltitude < 1.0e9);
+    // Second pulse re-arms from Earth so P always has a visible effect.
+    simulationWithTelemetry.integrate(2.0);
+    assert(simulationWithTelemetry.launchProbe(5000.0));
+    assert(simulationWithTelemetry.bodies[static_cast<std::size_t>(simulationWithTelemetry.selected)].active);
+    assert(simulationWithTelemetry.bodies[static_cast<std::size_t>(simulationWithTelemetry.selected)].id ==
+           "bagsolar-1");
 
     return 0;
 }

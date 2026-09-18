@@ -1,0 +1,187 @@
+{
+  "format": "bagsolar_planet_presentation_v1",
+  "provenance": "Downloaded visual models. Sketchfab asset.extras embedded in each GLB claim CC-BY-4.0 (Venus: CC-BY-SA-4.0). Packaging still installs only this manifest until attribution/redistribution policy is explicitly approved. Original downloads remain under assets/planets/; raylib-compatible prepared copies live under assets/planets/prepared/.",
+  "runtime_note": "Debian/Kali libraylib 6.0 is commonly built with SUPPORT_FILEFORMAT_JPG=0, so prepared assets embed PNG textures instead of JPEG.",
+  "models": [
+    {
+      "body_id": "sun",
+      "model": "prepared/sun_model.glb",
+      "enabled": true,
+      "visual_scale": 1.0,
+      "local_rotation_degrees": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "local_translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_includes_rings": false,
+      "preparation_notes": "Lossless u32\u2192u16 index rewrite (maxIndex<=65531); JPEG albedo converted to PNG and capped at 4096x2048 because distro raylib disables JPEG."
+    },
+    {
+      "body_id": "mercury",
+      "model": "prepared/mercury_first_planet.glb",
+      "enabled": true,
+      "visual_scale": 1.0,
+      "local_rotation_degrees": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "local_translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_includes_rings": false,
+      "preparation_notes": "u16 indices; JPEG texture converted to PNG for distro raylib."
+    },
+    {
+      "body_id": "venus",
+      "model": "prepared/venus.glb",
+      "enabled": true,
+      "visual_scale": 1.0,
+      "local_rotation_degrees": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "local_translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_includes_rings": false,
+      "preparation_notes": "u16 indices; JPEG albedo converted to PNG (4096x2048)."
+    },
+    {
+      "body_id": "earth",
+      "model": "prepared/earth.glb",
+      "enabled": true,
+      "visual_scale": 1.0,
+      "local_rotation_degrees": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "local_translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_includes_rings": false,
+      "preparation_notes": "metalrough conversion of required KHR_materials_pbrSpecularGlossiness; u16 indices; JPEG\u2192PNG at 4096x2048."
+    },
+    {
+      "body_id": "moon",
+      "model": "moon.glb",
+      "enabled": true,
+      "visual_scale": 1.0,
+      "local_rotation_degrees": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "local_translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_includes_rings": false,
+      "preparation_notes": "Uses assets/planets/moon.glb directly. Textures already PNG; raylib converts u32 indices to u16 at load (maxIndex<=1573, lossless)."
+    },
+    {
+      "body_id": "mars",
+      "model": "prepared/mars.glb",
+      "enabled": true,
+      "visual_scale": 1.0,
+      "local_rotation_degrees": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "local_translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_includes_rings": false,
+      "preparation_notes": "u16 index rewrite only (textures already PNG)."
+    },
+    {
+      "body_id": "jupiter",
+      "model": "prepared/jupiter.glb",
+      "enabled": true,
+      "visual_scale": 1.0,
+      "local_rotation_degrees": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "local_translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_includes_rings": false,
+      "preparation_notes": "Removed satellite meshes + animation; u16 indices; JPEG\u2192PNG."
+    },
+    {
+      "body_id": "saturn",
+      "model": "prepared/saturn.glb",
+      "enabled": true,
+      "visual_scale": 1.0,
+      "local_rotation_degrees": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "local_translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_includes_rings": true,
+      "preparation_notes": "metalrough; removed Mimas/Enceladus; dropped dense saturn2_A (~3.2M verts); kept planet + saturn2_B ring disk. 149992412 \u2192 6932632 bytes (~95.4% reduction)."
+    },
+    {
+      "body_id": "uranus",
+      "model": "prepared/uranus.glb",
+      "enabled": true,
+      "visual_scale": 1.0,
+      "local_rotation_degrees": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "local_translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_includes_rings": true,
+      "preparation_notes": "metalrough; removed Miranda; dropped dense uranus2_A; kept planet + uranus2_B disk. 87184316 \u2192 5033165 bytes approx. Comparison full no-moon variant: prepared/uranus_full_nomoons.glb."
+    },
+    {
+      "body_id": "neptune",
+      "model": "prepared/neptune.glb",
+      "enabled": true,
+      "visual_scale": 1.0,
+      "local_rotation_degrees": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "local_translation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_includes_rings": false,
+      "preparation_notes": "u16 index rewrite only (textures already PNG)."
+    }
+  ]
+}

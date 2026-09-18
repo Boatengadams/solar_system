@@ -1,0 +1,99 @@
+{
+  "questions": [
+    {
+      "id": "q_shs1_satellite",
+      "grade": "SHS1",
+      "subject": "Science",
+      "strand": "Systems",
+      "subStrand": "The Solar System",
+      "curriculumReference": "B10.3.2.1.1",
+      "alignment": "official",
+      "objective": "Identify a correct statement about satellites.",
+      "difficulty": "intermediate",
+      "questionType": "multiple_choice",
+      "questionKey": "question.q_shs1_satellite.text",
+      "explanationKey": "question.q_shs1_satellite.explanation",
+      "activityId": "shs1_satellite_concept_001",
+      "options": [
+        {"id": "orbits_body", "labelKey": "satellite.def.orbits_body", "correct": true},
+        {"id": "produces_own_light", "labelKey": "satellite.def.produces_own_light", "correct": false},
+        {"id": "only_natural", "labelKey": "satellite.def.only_natural", "correct": false}
+      ]
+    },
+    {
+      "id": "q_shs_gravity",
+      "grade": "SHS2",
+      "subject": "Science",
+      "strand": "Forces and Energy",
+      "subStrand": "Force and Motion",
+      "curriculumReference": "Supplementary enrichment",
+      "alignment": "supplementary_enrichment",
+      "objective": "Compute gravitational force magnitude for given masses and distance.",
+      "difficulty": "advanced",
+      "questionType": "numerical",
+      "questionKey": "question.q_shs_gravity.text",
+      "explanationKey": "question.q_shs_gravity.explanation",
+      "activityId": "shs_gravity_lab_001",
+      "numericalAnswer": 3.964e28,
+      "numericalTolerance": 0.01
+    },
+    {
+      "id": "q_shs_orbit",
+      "grade": "SHS2",
+      "subject": "Science",
+      "strand": "Forces and Energy",
+      "subStrand": "Force and Motion",
+      "curriculumReference": "Supplementary enrichment",
+      "alignment": "supplementary_enrichment",
+      "objective": "Relate orbital period trend to orbital radius.",
+      "difficulty": "advanced",
+      "questionType": "multiple_choice",
+      "questionKey": "question.q_shs_orbit.text",
+      "explanationKey": "question.q_shs_orbit.explanation",
+      "activityId": "shs_orbit_lab_001",
+      "options": [
+        {"id": "period_increases", "labelKey": "orbit.period.longer", "correct": true},
+        {"id": "period_decreases", "labelKey": "orbit.period.shorter", "correct": false}
+      ]
+    },
+    {
+      "id": "q_shs_escape",
+      "grade": "SHS3",
+      "subject": "Science",
+      "strand": "Forces and Energy",
+      "subStrand": "Force and Motion",
+      "curriculumReference": "Supplementary enrichment",
+      "alignment": "supplementary_enrichment",
+      "objective": "Compare escape speeds qualitatively.",
+      "difficulty": "challenge",
+      "questionType": "multiple_choice",
+      "questionKey": "question.q_shs_escape.text",
+      "explanationKey": "question.q_shs_escape.explanation",
+      "activityId": "shs_escape_velocity_001",
+      "options": [
+        {"id": "earth_gt_moon", "labelKey": "escape.earth_gt_moon", "correct": true},
+        {"id": "moon_gt_earth", "labelKey": "escape.moon_gt_earth", "correct": false}
+      ]
+    },
+    {
+      "id": "q_shs_compare",
+      "grade": "SHS1",
+      "subject": "Science",
+      "strand": "Systems",
+      "subStrand": "The Solar System",
+      "curriculumReference": "Supplementary enrichment",
+      "alignment": "supplementary_enrichment",
+      "objective": "Identify the largest planet by radius among the eight.",
+      "difficulty": "advanced",
+      "questionType": "multiple_choice",
+      "questionKey": "question.q_shs_compare.text",
+      "explanationKey": "question.q_shs_compare.explanation",
+      "activityId": "shs_planet_comparison_001",
+      "options": [
+        {"id": "jupiter", "labelKey": "solarSystem.jupiter", "correct": true},
+        {"id": "saturn", "labelKey": "solarSystem.saturn", "correct": false},
+        {"id": "earth", "labelKey": "solarSystem.earth", "correct": false}
+      ]
+    }
+  ]
+}

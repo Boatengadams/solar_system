@@ -1,13 +1,13 @@
 {
   "id": "default_solar_system",
   "name": "Default Solar System",
-  "description": "The Sun, eight planets, and the BAGSOLAR-1 educational spacecraft.",
+  "description": "The Sun, eight planets, the Moon, and the BAGSOLAR-1 educational spacecraft.",
   "epoch": "J2000",
   "reference_frame": "heliocentric",
-  "body_references": ["sun", "mercury", "venus", "earth", "mars", "jupiter", "saturn", "uranus", "neptune", "bagsolar-1"],
+  "body_references": ["sun", "mercury", "venus", "earth", "moon", "mars", "jupiter", "saturn", "uranus", "neptune", "bagsolar-1"],
   "settings": {
     "timestep_s": 3600.0,
-    "time_scale": 1.0,
+    "time_scale": 10000.0,
     "integrator": "velocity_verlet",
     "trails_enabled": true,
     "vectors_enabled": false,

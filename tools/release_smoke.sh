@@ -41,8 +41,8 @@ printf '%s\n' '== offline local ephemeris =='
 
 printf '%s\n' '== install =='
 cmake --install "$BUILD_DIR" --prefix "$INSTALL_DIR"
-test -f "$INSTALL_DIR/share/bagsolar/data/bodies/sun.json"
-test -f "$INSTALL_DIR/share/bagsolar/docs/docs/BUILD.md"
+test -f "$INSTALL_DIR/share/bags_lab/data/bodies/sun.json"
+test -f "$INSTALL_DIR/share/bags_lab/docs/BUILD.md"
 (cd "$INSTALL_RUN_DIR" && \
     "$INSTALL_DIR/bin/bagsolar_resource_smoke" >/dev/null && \
     "$INSTALL_DIR/bin/bagsolar_validation" >/dev/null && \
@@ -50,13 +50,13 @@ test -f "$INSTALL_DIR/share/bagsolar/docs/docs/BUILD.md"
 
 printf '%s\n' '== package =='
 cmake --build "$BUILD_DIR" --target package --parallel 2
-PACKAGE_FILE=$(find "$BUILD_DIR" -maxdepth 1 -type f -name 'BAGSOLAR-*.tar.gz' -print -quit)
+PACKAGE_FILE=$(find "$BUILD_DIR" -maxdepth 1 -type f -name 'BAGS_LAB-*.tar.gz' -print -quit)
 test -n "$PACKAGE_FILE"
 (cd "$PACKAGE_EXTRACT_DIR" && cmake -E tar xzf "$PACKAGE_FILE")
-PACKAGE_DIR=$(find "$PACKAGE_EXTRACT_DIR" -mindepth 1 -maxdepth 1 -type d -name 'BAGSOLAR-*' -print -quit)
+PACKAGE_DIR=$(find "$PACKAGE_EXTRACT_DIR" -mindepth 1 -maxdepth 1 -type d -name 'BAGS_LAB-*' -print -quit)
 test -n "$PACKAGE_DIR"
-test -f "$PACKAGE_DIR/share/bagsolar/data/bodies/sun.json"
-test -f "$PACKAGE_DIR/share/bagsolar/docs/docs/BUILD.md"
+test -f "$PACKAGE_DIR/share/bags_lab/data/bodies/sun.json"
+test -f "$PACKAGE_DIR/share/bags_lab/docs/BUILD.md"
 (cd "$PACKAGE_RUN_DIR" && \
     "$PACKAGE_DIR/bin/bagsolar_resource_smoke" >/dev/null && \
     "$PACKAGE_DIR/bin/bagsolar_validation" >/dev/null && \

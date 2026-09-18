@@ -1,0 +1,42 @@
+{
+  "id": "moon",
+  "name": "Moon",
+  "type": "Moon",
+  "mass_kg": 7.342e+22,
+  "radius_m": 1737400.0,
+  "initial_position_m": [
+    147483985259.31,
+    0.0,
+    0.0
+  ],
+  "initial_velocity_mps": [
+    0.0,
+    31305.085098844138,
+    0.0
+  ],
+  "parent_id": "earth",
+  "visual": {
+    "color_rgba": [
+      200,
+      200,
+      205,
+      255
+    ],
+    "accent_rgba": [
+      160,
+      170,
+      180,
+      255
+    ],
+    "display_radius_px": 2.8
+  },
+  "orbital": {
+    "semi_major_axis_m": 384399000.0,
+    "eccentricity": 0.0549,
+    "orbital_period_s": 2360591.5
+  },
+  "rotation": {
+    "sidereal_period_s": 2360591.5,
+    "axial_tilt_deg": 6.68
+  }
+}

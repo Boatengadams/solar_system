@@ -2,14 +2,36 @@
   "id": "sun",
   "name": "Sun",
   "type": "Star",
-  "mass_kg": 1.98847e30,
-  "radius_m": 6.957e8,
-  "initial_position_m": [0.0, 0.0, 0.0],
-  "initial_velocity_mps": [0.0, 0.0, 0.0],
+  "mass_kg": 1.98847e+30,
+  "radius_m": 695700000.0,
+  "initial_position_m": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "initial_velocity_mps": [
+    0.0,
+    0.0,
+    0.0
+  ],
   "visual": {
-    "color_rgba": [255, 205, 65, 255],
-    "accent_rgba": [255, 120, 20, 255],
+    "color_rgba": [
+      255,
+      205,
+      65,
+      255
+    ],
+    "accent_rgba": [
+      255,
+      120,
+      20,
+      255
+    ],
     "display_radius_px": 31.0,
     "luminous": true
+  },
+  "rotation": {
+    "sidereal_period_s": 2160432.0,
+    "axial_tilt_deg": 7.25
   }
 }

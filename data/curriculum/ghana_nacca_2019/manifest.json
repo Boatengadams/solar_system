@@ -1,0 +1,42 @@
+{
+  "curriculumVersion": "ghana_nacca_2019",
+  "localeDefault": "en",
+  "source": {
+    "organization": "NaCCA / Ministry of Education",
+    "document": "Science Curriculum for Primary Schools and Common Core Programme (Science)",
+    "version": "2019–2020",
+    "reference": "Strand Systems / Cycles — Solar System and Earth Science indicators",
+    "verifiedAt": "2026-09-16"
+  },
+  "grades": [
+    {"id": "B1", "displayKey": "grade.B1", "phase": "lower_primary", "presentationLayer": "foundation", "curriculumCode": "B1"},
+    {"id": "B2", "displayKey": "grade.B2", "phase": "lower_primary", "presentationLayer": "foundation", "curriculumCode": "B2"},
+    {"id": "B3", "displayKey": "grade.B3", "phase": "lower_primary", "presentationLayer": "foundation", "curriculumCode": "B3"},
+    {"id": "B4", "displayKey": "grade.B4", "phase": "upper_primary", "presentationLayer": "explorer", "curriculumCode": "B4"},
+    {"id": "B5", "displayKey": "grade.B5", "phase": "upper_primary", "presentationLayer": "explorer", "curriculumCode": "B5"},
+    {"id": "B6", "displayKey": "grade.B6", "phase": "upper_primary", "presentationLayer": "explorer", "curriculumCode": "B6"},
+    {"id": "JHS1", "displayKey": "grade.JHS1", "phase": "junior_high", "presentationLayer": "explorer", "curriculumCode": "B7"},
+    {"id": "JHS2", "displayKey": "grade.JHS2", "phase": "junior_high", "presentationLayer": "explorer", "curriculumCode": "B8"},
+    {"id": "JHS3", "displayKey": "grade.JHS3", "phase": "junior_high", "presentationLayer": "explorer", "curriculumCode": "B9"},
+    {"id": "SHS1", "displayKey": "grade.SHS1", "phase": "senior_high", "presentationLayer": "scientist", "curriculumCode": "B10"},
+    {"id": "SHS2", "displayKey": "grade.SHS2", "phase": "senior_high", "presentationLayer": "scientist", "curriculumCode": "SHS2"},
+    {"id": "SHS3", "displayKey": "grade.SHS3", "phase": "senior_high", "presentationLayer": "scientist", "curriculumCode": "SHS3"}
+  ],
+  "activityFiles": [
+    "activities/foundation_b1_b3.json",
+    "activities/explorer_b4_b6.json",
+    "activities/explorer_jhs.json",
+    "activities/scientist_shs.json"
+  ],
+  "questionFiles": [
+    "questions/foundation_questions.json",
+    "questions/explorer_questions.json",
+    "questions/scientist_questions.json"
+  ],
+  "missionFiles": [
+    "missions/jhs_missions.json"
+  ],
+  "misconceptionFiles": [
+    "misconceptions/common_space_misconceptions.json"
+  ]
+}

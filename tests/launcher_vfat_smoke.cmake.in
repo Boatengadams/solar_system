@@ -1,0 +1,138 @@
+# VFAT USB launcher regression (no real VFAT mount required).
+# Simulates: package ELF exists but is not +x; a sibling directory trap named
+# BAGS_LAB must never be chosen; resources resolve from the package, not /tmp.
+
+set(build_dir "@CMAKE_BINARY_DIR@")
+set(source_dir "@CMAKE_SOURCE_DIR@")
+set(cmake_command "@CMAKE_COMMAND@")
+
+if(DEFINED ENV{TMPDIR})
+    set(temp_root "$ENV{TMPDIR}")
+elseif(DEFINED ENV{TEMP})
+    set(temp_root "$ENV{TEMP}")
+elseif(DEFINED ENV{TMP})
+    set(temp_root "$ENV{TMP}")
+else()
+    set(temp_root "/tmp")
+endif()
+
+string(MD5 build_id "${build_dir}")
+set(smoke_root "${temp_root}/bagsolar-launcher-vfat-${build_id}")
+file(REMOVE_RECURSE "${smoke_root}")
+file(MAKE_DIRECTORY "${smoke_root}")
+
+set(package_dir "${smoke_root}/BAGS_LAB")
+file(MAKE_DIRECTORY "${package_dir}")
+file(MAKE_DIRECTORY "${package_dir}/assets/planets/prepared")
+
+# Real runtime data so bagsolar_resource_smoke can load the default scenario.
+file(COPY "${source_dir}/data" DESTINATION "${package_dir}")
+file(WRITE "${package_dir}/assets/planets/manifest.json"
+     "{\"format\":\"bagsolar_planet_presentation_v1\",\"models\":[]}")
+file(WRITE "${package_dir}/assets/planets/prepared/.keep" "")
+
+# Install launcher + a real ELF renamed as the portable binaries.
+set(launcher_src "${source_dir}/launcher/linux/BAGS_LAB.sh")
+if(NOT EXISTS "${launcher_src}")
+    message(FATAL_ERROR "missing launcher: ${launcher_src}")
+endif()
+configure_file("${launcher_src}" "${package_dir}/BAGS_LAB.sh" COPYONLY)
+
+set(smoke_bin "${build_dir}/bagsolar_resource_smoke")
+if(NOT EXISTS "${smoke_bin}")
+    message(FATAL_ERROR "missing bagsolar_resource_smoke: ${smoke_bin}")
+endif()
+execute_process(
+    COMMAND "${cmake_command}" -E copy "${smoke_bin}" "${package_dir}/BAGS_LAB.EXE"
+    RESULT_VARIABLE copy_exe_result)
+if(NOT copy_exe_result EQUAL 0)
+    message(FATAL_ERROR "failed to stage BAGS_LAB.EXE")
+endif()
+execute_process(
+    COMMAND "${cmake_command}" -E copy "${smoke_bin}" "${package_dir}/BAGS_LAB"
+    RESULT_VARIABLE copy_unix_result)
+if(NOT copy_unix_result EQUAL 0)
+    message(FATAL_ERROR "failed to stage BAGS_LAB")
+endif()
+
+# Exact VFAT failure mode: binaries exist but are not executable.
+execute_process(COMMAND chmod a-x "${package_dir}/BAGS_LAB.EXE" "${package_dir}/BAGS_LAB")
+
+# Directory trap that previously caused: "Is a directory"
+# ($HERE/../BAGS_LAB when HERE is the package directory).
+# package_dir is already named BAGS_LAB under smoke_root — that IS the trap.
+
+set(workdir "${smoke_root}/cwd")
+file(MAKE_DIRECTORY "${workdir}")
+
+# --- Case 1: non-executable ELF → temp copy, ResourceRoot stays on package ---
+execute_process(
+    COMMAND "${cmake_command}" -E env
+            BAGS_LAB_LAUNCHER_TRACE=1
+            "bash" "${package_dir}/BAGS_LAB.sh"
+    WORKING_DIRECTORY "${workdir}"
+    RESULT_VARIABLE launch_result
+    OUTPUT_VARIABLE launch_output
+    ERROR_VARIABLE launch_error)
+if(NOT launch_result EQUAL 0)
+    message(FATAL_ERROR "non-executable package launch failed (${launch_result})\n${launch_output}\n${launch_error}")
+endif()
+if(launch_error MATCHES "Is a directory")
+    message(FATAL_ERROR "launcher attempted to execute a directory:\n${launch_error}")
+endif()
+if(NOT launch_error MATCHES "temp exec")
+    message(FATAL_ERROR "expected VFAT-safe temporary exec path\n${launch_error}")
+endif()
+if(NOT launch_output MATCHES "BAGS_LAB runtime data: ${package_dir}/data")
+    message(FATAL_ERROR "ResourceRoot did not stay on package directory\n${launch_output}\n${launch_error}")
+endif()
+if(launch_output MATCHES "BAGS_LAB runtime data: ${temp_root}/bags_lab")
+    message(FATAL_ERROR "ResourceRoot incorrectly resolved under temp runtime\n${launch_output}")
+endif()
+if(NOT launch_output MATCHES "BAGS_LAB assets root: ${package_dir}/assets")
+    message(FATAL_ERROR "assets root did not resolve to package\n${launch_output}")
+endif()
+
+# --- Case 2: directly executable ELF → no temp copy required ---
+execute_process(COMMAND chmod u+x "${package_dir}/BAGS_LAB.EXE" "${package_dir}/BAGS_LAB")
+execute_process(
+    COMMAND "${cmake_command}" -E env
+            BAGS_LAB_LAUNCHER_TRACE=1
+            "bash" "${package_dir}/BAGS_LAB.sh"
+    WORKING_DIRECTORY "${workdir}"
+    RESULT_VARIABLE direct_result
+    OUTPUT_VARIABLE direct_output
+    ERROR_VARIABLE direct_error)
+if(NOT direct_result EQUAL 0)
+    message(FATAL_ERROR "direct-exec package launch failed (${direct_result})\n${direct_output}\n${direct_error}")
+endif()
+if(NOT direct_error MATCHES "direct exec")
+    message(FATAL_ERROR "expected direct exec when +x is available\n${direct_error}")
+endif()
+if(direct_error MATCHES "Is a directory")
+    message(FATAL_ERROR "direct exec path still hit directory trap\n${direct_error}")
+endif()
+if(NOT direct_output MATCHES "BAGS_LAB runtime data: ${package_dir}/data")
+    message(FATAL_ERROR "direct exec ResourceRoot mismatch\n${direct_output}")
+endif()
+
+# --- Case 3: missing executable ---
+file(REMOVE "${package_dir}/BAGS_LAB.EXE" "${package_dir}/BAGS_LAB")
+execute_process(
+    COMMAND "bash" "${package_dir}/BAGS_LAB.sh"
+    WORKING_DIRECTORY "${workdir}"
+    RESULT_VARIABLE missing_result
+    OUTPUT_VARIABLE missing_output
+    ERROR_VARIABLE missing_error)
+if(missing_result EQUAL 0)
+    message(FATAL_ERROR "missing executable should fail the launcher")
+endif()
+if(NOT missing_error MATCHES "executable not found")
+    message(FATAL_ERROR "missing executable diagnostic unclear\n${missing_error}")
+endif()
+if(missing_error MATCHES "Is a directory")
+    message(FATAL_ERROR "missing-exec path attempted directory exec\n${missing_error}")
+endif()
+
+message(STATUS "launcher VFAT regression ok")
+message(STATUS "${launch_output}")

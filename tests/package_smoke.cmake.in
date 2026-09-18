@@ -1,6 +1,9 @@
 set(build_dir "@CMAKE_BINARY_DIR@")
+set(source_dir "@CMAKE_SOURCE_DIR@")
 set(cmake_command "@CMAKE_COMMAND@")
 set(install_bindir "@CMAKE_INSTALL_BINDIR@")
+set(install_libdir "@CMAKE_INSTALL_LIBDIR@")
+set(install_datadir "@CMAKE_INSTALL_DATADIR@")
 set(smoke_name "bagsolar_resource_smoke")
 
 if(DEFINED ENV{TMPDIR})
@@ -20,7 +23,7 @@ set(work_dir "${smoke_root}/work")
 file(REMOVE_RECURSE "${smoke_root}")
 file(MAKE_DIRECTORY "${package_extract}" "${work_dir}")
 
-file(GLOB old_packages "${build_dir}/BAGSOLAR-*.tar.gz")
+file(GLOB old_packages "${build_dir}/BAGS_LAB-*.tar.gz")
 if(old_packages)
     file(REMOVE ${old_packages})
 endif()
@@ -34,10 +37,10 @@ if(NOT package_result EQUAL 0)
     message(FATAL_ERROR "package build failed (${package_result})\n${package_output}\n${package_error}")
 endif()
 
-file(GLOB packages "${build_dir}/BAGSOLAR-*.tar.gz")
+file(GLOB packages "${build_dir}/BAGS_LAB-*.tar.gz")
 list(LENGTH packages package_count)
 if(NOT package_count EQUAL 1)
-    message(FATAL_ERROR "expected exactly one generated BAGSOLAR package, found ${package_count}")
+    message(FATAL_ERROR "expected exactly one generated BAGS_LAB package, found ${package_count}")
 endif()
 list(GET packages 0 package_file)
 
@@ -51,15 +54,117 @@ if(NOT extract_result EQUAL 0)
     message(FATAL_ERROR "package extraction failed (${extract_result})\n${extract_output}\n${extract_error}")
 endif()
 
-file(GLOB extracted_roots LIST_DIRECTORIES true "${package_extract}/BAGSOLAR-*")
+file(GLOB extracted_roots LIST_DIRECTORIES true "${package_extract}/BAGS_LAB-*")
 list(LENGTH extracted_roots extracted_count)
 if(NOT extracted_count EQUAL 1)
-    message(FATAL_ERROR "package extraction produced no top-level BAGSOLAR directory")
+    message(FATAL_ERROR "package extraction produced no top-level BAGS_LAB directory")
 endif()
 list(GET extracted_roots 0 package_root)
 set(smoke_executable "${package_root}/${install_bindir}/${smoke_name}")
+set(bags_lab_executable "${package_root}/${install_bindir}/BAGS_LAB")
 if(NOT EXISTS "${smoke_executable}")
     message(FATAL_ERROR "packaged resource smoke executable is missing: ${smoke_executable}")
+endif()
+if(NOT EXISTS "${bags_lab_executable}")
+    message(FATAL_ERROR "packaged BAGS_LAB executable is missing: ${bags_lab_executable}")
+endif()
+
+# Fail if the presentation manifest's enabled GLB paths are missing from the package.
+# Paths are resolved relative to the package (never a developer home directory).
+set(planets_root "${package_root}/${install_datadir}/bags_lab/assets/planets")
+set(manifest_path "${source_dir}/assets/planets/manifest.json")
+if(NOT EXISTS "${manifest_path}")
+    message(FATAL_ERROR "source planet presentation manifest is missing: ${manifest_path}")
+endif()
+if(NOT EXISTS "${planets_root}/manifest.json")
+    message(FATAL_ERROR "packaged planet presentation manifest is missing: ${planets_root}/manifest.json")
+endif()
+
+execute_process(
+    COMMAND python3 -c "
+import json, pathlib, sys
+src = pathlib.Path(sys.argv[1])
+pkg = pathlib.Path(sys.argv[2])
+manifest = json.loads(src.read_text(encoding='utf-8'))
+if manifest.get('format') != 'bagsolar_planet_presentation_v1':
+    raise SystemExit('unexpected planet presentation manifest format')
+missing = []
+for entry in manifest.get('models', []):
+    if not entry.get('enabled', False):
+        continue
+    relative = entry['model']
+    if not (pkg / relative).is_file():
+        missing.append(relative)
+if missing:
+    print('missing packaged planet models: ' + ', '.join(missing), file=sys.stderr)
+    raise SystemExit(1)
+print('packaged enabled planet models ok')
+"
+            "${manifest_path}" "${planets_root}"
+    RESULT_VARIABLE planet_check_result
+    OUTPUT_VARIABLE planet_check_output
+    ERROR_VARIABLE planet_check_error)
+if(NOT planet_check_result EQUAL 0)
+    message(FATAL_ERROR "packaged planet presentation assets incomplete (${planet_check_result})\n${planet_check_output}\n${planet_check_error}")
+endif()
+
+# Runtime dependency / relocatable search-path regression (libtiff.so.3 class of failures).
+# Do not require the developer machine's libtiff to be installed.
+set(package_libdir "${package_root}/${install_libdir}")
+set(sidecar_libdir "${package_root}/${install_bindir}/lib")
+set(root_libdir "${package_root}/lib")
+
+execute_process(
+    COMMAND python3 "${source_dir}/tools/audit_portable_libs.py"
+            "${bags_lab_executable}"
+            --require-origin-lib
+            --libdir "${sidecar_libdir}"
+    RESULT_VARIABLE audit_result
+    OUTPUT_VARIABLE audit_output
+    ERROR_VARIABLE audit_error)
+# Sidecar lib/ may be absent for static-raylib CPack layouts; retry without --libdir
+# but still require $ORIGIN/lib and the libtiff guard below.
+if(NOT audit_result EQUAL 0)
+    execute_process(
+        COMMAND python3 "${source_dir}/tools/audit_portable_libs.py"
+                "${bags_lab_executable}"
+                --require-origin-lib
+        RESULT_VARIABLE audit_result
+        OUTPUT_VARIABLE audit_output
+        ERROR_VARIABLE audit_error)
+endif()
+if(NOT audit_result EQUAL 0)
+    message(FATAL_ERROR "packaged BAGS_LAB dependency audit failed (${audit_result})\n${audit_output}\n${audit_error}")
+endif()
+
+execute_process(
+    COMMAND python3 -c "
+import re, subprocess, pathlib, sys
+exe = pathlib.Path(sys.argv[1])
+libdirs = [pathlib.Path(p) for p in sys.argv[2:] if p]
+out = subprocess.check_output(['readelf', '-d', str(exe)], text=True, errors='replace')
+for libdir in libdirs:
+    if not libdir.is_dir():
+        continue
+    for so in libdir.glob('*.so*'):
+        if so.is_file():
+            out += subprocess.check_output(['readelf', '-d', str(so)], text=True, errors='replace')
+needed = re.findall(r'NEEDED\\s+Shared library:\\s+\\[([^\\]]+)\\]', out)
+tiff_needed = [n for n in needed if n.startswith('libtiff.so')]
+bundled = any(libdir.is_dir() and any(libdir.glob('libtiff.so*')) for libdir in libdirs)
+if tiff_needed and not bundled:
+    raise SystemExit('packaged runtime requires ' + ','.join(tiff_needed) + ' but does not bundle TIFF')
+print('libtiff regression guard ok')
+"
+            "${bags_lab_executable}"
+            "${package_libdir}"
+            "${sidecar_libdir}"
+            "${root_libdir}"
+    RESULT_VARIABLE tiff_result
+    OUTPUT_VARIABLE tiff_output
+    ERROR_VARIABLE tiff_error)
+if(NOT tiff_result EQUAL 0)
+    message(FATAL_ERROR "libtiff portability regression (${tiff_result})\n${tiff_output}\n${tiff_error}")
 endif()
 
 execute_process(
@@ -72,8 +177,11 @@ if(NOT smoke_result EQUAL 0)
     message(FATAL_ERROR "packaged resource smoke failed (${smoke_result})\n${smoke_output}\n${smoke_error}")
 endif()
 
-if(NOT smoke_output MATCHES "BAGSOLAR runtime data:")
+if(NOT smoke_output MATCHES "BAGS_LAB runtime data:")
     message(FATAL_ERROR "packaged smoke did not report resolved runtime data\n${smoke_output}")
 endif()
 
+message(STATUS "${planet_check_output}")
+message(STATUS "${audit_output}")
+message(STATUS "${tiff_output}")
 message(STATUS "${smoke_output}")

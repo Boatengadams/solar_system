@@ -2,11 +2,41 @@
   "id": "mercury",
   "name": "Mercury",
   "type": "Planet",
-  "mass_kg": 3.3011e23,
-  "radius_m": 2.4397e6,
-  "initial_position_m": [45991292263.338959, 0.0, 0.0],
-  "initial_velocity_mps": [0.0, 58982.910211690883, 0.0],
+  "mass_kg": 3.3011e+23,
+  "radius_m": 2439700.0,
+  "initial_position_m": [
+    45991292263.33896,
+    0.0,
+    0.0
+  ],
+  "initial_velocity_mps": [
+    0.0,
+    58982.91021169088,
+    0.0
+  ],
   "parent_id": "sun",
-  "visual": {"color_rgba": [155, 155, 160, 255], "accent_rgba": [225, 210, 180, 255], "display_radius_px": 3.0},
-  "orbital": {"semi_major_axis_m": 57909227000.0, "eccentricity": 0.2056, "orbital_period_s": 7600521.7296}
+  "visual": {
+    "color_rgba": [
+      155,
+      155,
+      160,
+      255
+    ],
+    "accent_rgba": [
+      225,
+      210,
+      180,
+      255
+    ],
+    "display_radius_px": 3.0
+  },
+  "orbital": {
+    "semi_major_axis_m": 57909227000.0,
+    "eccentricity": 0.2056,
+    "orbital_period_s": 7600521.7296
+  },
+  "rotation": {
+    "sidereal_period_s": 5067120.0,
+    "axial_tilt_deg": 0.034
+  }
 }

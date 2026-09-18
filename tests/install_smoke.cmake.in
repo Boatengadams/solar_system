@@ -44,7 +44,7 @@ if(NOT smoke_result EQUAL 0)
     message(FATAL_ERROR "installed resource smoke failed (${smoke_result})\n${smoke_output}\n${smoke_error}")
 endif()
 
-if(NOT smoke_output MATCHES "BAGSOLAR runtime data:")
+if(NOT smoke_output MATCHES "BAGS_LAB runtime data:")
     message(FATAL_ERROR "installed smoke did not report resolved runtime data\n${smoke_output}")
 endif()
 

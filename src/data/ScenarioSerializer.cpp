@@ -30,7 +30,8 @@ Json bodyJson(const Body& body) {
             {"display_radius_px", body.radius}, {"luminous", body.luminous}, {"ringed", body.ringed}
         }},
         {"orbital", {{"semi_major_axis_m", body.semiMajorAxis}, {"eccentricity", body.eccentricity},
-                      {"orbital_period_s", body.orbitalPeriod}}}
+                      {"orbital_period_s", body.orbitalPeriod}}},
+        {"rotation", {{"sidereal_period_s", body.rotationPeriod}, {"axial_tilt_deg", body.axialTilt}}}
     };
 }
 
@@ -75,7 +76,8 @@ SaveResult ScenarioSerializer::save(const std::filesystem::path& path, const Sim
         {"timestep_error_tolerance", snapshot.settings.timestepErrorTolerance},
         {"minimum_safe_separation_m", snapshot.settings.minimumSafeSeparationMeters},
                          {"trails_enabled", snapshot.settings.trailsEnabled}, {"vectors_enabled", snapshot.settings.vectorsEnabled},
-                         {"labels_enabled", snapshot.settings.labelsEnabled}, {"paused", snapshot.paused},
+                         {"labels_enabled", snapshot.settings.labelsEnabled},
+                         {"selection_highlight_enabled", snapshot.settings.selectionHighlightEnabled}, {"paused", snapshot.paused},
                          {"show_orbits", snapshot.showOrbits}, {"show_trails", snapshot.showTrails},
                          {"show_vectors", snapshot.showVectors}, {"show_grid", snapshot.showGrid}}},
         {"bodies", Json::array()}
@@ -117,6 +119,7 @@ DataResult<SimulationSnapshot> ScenarioSerializer::load(const std::filesystem::p
         snapshot.settings.trailsEnabled = simulation.value("trails_enabled", true);
         snapshot.settings.vectorsEnabled = simulation.value("vectors_enabled", false);
         snapshot.settings.labelsEnabled = simulation.value("labels_enabled", false);
+        snapshot.settings.selectionHighlightEnabled = simulation.value("selection_highlight_enabled", true);
         snapshot.settings.referenceFrame = snapshot.metadata.referenceFrame;
         snapshot.paused = simulation.value("paused", false);
         snapshot.showOrbits = simulation.value("show_orbits", false);
@@ -148,6 +151,11 @@ DataResult<SimulationSnapshot> ScenarioSerializer::load(const std::filesystem::p
             definition.semiMajorAxisM = orbital.value("semi_major_axis_m", 0.0);
             definition.eccentricity = orbital.value("eccentricity", 0.0);
             definition.orbitalPeriodS = orbital.value("orbital_period_s", 0.0);
+            if (jsonBody.contains("rotation") && jsonBody["rotation"].is_object()) {
+                const auto& rotation = jsonBody["rotation"];
+                definition.rotationPeriodS = rotation.value("sidereal_period_s", definition.rotationPeriodS);
+                definition.axialTiltDeg = rotation.value("axial_tilt_deg", definition.axialTiltDeg);
+            }
             auto body = BodyFactory::create(definition);
             if (!body) return DataResult<SimulationSnapshot>::failure(body.error);
             snapshot.bodies.push_back(std::move(*body.value));

@@ -16,6 +16,8 @@ struct SimulationSettings {
     bool trailsEnabled = true;
     bool vectorsEnabled = false;
     bool labelsEnabled = false;
+    // Presentation-only: selection remains available for inspection and focus.
+    bool selectionHighlightEnabled = true;
     std::string referenceFrame = "heliocentric";
 };
 

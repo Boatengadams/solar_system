@@ -124,6 +124,24 @@ DataResult<BodyDefinition> ScenarioLoader::loadBodyDefinition(const std::string&
         if (orbital.contains("orbital_period_s")) definition.orbitalPeriodS = orbital["orbital_period_s"].get<double>();
         if (!std::isfinite(definition.semiMajorAxisM) || !std::isfinite(definition.eccentricity) || !std::isfinite(definition.orbitalPeriodS)) return DataResult<BodyDefinition>::failure(context + " orbital values must be finite");
     }
+    if (json.contains("rotation")) {
+        if (!json["rotation"].is_object()) return DataResult<BodyDefinition>::failure(context + " field 'rotation' must be an object");
+        const auto& rotation = json["rotation"];
+        if (rotation.contains("sidereal_period_s")) {
+            if (!rotation["sidereal_period_s"].is_number()) return DataResult<BodyDefinition>::failure(context + " rotation.sidereal_period_s must be a number");
+            definition.rotationPeriodS = rotation["sidereal_period_s"].get<double>();
+        }
+        if (rotation.contains("axial_tilt_deg")) {
+            if (!rotation["axial_tilt_deg"].is_number()) return DataResult<BodyDefinition>::failure(context + " rotation.axial_tilt_deg must be a number");
+            definition.axialTiltDeg = rotation["axial_tilt_deg"].get<double>();
+        }
+        if (!std::isfinite(definition.rotationPeriodS) || definition.rotationPeriodS == 0.0) {
+            return DataResult<BodyDefinition>::failure(context + " rotation.sidereal_period_s must be finite and non-zero");
+        }
+        if (!std::isfinite(definition.axialTiltDeg)) {
+            return DataResult<BodyDefinition>::failure(context + " rotation.axial_tilt_deg must be finite");
+        }
+    }
     return DataResult<BodyDefinition>::success(std::move(definition));
     } catch (const Json::exception& error) {
         return DataResult<BodyDefinition>::failure("invalid body JSON in " + path.string() + ": " + error.what());
@@ -175,6 +193,7 @@ DataResult<ScenarioMetadata> ScenarioLoader::parseScenario(const std::filesystem
     if (settingsJson.contains("trails_enabled")) settings.trailsEnabled = settingsJson["trails_enabled"].get<bool>();
     if (settingsJson.contains("vectors_enabled")) settings.vectorsEnabled = settingsJson["vectors_enabled"].get<bool>();
     if (settingsJson.contains("labels_enabled")) settings.labelsEnabled = settingsJson["labels_enabled"].get<bool>();
+    if (settingsJson.contains("selection_highlight_enabled")) settings.selectionHighlightEnabled = settingsJson["selection_highlight_enabled"].get<bool>();
     if (json.contains("educational") && json["educational"].is_object()) {
         if (json["educational"].contains("lesson")) metadata.lesson = json["educational"]["lesson"].get<std::string>();
         if (json["educational"].contains("experiment")) metadata.experiment = json["educational"]["experiment"].get<std::string>();

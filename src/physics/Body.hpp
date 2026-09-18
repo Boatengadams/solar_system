@@ -31,7 +31,9 @@ struct Body {
     bool userCreated = false;
     int parent = -1;
     std::string parentId;
-    std::vector<Vec2> trail;
+    // Historical physical positions in astronomical units. Rendering applies
+    // the same presentation transform as the current body position.
+    std::vector<Vec3> trail;
 };
 
 } // namespace bag

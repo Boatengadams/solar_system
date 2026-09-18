@@ -26,6 +26,8 @@ struct BodyDefinition {
     double semiMajorAxisM = 0.0;
     double eccentricity = 0.0;
     double orbitalPeriodS = 0.0;
+    double rotationPeriodS = 86400.0; // sidereal; negative => retrograde
+    double axialTiltDeg = 0.0;
 };
 
 struct CustomBodyData {

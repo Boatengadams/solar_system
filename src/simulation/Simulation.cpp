@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <iterator>
 #include <limits>
 
 #include "../core/Logger.hpp"
@@ -16,12 +17,25 @@
 namespace bag {
 namespace {
 constexpr double MAX_FRAME_DELTA = 1.0 / 30.0;
+
+constexpr GradeId kAllGrades[] = {
+    GradeId::B1, GradeId::B2, GradeId::B3, GradeId::B4, GradeId::B5, GradeId::B6,
+    GradeId::JHS1, GradeId::JHS2, GradeId::JHS3, GradeId::SHS1, GradeId::SHS2, GradeId::SHS3,
+};
+
+int gradeIndex(GradeId grade) {
+    for (int index = 0; index < static_cast<int>(std::size(kAllGrades)); ++index) {
+        if (kAllGrades[index] == grade) return index;
+    }
+    return 6;
 }
+} // namespace
 
 const char* appScreenName(AppScreen screen) {
     switch (screen) {
     case AppScreen::Simulation: return "SIMULATION";
     case AppScreen::Education: return "EDUCATION";
+    case AppScreen::LearningLab: return "LEARNING LAB";
     case AppScreen::ScenarioBrowser: return "SCENARIOS";
     case AppScreen::MissionDesigner: return "MISSION TOOLS";
     case AppScreen::Telemetry: return "TELEMETRY";
@@ -43,6 +57,23 @@ Simulation::Simulation(std::filesystem::path root)
             logError(resources.error);
         }
     }
+
+    const auto curriculumPath = dataRoot / "curriculum" / "ghana_nacca_2019";
+    const auto loaded = CurriculumLoader::loadFromDirectory(curriculumPath);
+    if (loaded) {
+        curriculumCatalog = loaded.catalog;
+        curriculumReady = true;
+        std::string i18nError;
+        if (!curriculumI18n.loadFile(curriculumPath / "i18n" / "en.json", i18nError)) {
+            logError(i18nError);
+        }
+        applyLearnerPresentationMode();
+    } else {
+        curriculumReady = false;
+        curriculumLoadError = loaded.error;
+        logError("curriculum load failed: " + loaded.error);
+    }
+
     reset();
     setChallenge(0);
 }
@@ -69,10 +100,19 @@ bool Simulation::loadScenario(const std::string& id) {
     settings = result.value->settings;
     bodies = result.value->bodies;
     stars = result.value->stars;
+    // Keep the educational probe dormant until P pulses/launches it so it does not
+    // look like a mystery body circling with the planets.
+    for (Body& body : bodies) {
+        if (body.type == "Spacecraft" || body.id == "bagsolar-1") {
+            body.active = false;
+            body.trail.clear();
+        }
+    }
     speed = settings.timeScale;
     showTrails = settings.trailsEnabled;
     showVectors = settings.vectorsEnabled;
     selected = -1;
+    soloStudy = false;
     simTime = 0.0;
     accumulator = 0.0;
     actualTimestep = settings.timestepSeconds;
@@ -129,8 +169,10 @@ bool Simulation::initializeFromEphemeris(const EphemerisSnapshot& snapshot) {
 void Simulation::integrate(double realDeltaSeconds) {
     const double scaled = std::min(realDeltaSeconds, MAX_FRAME_DELTA) * speed;
     accumulator += scaled;
+    // High time-scales need more substeps so ×10000 / ×100000 still advance noticeably.
+    const int maxSteps = std::clamp(100 + static_cast<int>(speed / 40.0), 100, 2500);
     int steps = 0;
-    while (accumulator >= (settings.adaptiveTimestep ? nextTimestep : settings.timestepSeconds) && steps++ < 100) {
+    while (accumulator >= (settings.adaptiveTimestep ? nextTimestep : settings.timestepSeconds) && steps++ < maxSteps) {
         Integrator integrator = Integrator::VelocityVerlet;
         if (!parseIntegrator(settings.integrator, integrator)) {
             logError("unsupported integrator '" + settings.integrator + "'");
@@ -187,9 +229,11 @@ void Simulation::integrate(double realDeltaSeconds) {
             if (!body.active || static_cast<int>(simTime) % 21600 >= 3600) {
                 continue;
             }
-            if (body.trail.empty() || body.trail.back().x != static_cast<float>(body.position.x / PhysicsEngine::AU)) {
-                body.trail.push_back({static_cast<float>(body.position.x / PhysicsEngine::AU),
-                                      static_cast<float>(body.position.y / PhysicsEngine::AU)});
+            const Vec3 trailPosition = body.position / PhysicsEngine::AU;
+            if (body.trail.empty() || body.trail.back().x != static_cast<float>(trailPosition.x) ||
+                body.trail.back().y != static_cast<float>(trailPosition.y) ||
+                body.trail.back().z != static_cast<float>(trailPosition.z)) {
+                body.trail.push_back(trailPosition);
                 if (static_cast<int>(body.trail.size()) > PhysicsEngine::MAX_TRAIL) {
                     body.trail.erase(body.trail.begin());
                 }
@@ -198,16 +242,42 @@ void Simulation::integrate(double realDeltaSeconds) {
     }
 }
 
-void Simulation::launchProbe(double delta) {
-    auto probe = std::find_if(bodies.begin(), bodies.end(), [](const Body& body) { return body.id == "bagsolar-1"; });
+bool Simulation::launchProbe(double deltaV) {
     auto earth = std::find_if(bodies.begin(), bodies.end(), [](const Body& body) { return body.id == "earth"; });
-    if (probe == bodies.end() || earth == bodies.end()) {
-        return;
+    if (earth == bodies.end() || !earth->active) return false;
+
+    auto probe = std::find_if(bodies.begin(), bodies.end(), [](const Body& body) { return body.id == "bagsolar-1"; });
+    if (probe == bodies.end()) {
+        ScenarioLoader loader(dataRoot);
+        const auto definition = loader.loadBodyDefinition("bagsolar-1");
+        if (!definition) {
+            logError(definition.error);
+            return false;
+        }
+        const auto created = BodyFactory::create(*definition.value);
+        if (!created) {
+            logError(created.error);
+            return false;
+        }
+        addBody(*created.value);
+        probe = std::find_if(bodies.begin(), bodies.end(), [](const Body& body) { return body.id == "bagsolar-1"; });
+        if (probe == bodies.end()) return false;
     }
-    probe->position = earth->position + Vec3{0, 4.2e8, 0};
-    probe->velocity = earth->velocity + Vec3{-delta, 0, 0};
+
+    // Inject outside Earth on a near-circular path, then add the pulse Δv so the
+    // burn is obvious in the live system.
+    constexpr double altitudeM = 4.2e8;
+    const Vec3 radial{0.0, altitudeM, 0.0};
+    const double circularSpeed = std::sqrt(PhysicsEngine::G * earth->mass / altitudeM);
+    const double pulse = std::isfinite(deltaV) ? std::abs(deltaV) : 3500.0;
+    probe->position = earth->position + radial;
+    probe->velocity = earth->velocity + Vec3{-(circularSpeed + pulse), 0.0, 0.0};
+    probe->active = true;
     probe->trail.clear();
+    soloStudy = false;
+    selected = static_cast<int>(std::distance(bodies.begin(), probe));
     lastPredictionComparison.reset();
+    return true;
 }
 
 bool Simulation::addCustomBody(const CustomBodyData& data) {
@@ -274,6 +344,7 @@ bool Simulation::loadSnapshot(const std::filesystem::path& path) {
     lastPredictionComparison.reset();
     refreshScientificState();
     selected = -1;
+    soloStudy = false;
     telemetry.clear();
     return true;
 }
@@ -519,9 +590,327 @@ bool Simulation::loadEducationProgress(const std::filesystem::path& path) {
     return educationProgress.load(path);
 }
 
+bool Simulation::setLearnerGrade(GradeId grade) {
+    learnerGrade = grade;
+    curriculumActivityIndex = 0;
+    learningLabSession.reset();
+    curriculumAnswerSelection.clear();
+    lastCurriculumAssessment.reset();
+    lastCurriculumMisconception.reset();
+    applyLearnerPresentationMode();
+    return true;
+}
+
+bool Simulation::cycleLearnerGrade(int direction) {
+    if (direction == 0) return false;
+    const int count = static_cast<int>(std::size(kAllGrades));
+    const int next = (gradeIndex(learnerGrade) + (direction > 0 ? 1 : -1) + count) % count;
+    return setLearnerGrade(kAllGrades[next]);
+}
+
+PresentationLayer Simulation::learnerPresentationLayer() const {
+    return presentationLayerFor(learnerGrade);
+}
+
+void Simulation::applyLearnerPresentationMode() {
+    switch (learnerPresentationLayer()) {
+    case PresentationLayer::Foundation:
+        settings.labelsEnabled = true;
+        settings.vectorsEnabled = false;
+        showVectors = false;
+        showOrbits = false;
+        showGrid = false;
+        break;
+    case PresentationLayer::Explorer:
+        settings.labelsEnabled = true;
+        settings.vectorsEnabled = false;
+        showVectors = false;
+        showOrbits = true;
+        showGrid = false;
+        break;
+    case PresentationLayer::Scientist:
+        settings.labelsEnabled = true;
+        settings.vectorsEnabled = true;
+        showVectors = true;
+        showOrbits = true;
+        showGrid = true;
+        break;
+    }
+}
+
+std::vector<const CurriculumActivity*> Simulation::activitiesForLearnerGrade() const {
+    if (!curriculumReady) return {};
+    return CurriculumLoader::activitiesForGrade(curriculumCatalog, learnerGrade);
+}
+
+const CurriculumActivity* Simulation::selectedCurriculumActivity() const {
+    const auto activities = activitiesForLearnerGrade();
+    if (activities.empty()) return nullptr;
+    const int index = std::clamp(curriculumActivityIndex, 0, static_cast<int>(activities.size()) - 1);
+    return activities[static_cast<std::size_t>(index)];
+}
+
+const CurriculumQuestion* Simulation::selectedCurriculumQuestion() const {
+    const CurriculumActivity* activity = learningLabSession.activity();
+    if (!activity && !(activity = selectedCurriculumActivity())) return nullptr;
+    if (activity->assessmentIds.empty()) return nullptr;
+    return CurriculumLoader::findQuestion(curriculumCatalog, activity->assessmentIds.front());
+}
+
+bool Simulation::selectCurriculumActivity(int index) {
+    const auto activities = activitiesForLearnerGrade();
+    if (activities.empty()) return false;
+    curriculumActivityIndex = std::clamp(index, 0, static_cast<int>(activities.size()) - 1);
+    learningLabSession.reset();
+    curriculumAnswerSelection.clear();
+    lastCurriculumAssessment.reset();
+    lastCurriculumMisconception.reset();
+    return true;
+}
+
+bool Simulation::startCurriculumActivity() {
+    const CurriculumActivity* activity = selectedCurriculumActivity();
+    if (!activity) return false;
+    curriculumAnswerSelection.clear();
+    lastCurriculumAssessment.reset();
+    lastCurriculumMisconception.reset();
+    return learningLabSession.start(*activity);
+}
+
+bool Simulation::advanceCurriculumActivity() {
+    const LearningLabStep step = learningLabSession.state().step;
+    if (step == LearningLabStep::Predict && learningLabSession.state().prediction.empty()) {
+        recordCurriculumPrediction("Learner prediction recorded");
+    }
+    if (step == LearningLabStep::Observe && learningLabSession.state().observation.empty()) {
+        recordCurriculumObservation("Learner observation recorded");
+    }
+    const bool advanced = learningLabSession.advance();
+    if (advanced && learningLabSession.state().step == LearningLabStep::Assess) {
+        curriculumAnswerSelection.clear();
+        lastCurriculumAssessment.reset();
+        lastCurriculumMisconception.reset();
+    }
+    return advanced;
+}
+
+bool Simulation::recordCurriculumPrediction(std::string text) {
+    return learningLabSession.recordPrediction(std::move(text));
+}
+
+bool Simulation::recordCurriculumObservation(std::string text) {
+    return learningLabSession.recordObservation(std::move(text));
+}
+
+bool Simulation::toggleCurriculumAnswerOption(int optionIndex) {
+    const CurriculumQuestion* question = selectedCurriculumQuestion();
+    if (!question || learningLabSession.state().step != LearningLabStep::Assess) return false;
+    if (optionIndex < 0 || optionIndex >= static_cast<int>(question->options.size())) return false;
+    const std::string& optionId = question->options[static_cast<std::size_t>(optionIndex)].id;
+    const bool multi = question->questionType == QuestionType::MultipleSelect;
+    if (!multi) {
+        curriculumAnswerSelection = {optionId};
+        return true;
+    }
+    const auto found = std::find(curriculumAnswerSelection.begin(), curriculumAnswerSelection.end(), optionId);
+    if (found != curriculumAnswerSelection.end()) curriculumAnswerSelection.erase(found);
+    else curriculumAnswerSelection.push_back(optionId);
+    return true;
+}
+
+bool Simulation::submitCurriculumAssessment() {
+    const CurriculumQuestion* question = selectedCurriculumQuestion();
+    if (!question || learningLabSession.state().step != LearningLabStep::Assess) return false;
+    AssessmentSubmission submission;
+    submission.questionId = question->id;
+    submission.selectedOptionIds = curriculumAnswerSelection;
+    lastCurriculumAssessment = AssessmentEngine::score(*question, submission);
+    lastCurriculumMisconception = MisconceptionEngine::detect(curriculumCatalog, question->id, curriculumAnswerSelection);
+    return learningLabSession.completeAssessment(lastCurriculumAssessment->correct, lastCurriculumAssessment->score);
+}
+
 void Simulation::setSpeed(double value) {
-    speed = std::max(0.01, std::min(100000.0, value));
+    // Time scaling only feeds the existing bounded accumulator. Integration
+    // still uses the configured/adaptive timestep and safety policies.
+    speed = std::max(0.1, std::min(100000.0, value));
     settings.timeScale = speed;
+}
+
+void Simulation::adjustSpeed(int direction) {
+    if (direction == 0) return;
+    constexpr double steps[] = {
+        0.1, 0.25, 0.5, 1.0, 2.0, 5.0, 10.0, 50.0, 100.0, 500.0,
+        1000.0, 5000.0, 10000.0, 50000.0, 100000.0,
+    };
+    int nearest = 0;
+    for (int index = 1; index < static_cast<int>(std::size(steps)); ++index) {
+        if (std::abs(steps[index] - speed) < std::abs(steps[nearest] - speed)) nearest = index;
+    }
+    const int next = std::clamp(nearest + (direction > 0 ? 1 : -1), 0, static_cast<int>(std::size(steps)) - 1);
+    setSpeed(steps[next]);
+}
+
+bool Simulation::selectBody(int index) {
+    if (index < 0 || index >= static_cast<int>(bodies.size())) return false;
+    if (!bodies[static_cast<std::size_t>(index)].active) return false;
+    selected = index;
+    // Isolation is owned by Z / Q — selecting must not silently cancel zoom state here.
+    // Callers that need to leave isolate restore the camera explicitly.
+    return true;
+}
+
+bool Simulation::isolateSelected() {
+    if (selected < 0 || selected >= static_cast<int>(bodies.size())) return false;
+    if (!bodies[static_cast<std::size_t>(selected)].active) return false;
+    soloStudy = true;
+    return true;
+}
+
+void Simulation::exitIsolation() {
+    soloStudy = false;
+}
+
+void Simulation::clearSelection() {
+    selected = -1;
+    soloStudy = false;
+}
+
+bool Simulation::stepBack() {
+    if (soloStudy) {
+        exitIsolation();
+        return true;
+    }
+    if (selected >= 0) {
+        clearSelection();
+        return true;
+    }
+    return false;
+}
+
+bool Simulation::bodyVisibleInView(int index) const {
+    if (index < 0 || index >= static_cast<int>(bodies.size())) return false;
+    const Body& candidate = bodies[static_cast<std::size_t>(index)];
+    if (!candidate.active) return false;
+    if (!soloStudy || selected < 0) return true;
+    if (index == selected) return true;
+
+    // Probes/spacecraft never tag along in Z study — only when they are the focus.
+    if (candidate.type == "Spacecraft" || candidate.id == "bagsolar-1") return false;
+
+    const Body& selectedBody = bodies[static_cast<std::size_t>(selected)];
+    // Earth study keeps Moon; Moon study keeps Earth. Other bodies stay alone.
+    if (!selectedBody.parentId.empty() && candidate.id == selectedBody.parentId &&
+        candidate.type != "Star" && candidate.type != "Spacecraft") {
+        return true;
+    }
+    if (!candidate.parentId.empty() && candidate.parentId == selectedBody.id &&
+        (candidate.type == "Moon" || candidate.id == "moon")) {
+        return true;
+    }
+    return false;
+}
+
+std::string Simulation::selectedBodyLesson() const {
+    if (selected < 0 || selected >= static_cast<int>(bodies.size())) return {};
+    const Body& body = bodies[static_cast<std::size_t>(selected)];
+    const PresentationLayer layer = learnerPresentationLayer();
+    if (body.id == "sun" || body.type == "Star") {
+        if (layer == PresentationLayer::Foundation) return "The Sun is a star. It makes its own light and keeps the planets moving around it.";
+        if (layer == PresentationLayer::Explorer) return "The Sun is the central star of the Solar System. Its gravity dominates planetary orbits.";
+        return "Treat the Sun as the dominant central mass: orbital energy and period scale with GM⊙ and heliocentric distance.";
+    }
+    if (body.id == "mercury") {
+        if (layer == PresentationLayer::Foundation) {
+            return "Mercury spins very slowly — one day lasts about 59 Earth days — and stands nearly upright with almost no tilt.";
+        }
+        if (layer == PresentationLayer::Explorer) {
+            return "Mercury's sidereal day is ~59 Earth days and its axial tilt is nearly 0°. Compare that with Earth's 24 h day and 23.5° tilt.";
+        }
+        return "Mercury: long sidereal day (~59 d) and near-zero obliquity. Spin is prograde but extremely slow versus orbital motion.";
+    }
+    if (body.id == "venus") {
+        if (layer == PresentationLayer::Foundation) {
+            return "Venus spins backward (retrograde). Its day is longer than its year — about 243 Earth days to spin once.";
+        }
+        if (layer == PresentationLayer::Explorer) {
+            return "Venus is retrograde: it spins opposite Earth's west-to-east sense, and a sidereal day (~243 Earth days) exceeds its year.";
+        }
+        return "Venus: retrograde rotation (negative sidereal period) with obliquity ~177°. Day length exceeds the orbital period.";
+    }
+    if (body.id == "earth") {
+        if (layer == PresentationLayer::Foundation) {
+            return "Earth's day is about 24 hours. It spins west-to-east (prograde) with a moderate tilt of about 23.5° — that tilt makes seasons.";
+        }
+        if (layer == PresentationLayer::Explorer) {
+            return "Earth orbits the Sun once a year. Its ~24 h prograde spin and ~23.5° tilt are the baseline for comparing other planets.";
+        }
+        return "Compare Earth's specific orbital energy, escape speed, and circular-orbit speed at 1 AU, plus its sidereal day and obliquity.";
+    }
+    if (body.id == "moon" || body.type == "Moon") {
+        if (layer == PresentationLayer::Foundation) return "The Moon is Earth's neighbour in space. It does not make its own light.";
+        if (layer == PresentationLayer::Explorer) return "The Moon is a natural satellite: it orbits Earth while Earth orbits the Sun.";
+        return "Satellite motion is hierarchical: lunar state is relative to Earth, while the Earth–Moon barycentre orbits the Sun.";
+    }
+    if (body.id == "mars") {
+        if (layer == PresentationLayer::Foundation) {
+            return "Mars is almost like Earth: a day lasts about 24.6 hours, and its tilt (~25°) is close to Earth's 23.5°.";
+        }
+        if (layer == PresentationLayer::Explorer) {
+            return "Mars has a prograde day (~24.6 h) and obliquity (~25°) nearly identical to Earth — a useful twin for spin comparisons.";
+        }
+        return "Mars: sidereal day ~24.6 h and obliquity ~25°. Prograde spin closely mirrors Earth's rotation geometry.";
+    }
+    if (body.id == "jupiter") {
+        if (layer == PresentationLayer::Foundation) {
+            return "Jupiter spins super fast — its day is only about 10 hours, the shortest day in the Solar System.";
+        }
+        if (layer == PresentationLayer::Explorer) {
+            return "Jupiter's ~10 h day is the shortest among the planets. Watch how quickly its globe turns compared with Earth.";
+        }
+        return "Jupiter: gas-giant rotation with a ~10 h sidereal day — much faster angular rate than the terrestrial planets.";
+    }
+    if (body.id == "saturn") {
+        if (layer == PresentationLayer::Foundation) {
+            return "Saturn also spins very fast (about 10.7 hours) and leans about 27° — similar tilt to Earth, but a much quicker day.";
+        }
+        if (layer == PresentationLayer::Explorer) {
+            return "Saturn's ~10.7 h day and ~27° tilt make a fast, Earth-like lean. Its rings follow the same tilted spin axis.";
+        }
+        return "Saturn: rapid ~10.7 h sidereal day with obliquity ~27°. Ring plane shares the body's oriented equator.";
+    }
+    if (body.id == "uranus") {
+        if (layer == PresentationLayer::Foundation) {
+            return "Uranus rolls on its side. It is tilted about 98°, so its spin axis lies almost in its orbit plane. A day lasts ~17 hours.";
+        }
+        if (layer == PresentationLayer::Explorer) {
+            return "Uranus has a sideways spin (~98° tilt) and a ~17 h day. The amber pole axis in study view shows that extreme lean.";
+        }
+        return "Uranus: obliquity ~98° (sideways rotator) with a ~17 h sidereal day; sense of spin is retrograde in IAU convention.";
+    }
+    if (body.id == "neptune") {
+        if (layer == PresentationLayer::Foundation) {
+            return "Neptune spins quickly — about 16 hours for one day — with a moderate tilt near 28°, a bit more than Earth.";
+        }
+        if (layer == PresentationLayer::Explorer) {
+            return "Neptune's ~16 h day and ~28° tilt are a fast, moderately tipped spin compared with Earth's 24 h / 23.5°.";
+        }
+        return "Neptune: ~16 h sidereal day and obliquity ~28°. Prograde ice-giant rotation with Earth-comparable tilt.";
+    }
+    if (body.type == "Planet") {
+        if (layer == PresentationLayer::Foundation) return body.name + " is a planet. Planets move around the Sun and spin on their axes.";
+        if (layer == PresentationLayer::Explorer) {
+            return body.name + " is a planet. Compare its day length, tilt, and spin direction with Earth's.";
+        }
+        return "Inspect " + body.name + ": heliocentric distance, orbital speed, sidereal day, obliquity, and bound/unbound energy.";
+    }
+    if (body.type == "Spacecraft") {
+        if (layer == PresentationLayer::Foundation) return body.name + " is a spacecraft made by people to explore space.";
+        if (layer == PresentationLayer::Explorer) return body.name + " is an artificial satellite / probe. Watch how burns change its path.";
+        return "Spacecraft trajectories respond to gravity and impulsive Δv. Track energy and whether the path stays bound.";
+    }
+    if (layer == PresentationLayer::Foundation) return "Look carefully at " + body.name + ". What is it, and how does it move?";
+    if (layer == PresentationLayer::Explorer) return "Study " + body.name + ": identify its type, path, and relationship to the Sun.";
+    return "Use " + body.name + " as a measurement target: radius, mass, distance, velocity, energy, and orbit class.";
 }
 
 void Simulation::adjustTimestep(double factor) {

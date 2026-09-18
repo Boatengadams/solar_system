@@ -2,11 +2,41 @@
   "id": "mars",
   "name": "Mars",
   "type": "Planet",
-  "mass_kg": 6.4171e23,
-  "radius_m": 3.3895e6,
-  "initial_position_m": [206693154674.76889, 0.0, 0.0],
-  "initial_velocity_mps": [0.0, 26496.522013253623, 0.0],
+  "mass_kg": 6.4171e+23,
+  "radius_m": 3389500.0,
+  "initial_position_m": [
+    206693154674.7689,
+    0.0,
+    0.0
+  ],
+  "initial_velocity_mps": [
+    0.0,
+    26496.522013253623,
+    0.0
+  ],
   "parent_id": "sun",
-  "visual": {"color_rgba": [190, 70, 45, 255], "accent_rgba": [255, 150, 105, 255], "display_radius_px": 3.2},
-  "orbital": {"semi_major_axis_m": 227939200000.0, "eccentricity": 0.0934, "orbital_period_s": 59353534.08}
+  "visual": {
+    "color_rgba": [
+      190,
+      70,
+      45,
+      255
+    ],
+    "accent_rgba": [
+      255,
+      150,
+      105,
+      255
+    ],
+    "display_radius_px": 3.2
+  },
+  "orbital": {
+    "semi_major_axis_m": 227939200000.0,
+    "eccentricity": 0.0934,
+    "orbital_period_s": 59353534.08
+  },
+  "rotation": {
+    "sidereal_period_s": 88642.663,
+    "axial_tilt_deg": 25.19
+  }
 }

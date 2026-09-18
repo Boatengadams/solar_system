@@ -1,0 +1,178 @@
+{
+  "activities": [
+    {
+      "id": "jhs1_solar_inner_planets_001",
+      "grade": "JHS1",
+      "subject": "Science",
+      "strand": "Systems",
+      "subStrand": "The Solar System",
+      "contentStandard": "B7.3.2.1",
+      "learningIndicator": "B7.3.2.1.1",
+      "curriculumReference": "B7.3.2.1.1",
+      "alignment": "official",
+      "learningObjective": "Identify the inner planets of the Solar System and describe their properties.",
+      "titleKey": "activity.jhs1_inner_planets.title",
+      "instructionsKey": "activity.jhs1_inner_planets.instructions",
+      "type": "interactive_simulation",
+      "difficulty": "intermediate",
+      "presentationLayer": "explorer",
+      "simulation": "solar_system",
+      "estimatedMinutes": 20,
+      "learningObjectiveIds": ["identify_inner_planets", "describe_planet_properties"],
+      "assessmentIds": ["q_jhs1_inner_planets"],
+      "source": {
+        "organization": "NaCCA / Ministry of Education",
+        "document": "Science Common Core Programme Curriculum (Basic 7–10)",
+        "version": "February 2020",
+        "reference": "B7.3.2.1.1 — identify the inner planets and describe their properties",
+        "verifiedAt": "2026-09-16"
+      },
+      "steps": [
+        {"type": "instruction"},
+        {"type": "explore", "simulationAction": "planet_explorer_tabs", "payload": ["learn", "explore", "test"]},
+        {"type": "question"},
+        {"type": "assessment"},
+        {"type": "feedback"}
+      ]
+    },
+    {
+      "id": "jhs1_solar_construct_001",
+      "grade": "JHS1",
+      "subject": "Science",
+      "strand": "Systems",
+      "subStrand": "The Solar System",
+      "contentStandard": "B7.3.2.1",
+      "learningIndicator": "B7.3.2.1.1",
+      "curriculumReference": "B7.3.2.1.1",
+      "alignment": "official",
+      "learningObjective": "Construct a model of the Solar System with correct order from the Sun.",
+      "titleKey": "activity.jhs1_construct.title",
+      "instructionsKey": "activity.jhs1_construct.instructions",
+      "type": "construction",
+      "difficulty": "intermediate",
+      "presentationLayer": "explorer",
+      "simulation": "solar_system_construction",
+      "estimatedMinutes": 25,
+      "learningObjectiveIds": ["construct_solar_system"],
+      "assessmentIds": ["q_jhs1_order"],
+      "source": {
+        "organization": "NaCCA / Ministry of Education",
+        "document": "Science Common Core Programme Curriculum (Basic 7–10)",
+        "version": "February 2020",
+        "reference": "B7.3.2.1.1 — identify inner planets; construction supports model-building exemplar practice",
+        "verifiedAt": "2026-09-16"
+      },
+      "steps": [
+        {"type": "instruction"},
+        {"type": "explore", "simulationAction": "construction_lab"},
+        {"type": "assessment"},
+        {"type": "feedback"}
+      ]
+    },
+    {
+      "id": "jhs1_orbit_lab_001",
+      "grade": "JHS1",
+      "subject": "Science",
+      "strand": "Systems",
+      "subStrand": "The Solar System",
+      "contentStandard": "B7.3.2.1",
+      "learningIndicator": "B7.3.2.1.1",
+      "curriculumReference": "B7.3.2.1.1",
+      "alignment": "official",
+      "learningObjective": "Investigate elliptical orbital movement by changing radius and velocity, then comparing prediction with result.",
+      "titleKey": "activity.jhs1_orbit_lab.title",
+      "instructionsKey": "activity.jhs1_orbit_lab.instructions",
+      "type": "prediction_experiment",
+      "difficulty": "intermediate",
+      "presentationLayer": "explorer",
+      "simulation": "orbit_lab",
+      "estimatedMinutes": 25,
+      "learningObjectiveIds": ["investigate_orbital_movement"],
+      "assessmentIds": ["q_jhs1_orbit"],
+      "source": {
+        "organization": "NaCCA / Ministry of Education",
+        "document": "Science Common Core Programme Curriculum (Basic 7–10)",
+        "version": "February 2020",
+        "reference": "B7.3.2.1.1 exemplar — elliptical path of movement of the inner planets",
+        "verifiedAt": "2026-09-16"
+      },
+      "steps": [
+        {"type": "instruction"},
+        {"type": "predict"},
+        {"type": "experiment", "simulationAction": "orbit_controls", "payload": ["radius", "velocity", "timescale", "planet_mass", "sun_mass"]},
+        {"type": "observe"},
+        {"type": "explain"},
+        {"type": "assessment"},
+        {"type": "feedback"}
+      ]
+    },
+    {
+      "id": "jhs2_outer_planets_001",
+      "grade": "JHS2",
+      "subject": "Science",
+      "strand": "Systems",
+      "subStrand": "The Solar System",
+      "contentStandard": "B8.3.2.1",
+      "learningIndicator": "B8.3.2.1.1",
+      "curriculumReference": "B8.3.2.1.1",
+      "alignment": "official",
+      "learningObjective": "Identify the outer planets and describe their properties.",
+      "titleKey": "activity.jhs2_outer_planets.title",
+      "instructionsKey": "activity.jhs2_outer_planets.instructions",
+      "type": "interactive_simulation",
+      "difficulty": "intermediate",
+      "presentationLayer": "explorer",
+      "simulation": "solar_system",
+      "estimatedMinutes": 20,
+      "learningObjectiveIds": ["identify_outer_planets"],
+      "assessmentIds": ["q_jhs2_outer_planets"],
+      "source": {
+        "organization": "NaCCA / Ministry of Education",
+        "document": "Science Common Core Programme Curriculum (Basic 7–10)",
+        "version": "February 2020",
+        "reference": "B8.3.2.1.1 — identify the outer planets and describe their properties",
+        "verifiedAt": "2026-09-16"
+      },
+      "steps": [
+        {"type": "instruction"},
+        {"type": "explore", "simulationAction": "focus_outer_planets"},
+        {"type": "assessment"},
+        {"type": "feedback"}
+      ]
+    },
+    {
+      "id": "jhs3_non_planetary_001",
+      "grade": "JHS3",
+      "subject": "Science",
+      "strand": "Systems",
+      "subStrand": "The Solar System",
+      "contentStandard": "B9.3.2.1",
+      "learningIndicator": "B9.3.2.1.1",
+      "curriculumReference": "B9.3.2.1.1",
+      "alignment": "official",
+      "learningObjective": "Understand movement of non-planetary bodies such as comets and asteroids in the Solar System.",
+      "titleKey": "activity.jhs3_non_planetary.title",
+      "instructionsKey": "activity.jhs3_non_planetary.instructions",
+      "type": "explore",
+      "difficulty": "intermediate",
+      "presentationLayer": "explorer",
+      "simulation": "asteroid_comet_lab",
+      "estimatedMinutes": 20,
+      "learningObjectiveIds": ["non_planetary_bodies"],
+      "assessmentIds": ["q_jhs3_asteroids"],
+      "source": {
+        "organization": "NaCCA / Ministry of Education",
+        "document": "Science Common Core Programme Curriculum (Basic 7–10)",
+        "version": "February 2020",
+        "reference": "B9.3.2.1.1 — movement of non-planetary bodies (comets, asteroids)",
+        "verifiedAt": "2026-09-16"
+      },
+      "steps": [
+        {"type": "instruction"},
+        {"type": "explore", "simulationAction": "show_asteroid_belt"},
+        {"type": "assessment"},
+        {"type": "feedback"}
+      ]
+    }
+  ]
+}

@@ -44,6 +44,8 @@ DataResult<Body> BodyFactory::create(const BodyDefinition& definition) {
     body.semiMajorAxis = definition.semiMajorAxisM;
     body.eccentricity = definition.eccentricity;
     body.orbitalPeriod = definition.orbitalPeriodS;
+    body.rotationPeriod = definition.rotationPeriodS;
+    body.axialTilt = definition.axialTiltDeg;
     return DataResult<Body>::success(std::move(body));
 }
 

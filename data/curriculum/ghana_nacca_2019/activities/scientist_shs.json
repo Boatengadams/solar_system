@@ -1,0 +1,183 @@
+{
+  "activities": [
+    {
+      "id": "shs1_satellite_concept_001",
+      "grade": "SHS1",
+      "subject": "Science",
+      "strand": "Systems",
+      "subStrand": "The Solar System",
+      "contentStandard": "B10.3.2.1",
+      "learningIndicator": "B10.3.2.1.1",
+      "curriculumReference": "B10.3.2.1.1",
+      "alignment": "official",
+      "learningObjective": "Explain the concept of a satellite, types of satellites, and their importance in the Solar System and society.",
+      "titleKey": "activity.shs1_satellite.title",
+      "instructionsKey": "activity.shs1_satellite.instructions",
+      "type": "interactive_simulation",
+      "difficulty": "intermediate",
+      "presentationLayer": "scientist",
+      "simulation": "satellite_lab",
+      "estimatedMinutes": 25,
+      "learningObjectiveIds": ["satellite_concept_uses"],
+      "assessmentIds": ["q_shs1_satellite"],
+      "source": {
+        "organization": "NaCCA / Ministry of Education",
+        "document": "Science Common Core Programme Curriculum (Basic 7–10)",
+        "version": "February 2020",
+        "reference": "B10.3.2.1.1 — explain the concept of satellite, types and importance",
+        "verifiedAt": "2026-09-16"
+      },
+      "steps": [
+        {"type": "instruction"},
+        {"type": "explore", "simulationAction": "satellite_types"},
+        {"type": "assessment"},
+        {"type": "feedback"}
+      ]
+    },
+    {
+      "id": "shs_gravity_lab_001",
+      "grade": "SHS2",
+      "subject": "Science",
+      "strand": "Forces and Energy",
+      "subStrand": "Force and Motion",
+      "contentStandard": "Supplementary enrichment",
+      "learningIndicator": "Supplementary enrichment",
+      "curriculumReference": "Supplementary enrichment",
+      "alignment": "supplementary_enrichment",
+      "learningObjective": "Investigate gravitational force using F = Gm1m2 / r² with SI units.",
+      "titleKey": "activity.shs_gravity_lab.title",
+      "instructionsKey": "activity.shs_gravity_lab.instructions",
+      "type": "calculation",
+      "difficulty": "advanced",
+      "presentationLayer": "scientist",
+      "simulation": "gravity_lab",
+      "estimatedMinutes": 30,
+      "learningObjectiveIds": ["gravity_force_law"],
+      "assessmentIds": ["q_shs_gravity"],
+      "source": {
+        "organization": "BAGSOLAR Learning Lab",
+        "document": "Advanced quantitative gravity investigation (extends existing BAGSOLAR physics education)",
+        "version": "2026",
+        "reference": "Supplementary enrichment",
+        "verifiedAt": "2026-09-16"
+      },
+      "steps": [
+        {"type": "instruction"},
+        {"type": "predict"},
+        {"type": "experiment", "simulationAction": "gravity_controls", "payload": ["mass1", "mass2", "distance"]},
+        {"type": "observe"},
+        {"type": "explain"},
+        {"type": "assessment"},
+        {"type": "feedback"}
+      ]
+    },
+    {
+      "id": "shs_orbit_lab_001",
+      "grade": "SHS2",
+      "subject": "Science",
+      "strand": "Forces and Energy",
+      "subStrand": "Force and Motion",
+      "contentStandard": "Supplementary enrichment",
+      "learningIndicator": "Supplementary enrichment",
+      "curriculumReference": "Supplementary enrichment",
+      "alignment": "supplementary_enrichment",
+      "learningObjective": "Investigate orbital radius, speed, period and central mass; plot distance vs period and distance vs speed.",
+      "titleKey": "activity.shs_orbit_lab.title",
+      "instructionsKey": "activity.shs_orbit_lab.instructions",
+      "type": "prediction_experiment",
+      "difficulty": "advanced",
+      "presentationLayer": "scientist",
+      "simulation": "orbit_lab_advanced",
+      "estimatedMinutes": 35,
+      "learningObjectiveIds": ["orbital_relationships"],
+      "assessmentIds": ["q_shs_orbit"],
+      "source": {
+        "organization": "BAGSOLAR Learning Lab",
+        "document": "Advanced orbital investigation with graphing",
+        "version": "2026",
+        "reference": "Supplementary enrichment",
+        "verifiedAt": "2026-09-16"
+      },
+      "steps": [
+        {"type": "instruction"},
+        {"type": "predict"},
+        {"type": "experiment", "simulationAction": "orbit_graph_controls"},
+        {"type": "observe"},
+        {"type": "explain"},
+        {"type": "assessment"},
+        {"type": "feedback"}
+      ]
+    },
+    {
+      "id": "shs_escape_velocity_001",
+      "grade": "SHS3",
+      "subject": "Science",
+      "strand": "Forces and Energy",
+      "subStrand": "Force and Motion",
+      "contentStandard": "Supplementary enrichment",
+      "learningIndicator": "Supplementary enrichment",
+      "curriculumReference": "Supplementary enrichment",
+      "alignment": "supplementary_enrichment",
+      "learningObjective": "Calculate and compare escape velocities using ve = √(2GM/r) for supported bodies.",
+      "titleKey": "activity.shs_escape.title",
+      "instructionsKey": "activity.shs_escape.instructions",
+      "type": "calculation",
+      "difficulty": "challenge",
+      "presentationLayer": "scientist",
+      "simulation": "escape_velocity_lab",
+      "estimatedMinutes": 30,
+      "learningObjectiveIds": ["escape_velocity"],
+      "assessmentIds": ["q_shs_escape"],
+      "source": {
+        "organization": "BAGSOLAR Learning Lab",
+        "document": "Advanced optional escape-velocity experiment",
+        "version": "2026",
+        "reference": "Supplementary enrichment — advanced activity",
+        "verifiedAt": "2026-09-16"
+      },
+      "steps": [
+        {"type": "instruction"},
+        {"type": "predict"},
+        {"type": "experiment", "simulationAction": "escape_controls", "payload": ["earth", "moon", "mars"]},
+        {"type": "observe"},
+        {"type": "explain"},
+        {"type": "assessment"},
+        {"type": "feedback"}
+      ]
+    },
+    {
+      "id": "shs_planet_comparison_001",
+      "grade": "SHS1",
+      "subject": "Science",
+      "strand": "Systems",
+      "subStrand": "The Solar System",
+      "contentStandard": "Supplementary enrichment",
+      "learningIndicator": "Supplementary enrichment",
+      "curriculumReference": "Supplementary enrichment",
+      "alignment": "supplementary_enrichment",
+      "learningObjective": "Compare planetary radius, mass, density, gravity, periods, distance, temperature, moons and atmosphere scientifically.",
+      "titleKey": "activity.shs_compare.title",
+      "instructionsKey": "activity.shs_compare.instructions",
+      "type": "comparison",
+      "difficulty": "advanced",
+      "presentationLayer": "scientist",
+      "simulation": "planet_comparison",
+      "estimatedMinutes": 25,
+      "learningObjectiveIds": ["planet_comparison"],
+      "assessmentIds": ["q_shs_compare"],
+      "source": {
+        "organization": "BAGSOLAR Learning Lab",
+        "document": "Scientific planet comparison dashboard",
+        "version": "2026",
+        "reference": "Supplementary enrichment",
+        "verifiedAt": "2026-09-16"
+      },
+      "steps": [
+        {"type": "instruction"},
+        {"type": "explore", "simulationAction": "comparison_dashboard"},
+        {"type": "assessment"},
+        {"type": "feedback"}
+      ]
+    }
+  ]
+}

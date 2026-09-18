@@ -2,11 +2,41 @@
   "id": "neptune",
   "name": "Neptune",
   "type": "Planet",
-  "mass_kg": 1.0241e26,
-  "radius_m": 2.4622e7,
-  "initial_position_m": [4459721663390.2383, 0.0, 0.0],
-  "initial_velocity_mps": [0.0, 5478.5797506428071, 0.0],
+  "mass_kg": 1.0241e+26,
+  "radius_m": 24622000.0,
+  "initial_position_m": [
+    4459721663390.238,
+    0.0,
+    0.0
+  ],
+  "initial_velocity_mps": [
+    0.0,
+    5478.579750642807,
+    0.0
+  ],
   "parent_id": "sun",
-  "visual": {"color_rgba": [55, 100, 210, 255], "accent_rgba": [120, 180, 255, 255], "display_radius_px": 3.0},
-  "orbital": {"semi_major_axis_m": 4495066000000.0, "eccentricity": 0.0086, "orbital_period_s": 5200692480.0}
+  "visual": {
+    "color_rgba": [
+      55,
+      100,
+      210,
+      255
+    ],
+    "accent_rgba": [
+      120,
+      180,
+      255,
+      255
+    ],
+    "display_radius_px": 3.0
+  },
+  "orbital": {
+    "semi_major_axis_m": 4495066000000.0,
+    "eccentricity": 0.0086,
+    "orbital_period_s": 5200692480.0
+  },
+  "rotation": {
+    "sidereal_period_s": 57996.0,
+    "axial_tilt_deg": 28.32
+  }
 }
