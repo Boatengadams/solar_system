@@ -550,11 +550,11 @@ void HUD::forcesMotionOverlay(const Simulation& simulation) const {
 void HUD::gravityModeOverlay(const Simulation& simulation) const {
     if (!simulation.gravityMode) return;
     const auto& t = theme();
-    const Rectangle panel = {ui::pagePad() + 58.0f, ui::topBarHeight() + 14.0f, 480.0f, 480.0f};
+    const Rectangle panel = {ui::pagePad() + 58.0f, ui::topBarHeight() + 14.0f, 520.0f, 520.0f};
     ui::drawGlassPanel(panel, true, 0.1f);
 
-    text("GRAVITY SIMULATION", panel.x + 14.0f, panel.y + 12.0f, 12.0f, t.accent);
-    text("↑ / ↓ adjust mass   R reset to default   G to close", panel.x + 14.0f, panel.y + 30.0f, 10.0f, t.textDim);
+    text("GRAVITY SIMULATION - INTERACTIVE VALUES", panel.x + 14.0f, panel.y + 12.0f, 12.0f, t.accent);
+    text("↑/↓ adjust   TAB cycle field   R reset   G/Q exit", panel.x + 14.0f, panel.y + 30.0f, 10.0f, t.textDim);
 
     if (simulation.selected < 0 || simulation.selected >= static_cast<int>(simulation.bodies.size())) {
         text("Select a body to analyse gravity.", panel.x + 14.0f, panel.y + 70.0f, 12.0f, t.textMuted);
@@ -565,10 +565,23 @@ void HUD::gravityModeOverlay(const Simulation& simulation) const {
     const double base = body.baseMass > 0.0 ? body.baseMass : body.mass;
     const double mult = body.massMultiplier > 0.0 ? body.massMultiplier : 1.0;
     const double effective = body.mass;
+    const double baseRadius = body.realRadius > 0.0 ? body.realRadius : 1.0;
+    const double radiusRatio = body.radius / baseRadius;
 
     ui::drawLabelValue("Selected Body", body.name.c_str(), panel.x + 14.0f, panel.y + 54.0f, 150.0f);
+    
+    // Mass field (editable)
+    const Color massBg = simulation.gravityModeEditField == 0 ? t.accentStrong : t.surface;
+    DrawRectangle(static_cast<int>(panel.x + 14.0f) - 4, static_cast<int>(panel.y + 76.0f) - 4, 350, 20, massBg);
     ui::drawLabelValue("Base Mass", (scientific(base) + " kg").c_str(), panel.x + 14.0f, panel.y + 76.0f, 150.0f);
-    ui::drawLabelValue("Mass Multiplier", (format(mult, 2) + "×").c_str(), panel.x + 14.0f, panel.y + 98.0f, 150.0f);
+    ui::drawLabelValue("Multiplier", (format(mult, 2) + "×").c_str(), panel.x + 240.0f, panel.y + 76.0f, 150.0f);
+    
+    // Radius field (editable)
+    const Color radiusBg = simulation.gravityModeEditField == 1 ? t.accentStrong : t.surface;
+    DrawRectangle(static_cast<int>(panel.x + 14.0f) - 4, static_cast<int>(panel.y + 98.0f) - 4, 350, 20, radiusBg);
+    ui::drawLabelValue("Radius", (format(body.radius / 1000.0, 1) + " M km").c_str(), panel.x + 14.0f, panel.y + 98.0f, 150.0f);
+    ui::drawLabelValue("Scale", (format(radiusRatio, 2) + "×").c_str(), panel.x + 240.0f, panel.y + 98.0f, 150.0f);
+    
     ui::drawLabelValue("Effective Mass", (scientific(effective) + " kg").c_str(), panel.x + 14.0f, panel.y + 120.0f, 150.0f);
 
     // Dominant gravitational source: parent, else Sun, else nearest massive body.

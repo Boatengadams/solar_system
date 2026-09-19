@@ -71,6 +71,7 @@ public:
     bool gravityMode = false;          // G — gravity simulation / mass analysis
     bool earthMoonFocus = false;       // F2 — dedicated Earth–Moon system focus
     bool showIndividualGravity = false; // optional per-body gravity contributions (V/G)
+    int gravityModeEditField = 0;      // 0=mass, 1=radius, 2=density
     VisualScaleMode visualScaleMode = VisualScaleMode::Educational;
     bool education = true;
     bool educationScreen = false;
@@ -126,6 +127,8 @@ public:
     CelestialBodyInfo selectedCelestialInfo() const;
     bool adjustSelectedMassMultiplier(int direction);
     bool resetSelectedMass();
+    bool adjustSelectedRadius(int direction);
+    bool cycleGravityModeEditField();
     void applyEffectiveMass(int index);
     void resetMassMultipliers();
     void toggleVisualScaleMode();

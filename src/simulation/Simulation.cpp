@@ -884,6 +884,35 @@ bool Simulation::resetSelectedMass() {
     return true;
 }
 
+bool Simulation::adjustSelectedRadius(int direction) {
+    if (!gravityMode || selected < 0 || selected >= static_cast<int>(bodies.size())) return false;
+    if (direction == 0) return false;
+    Body& body = bodies[static_cast<std::size_t>(selected)];
+    
+    // Discrete educational multipliers for radius
+    constexpr double steps[] = {0.1, 0.25, 0.5, 1.0, 2.0, 5.0, 10.0, 25.0, 50.0, 100.0};
+    double baseRadius = body.realRadius > 0.0 ? body.realRadius : body.radius;
+    double radiusMultiplier = body.radius / baseRadius;
+    
+    int nearest = 0;
+    for (int i = 1; i < static_cast<int>(std::size(steps)); ++i) {
+        if (std::abs(steps[i] - radiusMultiplier) < std::abs(steps[nearest] - radiusMultiplier)) {
+            nearest = i;
+        }
+    }
+    const int next = std::clamp(nearest + (direction > 0 ? 1 : -1), 0, static_cast<int>(std::size(steps)) - 1);
+    body.radius = baseRadius * steps[next];
+    refreshScientificState();
+    return true;
+}
+
+bool Simulation::cycleGravityModeEditField() {
+    if (!gravityMode) return false;
+    gravityModeEditField = (gravityModeEditField + 1) % 2;  // Cycle through: mass (0), radius (1)
+    return true;
+}
+
+
 void Simulation::toggleVisualScaleMode() {
     visualScaleMode = (visualScaleMode == VisualScaleMode::Educational)
         ? VisualScaleMode::Realistic

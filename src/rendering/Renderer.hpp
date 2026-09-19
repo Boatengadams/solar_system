@@ -113,6 +113,7 @@ private:
     // A small, presentation-only field makes the Sun's pull readable at a glance.
     void drawGravityField(const Simulation& simulation) const;
     void drawBody(const Body& body, const Simulation& simulation) const;
+    void drawBodyLabels(const Simulation& simulation) const;
     void drawStudySpinCues(const Body& body, float radius) const;
     void drawAxes() const;
     void drawSelectionIndicator(const Body& body, const Simulation& simulation) const;

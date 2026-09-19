@@ -866,27 +866,14 @@ void Renderer::drawForceMotionVectors(const Body& body, const Simulation& simula
     }
 
     // Optional individual gravitational contributions (toward each other mass).
-    // Only for the selected body — keeps the scene readable in multi-body view.
+    // Only for the selected body in gravity mode — keep short gravity field marks only.
+    // Individual contribution lines removed for cleaner visualization.
     const bool isSelected = simulation.selected >= 0 &&
         simulation.selected < static_cast<int>(simulation.bodies.size()) &&
         &simulation.bodies[static_cast<std::size_t>(simulation.selected)] == &body;
-    if (isSelected && (simulation.showIndividualGravity || simulation.gravityMode)) {
-        constexpr double soft = PhysicsEngine::MIN_PHYSICS_DISTANCE;
-        for (std::size_t j = 0; j < simulation.bodies.size(); ++j) {
-            if (j == bodyIndex || !simulation.bodies[j].active) continue;
-            const Body& other = simulation.bodies[j];
-            if (other.mass <= 0.0) continue;
-            const Vec3 delta = other.position - body.position;
-            const double distance = length(delta);
-            if (!std::isfinite(distance) || distance <= 0.0) continue;
-            const double safe = std::max(distance, soft);
-            const Vec3 contrib = delta * (PhysicsEngine::G * other.mass / (safe * safe * safe));
-            const double mag = length(contrib);
-            if (mag < accelMag * 0.02 && other.type != "Star") continue; // skip negligible pulls
-            const float arrowLen = visualLength(mag, 2.5e4, 0.7f, std::max(bodyR * 4.0f, 3.5f));
-            drawArrow3D(start, transform.vector(contrib, 1.0), arrowLen,
-                        alpha({255, 120, 200, 255}, 0.45f));
-        }
+    if (isSelected && simulation.gravityMode) {
+        // In gravity mode, show detailed analysis of which bodies contribute
+        // Display in HUD instead of cluttering the 3D view
     }
 }
 
@@ -1106,6 +1093,7 @@ void Renderer::scene(const Simulation& simulation) {
     }
     EndMode3D();
     if (selectedBody != nullptr) drawSelectionIndicator(*selectedBody, simulation);
+    if (simulation.showClassification) drawBodyLabels(simulation);
     if (trace && sceneFrames < 3) {
         const double totalMs = std::chrono::duration<double, std::milli>(Clock::now() - sceneStart).count();
         logInfo("[FRAME] scene total #" + std::to_string(sceneFrames) + " " + std::to_string(totalMs) + " ms");
@@ -1137,6 +1125,41 @@ void Renderer::drawSelectionIndicator(const Body& body, const Simulation& simula
     DrawLineEx({left, bottom}, {left + corner, bottom}, thickness, tick);
     DrawLineEx({right - corner, bottom}, {right, bottom}, thickness, tick);
     DrawLineEx({right, bottom - corner}, {right, bottom}, thickness, tick);
+}
+
+void Renderer::drawBodyLabels(const Simulation& simulation) const {
+    // Display body names and classifications as 2D labels on screen
+    for (int index = 0; index < static_cast<int>(simulation.bodies.size()); ++index) {
+        if (!simulation.bodyVisibleInView(index)) continue;
+        const Body& body = simulation.bodies[static_cast<std::size_t>(index)];
+        if (!body.active || body.name.empty()) continue;
+        
+        const Vector3 position = bodyWorldPosition(body, simulation);
+        const Vector2 screenPos = GetWorldToScreen(position, camera);
+        
+        // Only draw if on screen
+        if (screenPos.x < 0 || screenPos.x > GetScreenWidth() || 
+            screenPos.y < 0 || screenPos.y > GetScreenHeight()) continue;
+        
+        // Offset label above body
+        const float labelY = screenPos.y - presentationRadius(body, simulation) - 20.0f;
+        const int textWidth = MeasureText(body.name.c_str(), 12);
+        const float labelX = screenPos.x - textWidth * 0.5f;
+        
+        // Draw semi-transparent background
+        DrawRectangle(static_cast<int>(labelX) - 4, static_cast<int>(labelY) - 2, 
+                     textWidth + 8, 16, {0, 0, 0, 128});
+        
+        // Draw name
+        DrawText(body.name.c_str(), static_cast<int>(labelX), static_cast<int>(labelY), 12, RAYWHITE);
+        
+        // Draw classification below name
+        if (!body.type.empty()) {
+            const int typeWidth = MeasureText(body.type.c_str(), 10);
+            const float typeX = screenPos.x - typeWidth * 0.5f;
+            DrawText(body.type.c_str(), static_cast<int>(typeX), static_cast<int>(labelY + 14), 10, {180, 180, 180, 255});
+        }
+    }
 }
 
 int Renderer::hitTest(const Simulation& simulation, Vector2 mouse) const {

@@ -180,6 +180,12 @@ void InputController::update(Simulation& simulation, Renderer& renderer) {
         const bool bodyClick = !focusClick && renderer.consumePendingBodyPick(pickMouse) &&
                                !renderer.isCameraManipulating();
         if (focusClick || bodyClick) {
+            // If F2 (Earth-Moon focus) is active, clicking deactivates it
+            if (simulation.earthMoonFocus) {
+                simulation.exitIsolation();
+                renderer.restoreViewAfterIsolate();
+                return;
+            }
             const int hit = renderer.hitTest(simulation, pickMouse);
             if (simulation.soloStudy) {
                 // Leave isolate and restore the previous screen, then apply the click.
@@ -192,7 +198,13 @@ void InputController::update(Simulation& simulation, Renderer& renderer) {
         }
     }
 
-    if (IsKeyPressed(KEY_TAB)) cycleScreen(simulation);
+    // TAB: Cycle edit field in G mode, otherwise cycle screens
+    if (IsKeyPressed(KEY_TAB)) {
+        if (!simulation.gravityMode) {
+            cycleScreen(simulation);
+        }
+        return;
+    }
     if (IsKeyPressed(KEY_H) && simulation.screen != AppScreen::Settings) selectScreen(simulation, AppScreen::Help);
     if (IsKeyPressed(KEY_L)) {
         selectScreen(simulation, simulation.screen == AppScreen::Education ? AppScreen::Simulation : AppScreen::Education);
@@ -355,13 +367,32 @@ void InputController::update(Simulation& simulation, Renderer& renderer) {
     if (IsKeyPressed(KEY_A)) simulation.selectEducationActivity(EducationActivityType::Lesson, simulation.lesson - 1);
     if (IsKeyPressed(KEY_D)) simulation.selectEducationActivity(EducationActivityType::Lesson, simulation.lesson + 1);
     if (IsKeyPressed(KEY_E)) simulation.selectEducationActivity(EducationActivityType::Experiment, simulation.experiment + 1);
-    // In gravity mode, ↑/↓ adjust the selected body's mass multiplier (affects real physics).
+    
+    // In gravity mode, ↑/↓ adjust the selected edit field (mass or radius)
     if (simulation.gravityMode && simulation.selected >= 0) {
-        if (IsKeyPressed(KEY_UP)) simulation.adjustSelectedMassMultiplier(1);
-        if (IsKeyPressed(KEY_DOWN)) simulation.adjustSelectedMassMultiplier(-1);
+       if (IsKeyPressed(KEY_UP)) {
+           if (simulation.gravityModeEditField == 0) {
+               simulation.adjustSelectedMassMultiplier(1);
+           } else if (simulation.gravityModeEditField == 1) {
+               simulation.adjustSelectedRadius(1);
+           }
+       }
+       if (IsKeyPressed(KEY_DOWN)) {
+           if (simulation.gravityModeEditField == 0) {
+               simulation.adjustSelectedMassMultiplier(-1);
+           } else if (simulation.gravityModeEditField == 1) {
+               simulation.adjustSelectedRadius(-1);
+           }
+       }
+       // Tab to cycle through editable fields
+       if (IsKeyPressed(KEY_TAB)) {
+           simulation.cycleGravityModeEditField();
+           return;  // Don't cycle screens
+       }
     } else {
-        if (IsKeyPressed(KEY_UP)) simulation.selectEducationActivity(EducationActivityType::Experiment, simulation.experiment - 1);
-        if (IsKeyPressed(KEY_DOWN)) simulation.selectEducationActivity(EducationActivityType::Experiment, simulation.experiment + 1);
+       if (IsKeyPressed(KEY_UP)) simulation.selectEducationActivity(EducationActivityType::Experiment, simulation.experiment - 1);
+       if (IsKeyPressed(KEY_DOWN)) simulation.selectEducationActivity(EducationActivityType::Experiment, simulation.experiment + 1);
+       if (IsKeyPressed(KEY_TAB)) cycleScreen(simulation);
     }
     if (IsKeyPressed(KEY_ENTER)) simulation.startEducationActivity();
     if (IsKeyPressed(KEY_B)) simulation.beginEducationObservation();
