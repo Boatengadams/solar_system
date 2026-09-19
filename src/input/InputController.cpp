@@ -200,7 +200,9 @@ void InputController::update(Simulation& simulation, Renderer& renderer) {
 
     // TAB: Cycle edit field in G mode, otherwise cycle screens
     if (IsKeyPressed(KEY_TAB)) {
-        if (!simulation.gravityMode) {
+        if (simulation.gravityMode) {
+            simulation.cycleGravityModeEditField();
+        } else {
             cycleScreen(simulation);
         }
         return;
@@ -384,12 +386,7 @@ void InputController::update(Simulation& simulation, Renderer& renderer) {
                simulation.adjustSelectedRadius(-1);
            }
        }
-       // Tab to cycle through editable fields
-       if (IsKeyPressed(KEY_TAB)) {
-           simulation.cycleGravityModeEditField();
-           return;  // Don't cycle screens
-       }
-    } else {
+    } else if (!simulation.gravityMode) {
        if (IsKeyPressed(KEY_UP)) simulation.selectEducationActivity(EducationActivityType::Experiment, simulation.experiment - 1);
        if (IsKeyPressed(KEY_DOWN)) simulation.selectEducationActivity(EducationActivityType::Experiment, simulation.experiment + 1);
        if (IsKeyPressed(KEY_TAB)) cycleScreen(simulation);
