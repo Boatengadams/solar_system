@@ -413,7 +413,20 @@ void InputController::update(Simulation& simulation, Renderer& renderer) {
     // G = Gravity Simulation mode (mass analysis). Grid moved to Ctrl+G.
     if (!controlDown && IsKeyPressed(KEY_G)) {
         simulation.gravityMode = !simulation.gravityMode;
-        if (!simulation.gravityMode) {
+        if (simulation.gravityMode) {
+            // Entering gravity mode: auto-select first active body if none selected
+            if (simulation.selected < 0) {
+                for (int index = 0; index < static_cast<int>(simulation.bodies.size()); ++index) {
+                    if (simulation.bodies[static_cast<std::size_t>(index)].active &&
+                        simulation.bodies[static_cast<std::size_t>(index)].type != "Star") {
+                        simulation.selectBody(index);
+                        break;
+                    }
+                }
+            }
+            // Reset edit field to mass when entering
+            simulation.gravityModeEditField = 0;
+        } else {
             // Leaving gravity mode restores base masses so experiments stay reversible.
             simulation.resetMassMultipliers();
         }

@@ -361,6 +361,8 @@ void HUD::toolRail(const Simulation& simulation) const {
 }
 
 void HUD::selectedInfo(const Simulation& simulation) const {
+    // Hide selection panel when in G (gravity) mode - gravity overlay shows the info
+    if (simulation.gravityMode) return;
     if (simulation.selected < 0 || simulation.selected >= static_cast<int>(simulation.bodies.size())) return;
     const Body& body = simulation.bodies[static_cast<std::size_t>(simulation.selected)];
     const CelestialBodyInfo info = lookupCelestialInfo(body.id, body.type, body.luminous);
@@ -458,7 +460,9 @@ void HUD::selectedInfo(const Simulation& simulation) const {
 }
 
 void HUD::classificationOverlay(const Simulation& simulation) const {
-    if (!simulation.showClassification) return;
+    // Classification details have been moved into selectedInfo panel
+    // This panel is now hidden to consolidate UI
+    return;
     const auto& t = theme();
     const float screenW = static_cast<float>(GetScreenWidth());
     const Rectangle box = {screenW - 300.0f - 16.0f, ui::topBarHeight() + 14.0f, 300.0f, 280.0f};
