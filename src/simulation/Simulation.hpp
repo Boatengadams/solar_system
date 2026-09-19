@@ -25,6 +25,7 @@
 #include "../curriculum/MisconceptionEngine.hpp"
 #include "../curriculum/GradeIds.hpp"
 #include "SimulationSettings.hpp"
+#include "../astronomy/CelestialBodyCatalog.hpp"
 
 namespace bag {
 
@@ -64,8 +65,13 @@ public:
     bool paused = false;
     bool showOrbits = false;
     bool showTrails = true;
-    bool showVectors = false;
-    bool showGrid = false;
+    bool showVectors = false;          // V — Forces & Motion visualization
+    bool showGrid = false;             // Ctrl+G — reference grid
+    bool showClassification = false;   // Ctrl+N — naming / classification overlay
+    bool gravityMode = false;          // G — gravity simulation / mass analysis
+    bool earthMoonFocus = false;       // F2 — dedicated Earth–Moon system focus
+    bool showIndividualGravity = false; // optional per-body gravity contributions (V/G)
+    VisualScaleMode visualScaleMode = VisualScaleMode::Educational;
     bool education = true;
     bool educationScreen = false;
     bool soloStudy = false; // isolate selected body for focused learning
@@ -117,6 +123,12 @@ public:
     bool stepBack();
     bool bodyVisibleInView(int index) const;
     std::string selectedBodyLesson() const;
+    CelestialBodyInfo selectedCelestialInfo() const;
+    bool adjustSelectedMassMultiplier(int direction);
+    bool resetSelectedMass();
+    void applyEffectiveMass(int index);
+    void resetMassMultipliers();
+    void toggleVisualScaleMode();
     void adjustTimestep(double factor);
     void cycleIntegrator(int direction = 1);
     void setScreen(AppScreen next);

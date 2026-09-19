@@ -42,6 +42,31 @@ if(BAGS_LAB_BUNDLE_RAYLIB)
     if(CMAKE_VERSION VERSION_LESS "3.25")
         message(FATAL_ERROR "BAGS_LAB_BUNDLE_RAYLIB requires CMake >= 3.25 (raylib 6.0)")
     endif()
+    # Portable Linux uses raylib's bundled GLFW with the X11 backend. GLFW's
+    # CMake requires Xinerama headers (FindX11 → X11/extensions/Xinerama.h).
+    # Fail early with an installable host package name — never depend on ad-hoc
+    # CPATH=/tmp/... workarounds.
+    if(UNIX AND NOT APPLE)
+        find_path(BAGS_LAB_XINERAMA_INCLUDE_DIR
+            NAMES X11/extensions/Xinerama.h
+            DOC "Xinerama headers required to configure bundled GLFW for portable Linux")
+        find_library(BAGS_LAB_XINERAMA_LIBRARY
+            NAMES Xinerama
+            DOC "libXinerama (runtime usually already present; -dev package provides the link library name)")
+        if(NOT BAGS_LAB_XINERAMA_INCLUDE_DIR)
+            message(FATAL_ERROR
+                "Portable Linux (BAGS_LAB_BUNDLE_RAYLIB=ON) requires Xinerama development headers.\n"
+                "  Missing: X11/extensions/Xinerama.h\n"
+                "  Debian/Ubuntu/Kali:  sudo apt-get install libxinerama-dev\n"
+                "  Fedora/RHEL:        sudo dnf install libXinerama-devel\n"
+                "  Arch:               sudo pacman -S libxinerama\n"
+                "If headers live in a non-standard prefix, reconfigure with:\n"
+                "  -DCMAKE_PREFIX_PATH=/path/to/prefix\n"
+                "where that prefix contains include/X11/extensions/Xinerama.h.\n"
+                "Do not set CPATH to temporary staging directories.")
+        endif()
+        message(STATUS "BAGS_LAB: Xinerama headers found at ${BAGS_LAB_XINERAMA_INCLUDE_DIR}")
+    endif()
     include(FetchContent)
     set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
     set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
@@ -82,6 +107,7 @@ set(BAGSOLAR_SOURCES
     src/app/main.cpp
     src/astronomy/EphemerisTypes.cpp
     src/astronomy/EphemerisComparison.cpp
+    src/astronomy/CelestialBodyCatalog.cpp
     src/astronomy/CurlHttpClient.cpp
     src/astronomy/HorizonsParser.cpp
     src/astronomy/HorizonsProvider.cpp
@@ -215,6 +241,7 @@ if(BUILD_TESTING)
     add_executable(bagsolar_telemetry_tests
         tests/telemetry_tests.cpp
         src/astronomy/EphemerisTypes.cpp
+        src/astronomy/CelestialBodyCatalog.cpp
         src/astronomy/CurlHttpClient.cpp
         src/platform/ExternalCommand.cpp
         src/telemetry/TelemetryAnalyzer.cpp
@@ -258,6 +285,7 @@ if(BUILD_TESTING)
     add_executable(bagsolar_ephemeris_tests
         tests/ephemeris_tests.cpp
         src/astronomy/EphemerisTypes.cpp
+        src/astronomy/CelestialBodyCatalog.cpp
         src/astronomy/HorizonsParser.cpp
         src/astronomy/HorizonsProvider.cpp
         src/astronomy/HorizonsRequest.cpp
@@ -376,6 +404,7 @@ if(BUILD_TESTING)
         add_executable(bagsolar_spice_live_tests
             tests/spice_live_tests.cpp
             src/astronomy/EphemerisTypes.cpp
+            src/astronomy/CelestialBodyCatalog.cpp
             src/astronomy/SpiceProvider.cpp
             src/telemetry/TelemetryAnalyzer.cpp
             src/telemetry/TelemetryCollector.cpp
@@ -474,7 +503,13 @@ if(BUILD_TESTING)
                    ${CMAKE_CURRENT_BINARY_DIR}/bagsolar_package_smoke.cmake @ONLY)
     add_test(NAME bagsolar_package_smoke
              COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/bagsolar_package_smoke.cmake)
-    set_tests_properties(bagsolar_package_smoke PROPERTIES LABELS "integration;package")
+    if(BAGS_LAB_BUNDLE_RAYLIB)
+        set(_bags_package_smoke_labels "integration;package;portable")
+    else()
+        set(_bags_package_smoke_labels "integration;package;shared-dev")
+    endif()
+    set_tests_properties(bagsolar_package_smoke PROPERTIES
+        LABELS "${_bags_package_smoke_labels}")
 
     configure_file(${CMAKE_SOURCE_DIR}/tests/launcher_vfat_smoke.cmake.in
                    ${CMAKE_CURRENT_BINARY_DIR}/bagsolar_launcher_vfat_smoke.cmake @ONLY)
@@ -527,6 +562,8 @@ if(APPLE)
     # Preferred .app resource layout (NOT YET TESTED on a macOS host):
     #   BAGS_LAB.app/Contents/Resources/{data,assets}
     install(DIRECTORY data/ DESTINATION "BAGS_LAB.app/Contents/Resources/data")
+    install(FILES assets/milkyway.glb
+            DESTINATION "BAGS_LAB.app/Contents/Resources/assets")
     install(FILES assets/planets/manifest.json
             DESTINATION "BAGS_LAB.app/Contents/Resources/assets/planets")
     if(BAGS_LAB_INSTALL_PLANET_MODELS)
@@ -538,6 +575,7 @@ else()
     install(TARGETS BAGS_LAB bagsolar_validation bagsolar_ephemeris bagsolar_resource_smoke
             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
     install(DIRECTORY data/ DESTINATION ${CMAKE_INSTALL_DATADIR}/bags_lab/data)
+    install(FILES assets/milkyway.glb DESTINATION ${CMAKE_INSTALL_DATADIR}/bags_lab/assets)
     install(FILES assets/planets/manifest.json DESTINATION ${CMAKE_INSTALL_DATADIR}/bags_lab/assets/planets)
     if(BAGS_LAB_INSTALL_PLANET_MODELS)
         # Presentation models required by assets/planets/manifest.json (includes prepared/).

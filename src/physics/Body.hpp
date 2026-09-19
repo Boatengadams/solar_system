@@ -15,7 +15,11 @@ struct Body {
     std::string type;
     Vec3 position;
     Vec3 velocity;
+    // Effective gravitational mass used by the physics engine (kg).
+    // mass = baseMass * massMultiplier — never alter baseMass for rendering.
     double mass = 0.0;
+    double baseMass = 0.0;
+    double massMultiplier = 1.0;
     double radius = 1.0;
     double realRadius = 1.0;
     double axialTilt = 0.0;

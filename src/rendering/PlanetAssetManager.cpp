@@ -138,6 +138,13 @@ Vector3 PlanetAssetManager::modelCenter(const std::string& bodyId) const {
     return found == loaded.end() ? Vector3{} : found->second.center;
 }
 
+void PlanetAssetManager::setShader(const std::string& bodyId, Shader shader) {
+    const auto found = loaded.find(bodyId);
+    if (found == loaded.end()) return;
+    Model& model = found->second.model;
+    for (int index = 0; index < model.materialCount; ++index) model.materials[index].shader = shader;
+}
+
 void PlanetAssetManager::unload() {
     for (auto& [bodyId, asset] : loaded) {
         (void)bodyId;

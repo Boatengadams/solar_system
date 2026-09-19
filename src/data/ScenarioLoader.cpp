@@ -241,6 +241,8 @@ std::vector<Star> ScenarioLoader::createStars(std::mt19937& rng) {
     std::uniform_real_distribution<float> position(-6000.0f, 6000.0f);
     std::uniform_real_distribution<float> radius(0.4f, 1.8f);
     std::uniform_real_distribution<float> brightness(0.3f, 1.0f);
+    // Keep dense enough for a starfield backdrop. Renderer draws these as points
+    // (not spheres); do not raise this without re-checking first-frame cost.
     for (int i = 0; i < 1500; ++i) stars.push_back({{position(rng), position(rng)}, radius(rng), brightness(rng)});
     return stars;
 }

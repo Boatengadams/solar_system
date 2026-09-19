@@ -33,6 +33,8 @@ public:
     const Model* model(const std::string& bodyId) const;
     float modelRadius(const std::string& bodyId) const;
     Vector3 modelCenter(const std::string& bodyId) const;
+    // Applies a renderer-owned shader to every material of one loaded model.
+    void setShader(const std::string& bodyId, Shader shader);
     void unload();
 
     static bool isSupportedBodyId(const std::string& bodyId) {

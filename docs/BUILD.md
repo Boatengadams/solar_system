@@ -13,19 +13,48 @@ architecture: `docs/MULTIPLATFORM_BUILD_ARCHITECTURE.md`.
 - CTest (via CMake)
 - Bundled nlohmann/json headers under `third_party/nlohmann-json3-dev/`
 
+## Development vs portable (Linux)
+
+| | Development (`build/`) | Portable USB (`dist/linux-x64`) |
+| --- | --- | --- |
+| Status | **VERIFIED** | **VERIFIED** (linux-x64 only) |
+| `BAGS_LAB_BUNDLE_RAYLIB` | `OFF` (default) | `ON` |
+| raylib | system shared | static 6.0 (FetchContent) |
+| GLFW | host via distro raylib | static (raylib tree) |
+| CTest package smoke audit | `--profile shared-dev` | N/A here — use packager `--profile portable` |
+
+Do not treat a shared-dev CPack smoke as the USB portable gate.
+
 ## Portable Linux package (VERIFIED: linux-x64)
 
+Requires Xinerama **development** headers for bundled GLFW’s X11 backend:
+
 ```sh
+sudo apt-get install libxinerama-dev   # Kali / Debian / Ubuntu
 ./tools/package_portable.sh linux-x64
-./dist/linux-x64/BAGS_LAB.sh
+bash ./dist/linux-x64/BAGS_LAB.sh     # first-run dependency repair + launch
+```
+
+If headers are not on the default include path, pass a real prefix (official
+package contents), never a temporary `CPATH`:
+
+```sh
+export CMAKE_PREFIX_PATH=/path/to/prefix   # …/include/X11/extensions/Xinerama.h
+./tools/package_portable.sh linux-x64
 ```
 
 The verified portable package statically links raylib 6.0 and raylib’s bundled
 GLFW (no `libraylib.so`, no `libtiff`, no `libglfw.so.3`). Host X11/OpenGL
 (and glibc/libstdc++) stacks are still expected on typical Linux desktops.
+The portable shell launcher detects a missing host runtime on its first use and
+uses `sudo` plus the available Linux package manager to install it. This needs
+internet access and administrator authorization once per computer; subsequent
+USB launches simply run the application. Always launch a new-machine package
+through `bash BAGS_LAB.sh`, since the raw ELF cannot install dependencies after
+the Linux loader has rejected it.
 
 Other `dist/*` IDs exist as stubs until native builds are verified. The packager
-refuses to fabricate binaries.
+refuses to fabricate binaries. See `platform/linux/README.md`.
 
 ## Quick start
 

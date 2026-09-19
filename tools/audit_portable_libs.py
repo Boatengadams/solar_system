@@ -1,23 +1,29 @@
 #!/usr/bin/env python3
-"""Audit ELF runtime dependencies for BAGS_LAB portable packages.
+"""Audit ELF runtime dependencies for BAGS_LAB packages.
+
+Two explicit profiles (never mix them):
+
+  portable   — USB / static raylib release (BAGS_LAB_BUNDLE_RAYLIB=ON).
+               Forbids dynamic NEEDED on libraylib, libglfw, and libtiff.
+               GLFW must be statically linked from raylib's tree.
+
+  shared-dev — Development / system-raylib CPack layout (BUNDLE_RAYLIB=OFF).
+               Allows a bundled libraylib.so beside the binary and treats
+               host libglfw.so.* as a normal system dependency of distro
+               raylib. Still forbids unbundled libtiff and absolute RUNPATHs.
 
 Fails if a required non-system library is missing from the package lib/
 directory, or if RUNPATH/RPATH embeds an absolute build-machine path.
-
-System libraries (glibc, libstdc++, X11/Wayland, OpenGL) are expected from the
-host. Portable builds must statically link raylib's bundled GLFW — they must
-not require host libglfw.so.3 and must not ship a copied developer-machine
-GLFW. Project-bundled third-party libs (e.g. libraylib) must resolve from
-$ORIGIN/lib / the package lib directory.
 """
 from __future__ import annotations
 
 import argparse
-import os
 import re
 import subprocess
 import sys
 from pathlib import Path
+
+PROFILES = ("portable", "shared-dev")
 
 # Host graphics / C++ runtime — not shipped in lib/.
 SYSTEM_SONAMES = {
@@ -65,9 +71,10 @@ SYSTEM_SONAMES = {
     "libasound.so.2",
 }
 
-# Never allow these to be silently satisfied from the developer machine only,
-# and never "fix" them by copying an arbitrary host .so into lib/.
-FORBIDDEN_DYNAMIC = re.compile(r"^(libtiff\.so(\.|$)|libglfw\.so(\.|$)|libraylib\.so(\.|$))")
+# Always reject unbundled libtiff (both profiles).
+TIFF_SONAME = re.compile(r"^libtiff\.so(\.|$)")
+# Portable profile additionally rejects dynamic raylib/GLFW.
+PORTABLE_FORBIDDEN = re.compile(r"^(libtiff\.so(\.|$)|libglfw\.so(\.|$)|libraylib\.so(\.|$))")
 
 
 def readelf_dynamic(path: Path) -> str:
@@ -118,9 +125,13 @@ def is_system_soname(soname: str) -> bool:
     return False
 
 
-def audit(executable: Path, libdir: Path | None, require_origin_lib: bool) -> int:
+def audit(executable: Path, libdir: Path | None, require_origin_lib: bool, profile: str) -> int:
+    if profile not in PROFILES:
+        print(f"unknown audit profile: {profile!r} (expected one of {', '.join(PROFILES)})", file=sys.stderr)
+        return 2
+
     errors: list[str] = []
-    notes: list[str] = []
+    notes: list[str] = [f"audit profile: {profile}"]
 
     if not executable.is_file():
         print(f"missing executable: {executable}", file=sys.stderr)
@@ -140,23 +151,50 @@ def audit(executable: Path, libdir: Path | None, require_origin_lib: bool) -> in
         seen_files.add(real)
 
         for soname in needed_libs(path):
-            # Portable Linux must statically link GLFW. Never accept a dynamic
-            # libglfw dependency — including a copied host libglfw.so.3 in lib/.
-            if soname.startswith("libglfw.so"):
+            if profile == "portable" and soname.startswith("libglfw.so"):
+                # Portable Linux must statically link GLFW. Never accept a dynamic
+                # libglfw dependency — including a copied host libglfw.so.3 in lib/.
                 errors.append(
                     f"{path.name} dynamically requires {soname}; portable builds must "
                     f"statically link raylib's bundled GLFW (do not ship host libglfw)"
                 )
                 continue
 
-            if FORBIDDEN_DYNAMIC.search(soname):
+            if profile == "shared-dev" and soname.startswith("libglfw.so"):
+                # Distro shared raylib typically NEEDs host libglfw; that is OK for
+                # development CPack packages, not for the USB portable release.
+                notes.append(f"system ok (shared-dev): {soname} (from {path.name})")
+                continue
+
+            if profile == "portable" and PORTABLE_FORBIDDEN.search(soname):
+                errors.append(
+                    f"{path.name} dynamically requires {soname}; portable builds must not "
+                    f"NEED libraylib/libglfw/libtiff (static-link raylib+GLFW; no TIFF)"
+                )
+                continue
+
+            if TIFF_SONAME.search(soname):
                 bundled = resolve_in_libdir(soname, libdir) if libdir else None
                 if bundled is None:
                     errors.append(
                         f"{path.name} requires {soname}, which must be bundled under lib/ "
-                        f"(portable hosts are not assumed to provide TIFF/raylib)"
+                        f"(hosts are not assumed to provide TIFF)"
                     )
                     continue
+
+            if soname.startswith("libraylib.so"):
+                # shared-dev: libraylib must be staged beside the binary.
+                bundled = resolve_in_libdir(soname, libdir) if libdir else None
+                if bundled is None:
+                    errors.append(
+                        f"{path.name} requires {soname}, which must be bundled under lib/ "
+                        f"for relocatable shared-dev packages"
+                    )
+                    continue
+                notes.append(f"bundled ok: {soname} -> {bundled.name} (from {path.name})")
+                if bundled.resolve() not in seen_files:
+                    queue.append(bundled)
+                continue
 
             if is_system_soname(soname):
                 notes.append(f"system ok: {soname} (from {path.name})")
@@ -202,10 +240,10 @@ def audit(executable: Path, libdir: Path | None, require_origin_lib: bool) -> in
     if errors:
         for line in errors:
             print(line, file=sys.stderr)
-        print("portable dependency audit FAILED", file=sys.stderr)
+        print(f"{profile} dependency audit FAILED", file=sys.stderr)
         return 1
 
-    print("portable dependency audit ok")
+    print(f"{profile} dependency audit ok")
     return 0
 
 
@@ -223,6 +261,12 @@ def main() -> int:
         action="store_true",
         help="Require DT_RUNPATH/RPATH to include $ORIGIN/lib",
     )
+    parser.add_argument(
+        "--profile",
+        choices=PROFILES,
+        default="portable",
+        help="portable = static USB release audit; shared-dev = system-raylib CPack audit",
+    )
     args = parser.parse_args()
     libdir = args.libdir
     if libdir is not None and not libdir.is_dir():
@@ -231,7 +275,7 @@ def main() -> int:
         sibling = args.executable.parent / "lib"
         if sibling.is_dir():
             libdir = sibling
-    return audit(args.executable, libdir, args.require_origin_lib)
+    return audit(args.executable, libdir, args.require_origin_lib, args.profile)
 
 
 if __name__ == "__main__":

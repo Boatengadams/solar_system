@@ -21,6 +21,8 @@ DataResult<Body> validateAndCreate(const std::string& id, const std::string& nam
     body.name = name;
     body.type = type;
     body.mass = massKg;
+    body.baseMass = massKg;
+    body.massMultiplier = 1.0;
     body.realRadius = radiusM;
     body.position = positionM;
     body.velocity = velocityMps;

@@ -1,6 +1,7 @@
 #include "HUD.hpp"
 
 #include <algorithm>
+#include <cctype>
 #include <cmath>
 #include <iomanip>
 #include <sstream>
@@ -9,6 +10,7 @@
 #include "../education/EducationChallenges.hpp"
 #include "../education/EducationCatalog.hpp"
 #include "../education/LearnerReport.hpp"
+#include "../astronomy/CelestialBodyCatalog.hpp"
 #include "../physics/PhysicsEngine.hpp"
 #include "UiTheme.hpp"
 
@@ -17,6 +19,8 @@ namespace {
 
 using ui::theme;
 using ui::withAlpha;
+
+constexpr double TAU = 6.28318530717958647692; // 2π
 
 std::string format(double value, int digits = 2) {
     if (!std::isfinite(value)) return "—";
@@ -111,102 +115,695 @@ void HUD::text(const char* value, float x, float y, float size, Color colorValue
     DrawText(value, static_cast<int>(x), static_cast<int>(y), static_cast<int>(size), colorValue);
 }
 
+static double g_screenshotFeedbackTime = 0.0;
+
+void HUD::triggerScreenshotFeedback() {
+    g_screenshotFeedbackTime = GetTime();
+}
+
+void HUD::screenshotFeedback() const {
+    const double elapsed = GetTime() - g_screenshotFeedbackTime;
+    if (elapsed < 0.0 || elapsed > 2.6) return;
+    const auto& t = theme();
+    const float alphaVal = elapsed > 2.0 ? static_cast<float>((2.6 - elapsed) / 0.6) : 1.0f;
+    const float width = 280.0f;
+    const float height = 36.0f;
+    const float x = (static_cast<float>(GetScreenWidth()) - width) * 0.5f;
+    const float y = ui::topBarHeight() + 14.0f;
+    const Rectangle box = {x, y, width, height};
+    DrawRectangleRounded(box, 0.4f, 12, withAlpha(t.surfaceAlt, 0.95f * alphaVal));
+    DrawRectangleRoundedLines(box, 0.4f, 12, withAlpha(t.accent, 0.9f * alphaVal));
+    DrawCircle(static_cast<int>(x + 22.0f), static_cast<int>(y + 18.0f), 5.0f, withAlpha(t.success, alphaVal));
+    DrawText("CAPTURE SAVED (PNG)", static_cast<int>(x + 36.0f), static_cast<int>(y + 11.0f), 12,
+             withAlpha(t.text, alphaVal));
+}
+
 void HUD::pageChrome(const Simulation& simulation, const char* title, const char* subtitle) const {
     const auto& t = theme();
     DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), t.bg);
-    // Soft atmospheric wash
     DrawRectangleGradientV(0, 0, GetScreenWidth(), GetScreenHeight(),
-                           withAlpha(ui::rgba(18, 36, 48), 0.55f), t.bg);
+                           withAlpha(ui::rgba(14, 28, 44), 0.6f), t.bg);
     topBar(simulation);
-    text(title, ui::pagePad(), ui::contentTop(), 28, t.text);
-    text(subtitle, ui::pagePad(), ui::contentTop() + 34.0f, 14, t.textMuted);
+    text(title, ui::pagePad(), ui::contentTop(), 26, t.text);
+    text(subtitle, ui::pagePad(), ui::contentTop() + 32.0f, 13, t.textMuted);
 }
 
 void HUD::topBar(const Simulation& simulation) const {
     const auto& t = theme();
+    const float barW = static_cast<float>(GetScreenWidth());
     const float barH = ui::topBarHeight();
-    DrawRectangle(0, 0, GetScreenWidth(), static_cast<int>(barH), withAlpha(t.bgElevated, 0.96f));
-    DrawRectangle(0, static_cast<int>(barH) - 1, GetScreenWidth(), 1, withAlpha(t.border, 0.7f));
 
-    text("BAGS_LAB", 24, 14, 24, t.accentStrong);
-    text("Orbital lab", 26, 40, 11, t.textDim);
+    // Dark translucent background with thin bottom border
+    DrawRectangle(0, 0, static_cast<int>(barW), static_cast<int>(barH), withAlpha(t.bgElevated, 0.96f));
+    DrawRectangleGradientV(0, 0, static_cast<int>(barW), 22, withAlpha(t.accent, 0.04f), withAlpha(t.accent, 0.0f));
+    DrawRectangle(0, static_cast<int>(barH) - 1, static_cast<int>(barW), 1, withAlpha(t.border, 0.85f));
 
-    const ui::NavLayout nav = ui::buildNavLayout(static_cast<float>(GetScreenWidth()));
+    // Left: Scientific BAGS_LAB Logo & wordmark
+    constexpr float logoCx = 26.0f;
+    constexpr float logoCy = 27.0f;
+    DrawCircleLines(static_cast<int>(logoCx), static_cast<int>(logoCy), 12.0f, withAlpha(t.accent, 0.5f));
+    DrawCircleLines(static_cast<int>(logoCx), static_cast<int>(logoCy), 7.0f, withAlpha(t.accentStrong, 0.8f));
+    DrawCircle(static_cast<int>(logoCx), static_cast<int>(logoCy), 3.0f, t.accentStrong);
+    // Orbiting electron/satellite pip
+    const float orbitAngle = static_cast<float>(GetTime() * 1.5);
+    DrawCircle(static_cast<int>(logoCx + 12.0f * std::cos(orbitAngle)),
+               static_cast<int>(logoCy + 12.0f * std::sin(orbitAngle)), 1.8f, t.accent);
+
+    text("BAGS_LAB", 48.0f, 12.0f, 18.0f, t.text);
+    text("C++17 ORBITAL MECHANICS LABORATORY", 48.0f, 33.0f, 9.0f, t.textDim);
+
+    // Center Navigation tabs
+    const ui::NavLayout nav = ui::buildNavLayout(barW);
+    const Vector2 mouse = GetMousePosition();
     for (std::size_t index = 0; index < ui::kNavTabs.size(); ++index) {
+        const Rectangle hit = nav.hits[index];
         const bool active = simulation.screen == ui::kNavTabs[index].screen;
-        ui::drawChip(nav.hits[index], ui::kNavTabs[index].label, active);
+        const bool hover = CheckCollisionPointRec(mouse, hit);
+
+        if (active) {
+            DrawRectangleRounded({hit.x, hit.y + 4.0f, hit.width, hit.height - 6.0f}, 0.15f, 8,
+                                 withAlpha(t.accent, 0.14f));
+            DrawRectangle(static_cast<int>(hit.x + 4.0f), static_cast<int>(barH) - 3,
+                          static_cast<int>(hit.width - 8.0f), 2, t.accent);
+        } else if (hover) {
+            DrawRectangleRounded({hit.x, hit.y + 4.0f, hit.width, hit.height - 6.0f}, 0.15f, 8,
+                                 withAlpha(t.surfaceAlt, 0.5f));
+        }
+
+        const int fontSize = 11;
+        const float textWidth = static_cast<float>(MeasureText(ui::kNavTabs[index].label, fontSize));
+        DrawText(ui::kNavTabs[index].label,
+                 static_cast<int>(hit.x + (hit.width - textWidth) * 0.5f),
+                 static_cast<int>(hit.y + (hit.height - fontSize) * 0.5f - 1.0f),
+                 fontSize, active ? t.text : (hover ? t.accentStrong : t.textMuted));
     }
 
-    const float right = static_cast<float>(GetScreenWidth());
-    const Rectangle status = {right - 250.0f, 14.0f, 100.0f, 36.0f};
-    ui::drawChip(status, simulation.paused ? "Paused" : "Live", !simulation.paused,
-                 simulation.paused ? t.warn : t.success);
+    // Right Side: SIM TIME, Speed Pill, Status, Settings, Exit
+    const float right = barW;
 
-    text(time(simulation.simTime).c_str(), right - 138.0f, 16.0f, 16, t.accentStrong);
-    text(formatSpeed(simulation.speed).c_str(), right - 138.0f, 36.0f, 13, t.textMuted);
+    // Exit / Power Button
+    const Rectangle powerBtn = {right - 34.0f, 12.0f, 28.0f, 30.0f};
+    const bool powerHover = CheckCollisionPointRec(mouse, powerBtn);
+    if (powerHover) DrawRectangleRounded(powerBtn, 0.3f, 8, withAlpha(t.danger, 0.2f));
+    DrawCircleLines(static_cast<int>(powerBtn.x + 14.0f), static_cast<int>(powerBtn.y + 15.0f), 7.0f,
+                    powerHover ? t.danger : t.textMuted);
+    DrawLine(static_cast<int>(powerBtn.x + 14.0f), static_cast<int>(powerBtn.y + 9.0f),
+             static_cast<int>(powerBtn.x + 14.0f), static_cast<int>(powerBtn.y + 16.0f),
+             powerHover ? t.danger : t.textMuted);
+
+    // Settings Gear Icon
+    const Rectangle settingsBtn = {right - 66.0f, 12.0f, 28.0f, 30.0f};
+    const bool settingsHover = CheckCollisionPointRec(mouse, settingsBtn);
+    if (settingsHover) DrawRectangleRounded(settingsBtn, 0.3f, 8, withAlpha(t.surfaceAlt, 0.6f));
+    const float gearCx = settingsBtn.x + 14.0f;
+    const float gearCy = settingsBtn.y + 15.0f;
+    DrawCircleLines(static_cast<int>(gearCx), static_cast<int>(gearCy), 5.0f,
+                    settingsHover ? t.accentStrong : t.textMuted);
+    for (int i = 0; i < 6; ++i) {
+        const float a = static_cast<float>(i * PI / 3.0);
+        DrawLine(static_cast<int>(gearCx + 5.0f * std::cos(a)), static_cast<int>(gearCy + 5.0f * std::sin(a)),
+                 static_cast<int>(gearCx + 8.0f * std::cos(a)), static_cast<int>(gearCy + 8.0f * std::sin(a)),
+                 settingsHover ? t.accentStrong : t.textMuted);
+    }
+
+    // Wireless / Antenna Telemetry Status Icon
+    const float antX = right - 96.0f;
+    const float antY = 27.0f;
+    DrawCircleLines(static_cast<int>(antX), static_cast<int>(antY + 4.0f), 8.0f, withAlpha(t.accent, 0.7f));
+    DrawCircleLines(static_cast<int>(antX), static_cast<int>(antY + 4.0f), 4.0f, withAlpha(t.accent, 0.9f));
+    DrawCircle(static_cast<int>(antX), static_cast<int>(antY + 4.0f), 1.5f, t.accentStrong);
+
+    // Speed Control Pill [ ◀ | ⏵/⏸ x1.0 | ▶ ]
+    const Rectangle speedPill = {right - 216.0f, 11.0f, 108.0f, 32.0f};
+    DrawRectangleRounded(speedPill, 0.45f, 12, withAlpha(t.surface, 0.9f));
+    DrawRectangleRoundedLines(speedPill, 0.45f, 12, withAlpha(t.border, 0.8f));
+
+    // Play/pause symbol
+    if (simulation.paused) {
+        DrawTriangle({speedPill.x + 14.0f, speedPill.y + 10.0f},
+                     {speedPill.x + 14.0f, speedPill.y + 22.0f},
+                     {speedPill.x + 23.0f, speedPill.y + 16.0f}, t.warn);
+    } else {
+        DrawRectangle(static_cast<int>(speedPill.x + 14.0f), static_cast<int>(speedPill.y + 10.0f), 3, 12, t.success);
+        DrawRectangle(static_cast<int>(speedPill.x + 20.0f), static_cast<int>(speedPill.y + 10.0f), 3, 12, t.success);
+    }
+    const std::string spdStr = formatSpeed(simulation.speed);
+    text(spdStr.c_str(), speedPill.x + 30.0f, speedPill.y + 9.0f, 12, t.text);
+    // Chevrons on sides
+    text("‹", speedPill.x + 76.0f, speedPill.y + 6.0f, 14, t.textDim);
+    text("›", speedPill.x + 92.0f, speedPill.y + 6.0f, 14, t.textDim);
+
+    // SIM TIME Display: "SIM TIME" and "0.00 days"
+    const double days = simulation.simTime / PhysicsEngine::DAY;
+    std::string daysStr = format(days, 2) + " days";
+    text("SIM TIME", right - 336.0f, 12.0f, 9.0f, t.textDim);
+    text(daysStr.c_str(), right - 336.0f, 24.0f, 16.0f, t.accentStrong);
+
+    // Live status dot
+    DrawCircle(static_cast<int>(right - 350.0f), 27, 4.0f, simulation.paused ? t.warn : t.success);
 }
 
 void HUD::bottomBar(const Simulation& simulation) const {
     (void)simulation;
+}
+
+void HUD::toolRail(const Simulation& simulation) const {
     const auto& t = theme();
-    const float y = static_cast<float>(GetScreenHeight()) - ui::bottomBarHeight();
-    DrawRectangle(0, static_cast<int>(y), GetScreenWidth(), static_cast<int>(ui::bottomBarHeight()),
-                  withAlpha(t.bgElevated, 0.94f));
-    DrawRectangle(0, static_cast<int>(y), GetScreenWidth(), 1, withAlpha(t.border, 0.55f));
-    text("Drag orbit  ·  Right/Middle pan  ·  Wheel zoom  ·  Click select  ·  Z zoom  ·  Q back",
-         24, y + 14.0f, 13, t.textMuted);
-    text("Space pause   P pulse probe   ± speed   5/6 fast",
-         static_cast<float>(GetScreenWidth()) - 390.0f, y + 14.0f, 13, t.textDim);
+    const ui::HudLayout layout = ui::buildHudLayout(static_cast<float>(GetScreenWidth()),
+                                               static_cast<float>(GetScreenHeight()),
+                                               simulation.selected >= 0, simulation.soloStudy);
+    const Vector2 mouse = GetMousePosition();
+
+    // Tool rail glass container
+    DrawRectangleRounded(layout.toolRail, 0.2f, 12, withAlpha(t.panelGlass, 0.92f));
+    DrawRectangleRoundedLines(layout.toolRail, 0.2f, 12, withAlpha(t.border, 0.8f));
+
+    // 7 technical tools:
+    // 0: Select (default active)
+    // 1: Focus
+    // 2: Screenshot
+    // 3: Coordinate/Grid
+    // 4: Orbit Analysis
+    // 5: Layers / Trails
+    // 6: Data / Objects
+    for (int i = 0; i < 7; ++i) {
+        const Rectangle btn = layout.toolButtons[static_cast<std::size_t>(i)];
+        bool isActive = false;
+        if (i == 0) isActive = (simulation.selected < 0);
+        else if (i == 1) isActive = (simulation.selected >= 0);
+        else if (i == 3) isActive = simulation.showGrid;
+        else if (i == 4) isActive = simulation.showOrbits;
+        else if (i == 5) isActive = simulation.showTrails || simulation.showVectors;
+
+        const bool hover = CheckCollisionPointRec(mouse, btn);
+
+        if (isActive) {
+            DrawRectangleRounded(btn, 0.25f, 8, withAlpha(t.accent, 0.24f));
+            DrawRectangleRoundedLines(btn, 0.25f, 8, t.accent);
+        } else if (hover) {
+            DrawRectangleRounded(btn, 0.25f, 8, withAlpha(t.surfaceAlt, 0.6f));
+            DrawRectangleRoundedLines(btn, 0.25f, 8, withAlpha(t.borderSoft, 0.9f));
+        }
+
+        const Color iconColor = isActive ? t.accentStrong : (hover ? t.text : t.textMuted);
+        const float cx = btn.x + btn.width * 0.5f;
+        const float cy = btn.y + btn.height * 0.5f;
+
+        switch (i) {
+        case 0: { // Cursor / Select arrow
+            DrawTriangle({cx - 5.0f, cy - 7.0f}, {cx - 5.0f, cy + 7.0f}, {cx + 6.0f, cy + 1.0f}, iconColor);
+            break;
+        }
+        case 1: { // Focus target / Crosshairs
+            DrawCircleLines(static_cast<int>(cx), static_cast<int>(cy), 7.0f, iconColor);
+            DrawCircle(static_cast<int>(cx), static_cast<int>(cy), 2.0f, iconColor);
+            DrawLine(static_cast<int>(cx - 10.0f), static_cast<int>(cy), static_cast<int>(cx - 7.0f), static_cast<int>(cy), iconColor);
+            DrawLine(static_cast<int>(cx + 7.0f), static_cast<int>(cy), static_cast<int>(cx + 10.0f), static_cast<int>(cy), iconColor);
+            DrawLine(static_cast<int>(cx), static_cast<int>(cy - 10.0f), static_cast<int>(cx), static_cast<int>(cy - 7.0f), iconColor);
+            DrawLine(static_cast<int>(cx), static_cast<int>(cy + 7.0f), static_cast<int>(cx), static_cast<int>(cy + 10.0f), iconColor);
+            break;
+        }
+        case 2: { // Camera / Capture
+            DrawRectangleRoundedLines({cx - 9.0f, cy - 5.0f, 18.0f, 13.0f}, 0.2f, 4, iconColor);
+            DrawCircleLines(static_cast<int>(cx), static_cast<int>(cy + 1.5f), 4.0f, iconColor);
+            DrawRectangle(static_cast<int>(cx - 3.0f), static_cast<int>(cy - 8.0f), 6, 3, iconColor);
+            break;
+        }
+        case 3: { // Globe / Grid
+            DrawCircleLines(static_cast<int>(cx), static_cast<int>(cy), 8.0f, iconColor);
+            DrawLine(static_cast<int>(cx - 8.0f), static_cast<int>(cy), static_cast<int>(cx + 8.0f), static_cast<int>(cy), iconColor);
+            DrawLine(static_cast<int>(cx), static_cast<int>(cy - 8.0f), static_cast<int>(cx), static_cast<int>(cy + 8.0f), iconColor);
+            break;
+        }
+        case 4: { // Orbit analysis
+            DrawCircleLines(static_cast<int>(cx), static_cast<int>(cy), 8.0f, iconColor);
+            DrawCircle(static_cast<int>(cx + 6.0f), static_cast<int>(cy - 3.0f), 2.5f, iconColor);
+            break;
+        }
+        case 5: { // Layers stack
+            DrawLine(static_cast<int>(cx - 8.0f), static_cast<int>(cy - 4.0f), static_cast<int>(cx), static_cast<int>(cy - 8.0f), iconColor);
+            DrawLine(static_cast<int>(cx), static_cast<int>(cy - 8.0f), static_cast<int>(cx + 8.0f), static_cast<int>(cy - 4.0f), iconColor);
+            DrawLine(static_cast<int>(cx + 8.0f), static_cast<int>(cy - 4.0f), static_cast<int>(cx), static_cast<int>(cy), iconColor);
+            DrawLine(static_cast<int>(cx), static_cast<int>(cy), static_cast<int>(cx - 8.0f), static_cast<int>(cy - 4.0f), iconColor);
+
+            DrawLine(static_cast<int>(cx - 8.0f), static_cast<int>(cy + 2.0f), static_cast<int>(cx), static_cast<int>(cy + 6.0f), iconColor);
+            DrawLine(static_cast<int>(cx), static_cast<int>(cy + 6.0f), static_cast<int>(cx + 8.0f), static_cast<int>(cy + 2.0f), iconColor);
+            break;
+        }
+        case 6: { // Data / Objects cylinders
+            DrawRectangleRoundedLines({cx - 8.0f, cy - 7.0f, 16.0f, 14.0f}, 0.3f, 4, iconColor);
+            DrawLine(static_cast<int>(cx - 8.0f), static_cast<int>(cy - 2.0f), static_cast<int>(cx + 8.0f), static_cast<int>(cy - 2.0f), iconColor);
+            DrawLine(static_cast<int>(cx - 8.0f), static_cast<int>(cy + 3.0f), static_cast<int>(cx + 8.0f), static_cast<int>(cy + 3.0f), iconColor);
+            break;
+        }
+        }
+    }
 }
 
 void HUD::selectedInfo(const Simulation& simulation) const {
     if (simulation.selected < 0 || simulation.selected >= static_cast<int>(simulation.bodies.size())) return;
     const Body& body = simulation.bodies[static_cast<std::size_t>(simulation.selected)];
+    const CelestialBodyInfo info = lookupCelestialInfo(body.id, body.type, body.luminous);
     const auto& t = theme();
-    const float boxWidth = std::min(340.0f, GetScreenWidth() - 40.0f);
-    const float boxHeight = simulation.soloStudy ? 400.0f : 300.0f;
-    const Rectangle box = {
-        20.0f,
-        static_cast<float>(GetScreenHeight()) - ui::bottomBarHeight() - boxHeight - 16.0f,
-        boxWidth,
-        boxHeight,
-    };
-    ui::drawPanel(box, true);
-    DrawRectangleRounded({box.x, box.y, 5.0f, box.height}, 0.2f, 8,
-                         {body.accent.r, body.accent.g, body.accent.b, 255});
+    const ui::HudLayout layout = ui::buildHudLayout(static_cast<float>(GetScreenWidth()),
+                                               static_cast<float>(GetScreenHeight()),
+                                               true, simulation.soloStudy || simulation.earthMoonFocus);
+    const Rectangle box = layout.inspector;
+    ui::drawGlassPanel(box, true, 0.08f);
 
-    text(simulation.soloStudy ? "STUDY" : "SELECTED", box.x + 18, box.y + 14, 11,
-         simulation.soloStudy ? t.accent : t.textDim);
-    text(body.name.c_str(), box.x + 18, box.y + 32, 22, t.text);
-    text(body.type.c_str(), box.x + 18, box.y + 58, 12, t.textMuted);
+    DrawCircle(static_cast<int>(box.x + 18.0f), static_cast<int>(box.y + 20.0f), 4.5f, t.accentStrong);
+    text(body.name.c_str(), box.x + 30.0f, box.y + 11.0f, 16.0f, t.text);
 
-    ui::drawLabelValue("Mass", (scientific(body.mass) + " kg").c_str(), box.x + 18, box.y + 88);
-    ui::drawLabelValue("Radius", distance(body.realRadius).c_str(), box.x + 18, box.y + 110);
-    ui::drawLabelValue("Distance", distance(simulation.distanceFromSun(body)).c_str(), box.x + 18, box.y + 132);
-    ui::drawLabelValue("Velocity", (format(length(body.velocity) / 1000.0, 2) + " km/s").c_str(), box.x + 18, box.y + 154);
-    ui::drawLabelValue("Day length", dayLengthLabel(body.rotationPeriod).c_str(), box.x + 18, box.y + 176);
-    ui::drawLabelValue("Axial tilt", (format(body.axialTilt, 1) + " deg").c_str(), box.x + 18, box.y + 198);
-    ui::drawLabelValue("Spin", spinDirectionLabel(body).c_str(), box.x + 18, box.y + 220);
+    text(classificationLabel(info.classification), box.x + 30.0f, box.y + 30.0f, 10.0f, t.textDim);
 
-    if (simulation.soloStudy) {
-        text("Learn", box.x + 18, box.y + 252, 11, t.accent);
-        drawWrapped(simulation.selectedBodyLesson(), box.x + 18, box.y + 272, box.width - 36.0f, 13, t.textMuted, 4);
-        text("Amber axis = tilt · cyan equator · orange tick = spin", box.x + 18, box.y + 348, 11, t.textDim);
-        text("Spin motion exaggerated for study · Q exit", box.x + 18, box.y + 368, 11, t.textDim);
+    const float thumbCx = box.x + 48.0f;
+    const float thumbCy = box.y + 88.0f;
+    const float thumbR = 26.0f;
+    DrawCircleGradient({thumbCx, thumbCy}, thumbR + 8.0f,
+                       withAlpha({body.accent.r, body.accent.g, body.accent.b, 255}, 0.35f),
+                       withAlpha({body.accent.r, body.accent.g, body.accent.b, 255}, 0.0f));
+    DrawCircle(static_cast<int>(thumbCx), static_cast<int>(thumbCy), thumbR,
+               {body.color.r, body.color.g, body.color.b, 255});
+    DrawCircleGradient({thumbCx - 8.0f, thumbCy - 8.0f}, thumbR * 0.95f,
+                       withAlpha(WHITE, 0.45f), withAlpha(BLACK, 0.7f));
+    DrawCircleLines(static_cast<int>(thumbCx), static_cast<int>(thumbCy), thumbR,
+                    withAlpha({body.accent.r, body.accent.g, body.accent.b, 255}, 0.8f));
+    if (body.ringed) {
+        DrawLineEx({thumbCx - thumbR * 1.5f, thumbCy + 6.0f}, {thumbCx + thumbR * 1.5f, thumbCy - 6.0f}, 2.5f,
+                   withAlpha({body.accent.r, body.accent.g, body.accent.b, 255}, 0.9f));
+    }
+
+    const float valX = box.x + 92.0f;
+    const float offset = 120.0f;
+    const double displayMass = body.mass > 0.0 ? body.mass : body.baseMass;
+    ui::drawLabelValue("Mass", (scientific(displayMass) + " kg").c_str(), valX, box.y + 54.0f, offset);
+    ui::drawLabelValue("Radius", distance(body.realRadius).c_str(), valX, box.y + 74.0f, offset);
+
+    if (info.classification == BodyClassification::Star) {
+        ui::drawLabelValue("Role", info.role ? info.role : "Central star", valX, box.y + 94.0f, offset);
+    } else if (info.classification == BodyClassification::NaturalSatellite) {
+        ui::drawLabelValue("Parent", info.parentBodyId ? info.parentBodyId : body.parentId.c_str(),
+                           valX, box.y + 94.0f, offset);
+    } else if (info.orderFromSun > 0) {
+        ui::drawLabelValue("Order", (std::string(ordinalFromSun(info.orderFromSun)) + " from Sun").c_str(),
+                           valX, box.y + 94.0f, offset);
     } else {
-        text("Z fills the screen with this body   ·   Q back", box.x + 18, box.y + 252, 12, t.textDim);
-        if (body.id == "earth" || body.id == "moon" || body.type == "Moon") {
-            text("Earth study also keeps the Moon nearby", box.x + 18, box.y + 272, 12, t.textDim);
+        ui::drawLabelValue("Position", distance(simulation.distanceFromSun(body)).c_str(),
+                           valX, box.y + 94.0f, offset);
+    }
+
+    ui::drawLabelValue("Velocity", (format(length(body.velocity) / 1000.0, 2) + " km/s").c_str(),
+                       box.x + 18.0f, box.y + 124.0f, 140.0f);
+
+    if (info.classification == BodyClassification::Star) {
+        ui::drawLabelValue("Spectral", info.spectralClass ? info.spectralClass : "—",
+                           box.x + 18.0f, box.y + 144.0f, 140.0f);
+        ui::drawLabelValue("Energy", info.energySource ? info.energySource : "Fusion",
+                           box.x + 18.0f, box.y + 164.0f, 140.0f);
+        ui::drawLabelValue("Surface g", (format(simulation.surfaceGravity(body), 2) + " m/s²").c_str(),
+                           box.x + 18.0f, box.y + 184.0f, 140.0f);
+    } else {
+        const double periodDays = body.orbitalPeriod > 0.0 ? (body.orbitalPeriod / PhysicsEngine::DAY) : 0.0;
+        ui::drawLabelValue("Orbital Period", (periodDays > 0.0 ? format(periodDays, 2) + " days" : "—").c_str(),
+                           box.x + 18.0f, box.y + 144.0f, 140.0f);
+        ui::drawLabelValue("Rotation", dayLengthLabel(body.rotationPeriod).c_str(),
+                           box.x + 18.0f, box.y + 164.0f, 140.0f);
+        ui::drawLabelValue("Surface g", (format(simulation.surfaceGravity(body), 2) + " m/s²").c_str(),
+                           box.x + 18.0f, box.y + 184.0f, 140.0f);
+    }
+
+    DrawLine(static_cast<int>(box.x + 16.0f), static_cast<int>(box.y + 208.0f),
+             static_cast<int>(box.x + box.width - 16.0f), static_cast<int>(box.y + 208.0f),
+             withAlpha(t.border, 0.7f));
+
+    if (info.naturalSatelliteCount > 0 && info.classification != BodyClassification::NaturalSatellite) {
+        text("NATURAL SATELLITES", box.x + 18.0f, box.y + 218.0f, 11.0f, t.accent);
+        ui::drawLabelValue("Count", std::to_string(info.naturalSatelliteCount).c_str(),
+                           box.x + 18.0f, box.y + 238.0f, 140.0f);
+        if (info.largestPlanet) {
+            text("Largest planet in the Solar System", box.x + 18.0f, box.y + 258.0f, 11.0f, t.textMuted);
+        }
+    } else {
+        text("EDUCATIONAL NOTE", box.x + 18.0f, box.y + 218.0f, 11.0f, t.accent);
+        const std::string note = info.description ? info.description : simulation.selectedBodyLesson();
+        drawWrapped(note, box.x + 18.0f, box.y + 238.0f, box.width - 36.0f, 11, t.textMuted, 3);
+    }
+
+    if (simulation.soloStudy || simulation.earthMoonFocus) {
+        const char* modeNote = simulation.earthMoonFocus
+            ? "Earth–Moon Focus · Press Q to return"
+            : "Study Mode · Press Q to return";
+        text(modeNote, box.x + 18.0f, box.y + box.height - 28.0f, 11.0f, t.accentStrong);
+    }
+}
+
+void HUD::classificationOverlay(const Simulation& simulation) const {
+    if (!simulation.showClassification) return;
+    const auto& t = theme();
+    const float screenW = static_cast<float>(GetScreenWidth());
+    const Rectangle box = {screenW - 300.0f - 16.0f, ui::topBarHeight() + 14.0f, 300.0f, 280.0f};
+    ui::drawGlassPanel(box, true, 0.1f);
+
+    text("NAMES & CLASSIFICATION", box.x + 14.0f, box.y + 12.0f, 11.0f, t.accent);
+    text("Ctrl+N to close", box.x + 14.0f, box.y + 28.0f, 10.0f, t.textDim);
+
+    if (simulation.selected < 0 || simulation.selected >= static_cast<int>(simulation.bodies.size())) {
+        text("Select a body to inspect its", box.x + 14.0f, box.y + 60.0f, 12.0f, t.textMuted);
+        text("astronomical classification.", box.x + 14.0f, box.y + 78.0f, 12.0f, t.textMuted);
+        return;
+    }
+
+    const Body& body = simulation.bodies[static_cast<std::size_t>(simulation.selected)];
+    const CelestialBodyInfo info = lookupCelestialInfo(body.id, body.type, body.luminous);
+
+    std::string title = body.name;
+    for (char& c : title) c = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
+    text(title.c_str(), box.x + 14.0f, box.y + 52.0f, 18.0f, t.text);
+
+    float y = box.y + 82.0f;
+    ui::drawLabelValue("Type", classificationLabel(info.classification), box.x + 14.0f, y, 140.0f);
+    y += 22.0f;
+    if (info.orderFromSun > 0) {
+        ui::drawLabelValue("Order from Sun", ordinalFromSun(info.orderFromSun), box.x + 14.0f, y, 140.0f);
+        y += 22.0f;
+    }
+    if (info.classification == BodyClassification::NaturalSatellite) {
+        ui::drawLabelValue("Parent Body", info.parentBodyId ? info.parentBodyId : "—", box.x + 14.0f, y, 140.0f);
+        y += 22.0f;
+    }
+    if (info.naturalSatelliteCount > 0 && info.classification != BodyClassification::NaturalSatellite) {
+        ui::drawLabelValue("Natural Satellites", std::to_string(info.naturalSatelliteCount).c_str(),
+                           box.x + 14.0f, y, 140.0f);
+        y += 22.0f;
+    }
+    if (info.largestPlanet) {
+        ui::drawLabelValue("Largest Planet", "Yes", box.x + 14.0f, y, 140.0f);
+        y += 22.0f;
+    }
+    if (info.spectralClass) {
+        ui::drawLabelValue("Spectral class", info.spectralClass, box.x + 14.0f, y, 140.0f);
+        y += 22.0f;
+    }
+    if (info.role) {
+        ui::drawLabelValue("Role", info.role, box.x + 14.0f, y, 140.0f);
+        y += 22.0f;
+    }
+    ui::drawLabelValue("System", "Solar System", box.x + 14.0f, y, 140.0f);
+}
+
+void HUD::forcesMotionOverlay(const Simulation& simulation) const {
+    if (!simulation.showVectors) return;
+    const auto& t = theme();
+    const float screenW = static_cast<float>(GetScreenWidth());
+    const Rectangle box = {screenW - 320.0f - 16.0f, ui::topBarHeight() + 14.0f, 320.0f, 340.0f};
+    // Shift down if classification is also open
+    const float y0 = simulation.showClassification ? box.y + 290.0f : box.y;
+    const Rectangle panel = {box.x, y0, box.width, 300.0f};
+    ui::drawGlassPanel(panel, true, 0.1f);
+
+    text("FORCES & MOTION", panel.x + 14.0f, panel.y + 12.0f, 12.0f, t.accent);
+    text("VECTOR LEGEND", panel.x + 14.0f, panel.y + 34.0f, 10.0f, t.textDim);
+    DrawLine(static_cast<int>(panel.x + 14.0f), static_cast<int>(panel.y + 54.0f),
+             static_cast<int>(panel.x + 40.0f), static_cast<int>(panel.y + 54.0f), {80, 220, 255, 255});
+    text("Velocity — direction of motion", panel.x + 48.0f, panel.y + 46.0f, 11.0f, t.text);
+    DrawLine(static_cast<int>(panel.x + 14.0f), static_cast<int>(panel.y + 74.0f),
+             static_cast<int>(panel.x + 40.0f), static_cast<int>(panel.y + 74.0f), {255, 170, 70, 255});
+    text("Gravity — net gravitational accel.", panel.x + 48.0f, panel.y + 66.0f, 11.0f, t.text);
+
+    text("Velocity", panel.x + 14.0f, panel.y + 96.0f, 11.0f, {80, 220, 255, 255});
+    text("Instantaneous rate of change of position", panel.x + 14.0f, panel.y + 112.0f, 10.0f, t.textMuted);
+    text("(magnitude and direction).", panel.x + 14.0f, panel.y + 126.0f, 10.0f, t.textMuted);
+
+    text("Gravity", panel.x + 14.0f, panel.y + 148.0f, 11.0f, {255, 170, 70, 255});
+    text("Attractive force:  F = G M m / r²", panel.x + 14.0f, panel.y + 164.0f, 10.0f, t.textMuted);
+    text("Vector from live N-body accelerations.", panel.x + 14.0f, panel.y + 178.0f, 10.0f, t.textMuted);
+
+    text("Centripetal acceleration", panel.x + 14.0f, panel.y + 200.0f, 11.0f, t.accentStrong);
+    text("a_c = v²/r  — inward accel. for curves", panel.x + 14.0f, panel.y + 216.0f, 10.0f, t.textMuted);
+    text("Gravity can supply this in an orbit.", panel.x + 14.0f, panel.y + 230.0f, 10.0f, t.textMuted);
+
+    text("Centrifugal (rotating frame only)", panel.x + 14.0f, panel.y + 252.0f, 11.0f, t.warn);
+    text("Apparent outward pseudo-force — not an", panel.x + 14.0f, panel.y + 268.0f, 10.0f, t.textMuted);
+    text("extra gravitational force in inertial frame.", panel.x + 14.0f, panel.y + 282.0f, 10.0f, t.textMuted);
+}
+
+void HUD::gravityModeOverlay(const Simulation& simulation) const {
+    if (!simulation.gravityMode) return;
+    const auto& t = theme();
+    const Rectangle panel = {ui::pagePad() + 58.0f, ui::topBarHeight() + 14.0f, 480.0f, 480.0f};
+    ui::drawGlassPanel(panel, true, 0.1f);
+
+    text("GRAVITY SIMULATION", panel.x + 14.0f, panel.y + 12.0f, 12.0f, t.accent);
+    text("↑ / ↓ adjust mass   R reset to default   G to close", panel.x + 14.0f, panel.y + 30.0f, 10.0f, t.textDim);
+
+    if (simulation.selected < 0 || simulation.selected >= static_cast<int>(simulation.bodies.size())) {
+        text("Select a body to analyse gravity.", panel.x + 14.0f, panel.y + 70.0f, 12.0f, t.textMuted);
+        return;
+    }
+
+    const Body& body = simulation.bodies[static_cast<std::size_t>(simulation.selected)];
+    const double base = body.baseMass > 0.0 ? body.baseMass : body.mass;
+    const double mult = body.massMultiplier > 0.0 ? body.massMultiplier : 1.0;
+    const double effective = body.mass;
+
+    ui::drawLabelValue("Selected Body", body.name.c_str(), panel.x + 14.0f, panel.y + 54.0f, 150.0f);
+    ui::drawLabelValue("Base Mass", (scientific(base) + " kg").c_str(), panel.x + 14.0f, panel.y + 76.0f, 150.0f);
+    ui::drawLabelValue("Mass Multiplier", (format(mult, 2) + "×").c_str(), panel.x + 14.0f, panel.y + 98.0f, 150.0f);
+    ui::drawLabelValue("Effective Mass", (scientific(effective) + " kg").c_str(), panel.x + 14.0f, panel.y + 120.0f, 150.0f);
+
+    // Dominant gravitational source: parent, else Sun, else nearest massive body.
+    const Body* source = nullptr;
+    if (!body.parentId.empty()) {
+        for (const Body& candidate : simulation.bodies) {
+            if (candidate.id == body.parentId && candidate.active) {
+                source = &candidate;
+                break;
+            }
+        }
+    }
+    if (source == nullptr) {
+        for (const Body& candidate : simulation.bodies) {
+            if (candidate.active && (candidate.id == "sun" || candidate.luminous) && candidate.id != body.id) {
+                source = &candidate;
+                break;
+            }
+        }
+    }
+
+    if (source != nullptr) {
+        const double dist = length(source->position - body.position);
+        const double sourceMu = PhysicsEngine::G * source->mass;
+        const double force = PhysicsEngine::G * effective * source->mass / std::max(dist * dist, 1.0);
+        const double accel = PhysicsEngine::G * source->mass / std::max(dist * dist, 1.0);
+        const double weight = effective * accel;
+        const double orbitalVelocity = std::sqrt(sourceMu / std::max(dist, 1.0));
+        const double orbitalPeriod = TAU * std::sqrt((dist * dist * dist) / std::max(sourceMu, 1.0));
+        
+        ui::drawLabelValue("Source", source->name.c_str(), panel.x + 14.0f, panel.y + 150.0f, 150.0f);
+        ui::drawLabelValue("Distance", distance(dist).c_str(), panel.x + 14.0f, panel.y + 172.0f, 150.0f);
+        
+        // Force and acceleration calculations
+        ui::drawLabelValue("Force |F|", (scientific(force) + " N").c_str(), panel.x + 14.0f, panel.y + 194.0f, 150.0f);
+        ui::drawLabelValue("Accel. |g|", (scientific(accel) + " m/s²").c_str(), panel.x + 14.0f, panel.y + 216.0f, 150.0f);
+        ui::drawLabelValue("Weight |W|", (scientific(weight) + " N").c_str(), panel.x + 14.0f, panel.y + 238.0f, 150.0f);
+        
+        // Orbital mechanics calculations
+        ui::drawLabelValue("Orbital Velocity", (format(orbitalVelocity, 1) + " m/s").c_str(), 
+                          panel.x + 14.0f, panel.y + 260.0f, 150.0f);
+        
+        const int days = static_cast<int>(orbitalPeriod / 86400.0);
+        const int hours = static_cast<int>((orbitalPeriod - days * 86400.0) / 3600.0);
+        const int minutes = static_cast<int>((orbitalPeriod - days * 86400.0 - hours * 3600.0) / 60.0);
+        std::string periodStr = std::to_string(days) + "d " + std::to_string(hours) + "h " + std::to_string(minutes) + "m";
+        ui::drawLabelValue("Orbital Period", periodStr.c_str(), panel.x + 14.0f, panel.y + 282.0f, 150.0f);
+        
+        ui::drawLabelValue("Force Direction", "Toward source", panel.x + 14.0f, panel.y + 304.0f, 150.0f);
+        
+        // Formula display
+        text("Formulas:", panel.x + 14.0f, panel.y + 330.0f, 11.0f, t.accentStrong);
+        text("F = GMm/r²    g = GM/R²    W = mg", panel.x + 14.0f, panel.y + 346.0f, 10.0f, t.textMuted);
+        text("v = √(GM/r)    T = 2π√(r³/GM)", panel.x + 14.0f, panel.y + 362.0f, 10.0f, t.textMuted);
+    }
+
+    text("Changing mass updates formulas in the", panel.x + 14.0f, panel.y + 395.0f, 10.0f, t.textMuted);
+    text("live physics engine — orbits respond.", panel.x + 14.0f, panel.y + 411.0f, 10.0f, t.textMuted);
+    text("Press R to reset body mass to default.", panel.x + 14.0f, panel.y + 427.0f, 10.0f, t.textMuted);
+}
+
+void HUD::earthMoonOverlay(const Simulation& simulation) const {
+    if (!simulation.earthMoonFocus) return;
+    const auto& t = theme();
+    const float screenW = static_cast<float>(GetScreenWidth());
+    const Rectangle panel = {screenW * 0.5f - 200.0f, ui::topBarHeight() + 14.0f, 400.0f, 200.0f};
+    ui::drawGlassPanel(panel, true, 0.08f);
+
+    text("EARTH–MOON SYSTEM", panel.x + 16.0f, panel.y + 12.0f, 13.0f, t.accent);
+    text("Earth", panel.x + 16.0f, panel.y + 40.0f, 12.0f, t.text);
+    text("• 3rd planet from Sun  • Terrestrial  • Satellite: Moon",
+         panel.x + 16.0f, panel.y + 58.0f, 11.0f, t.textMuted);
+    text("Moon", panel.x + 16.0f, panel.y + 84.0f, 12.0f, t.text);
+    text("• Earth's natural satellite  • Orbits Earth",
+         panel.x + 16.0f, panel.y + 102.0f, 11.0f, t.textMuted);
+    text("Orbital relationship", panel.x + 16.0f, panel.y + 128.0f, 12.0f, t.accentStrong);
+    text("Gravity provides the attractive interaction.", panel.x + 16.0f, panel.y + 146.0f, 11.0f, t.textMuted);
+    text("Both bodies orbit their common centre of mass.", panel.x + 16.0f, panel.y + 164.0f, 11.0f, t.textMuted);
+}
+
+void HUD::scaleModeBadge(const Simulation& simulation) const {
+    const auto& t = theme();
+    const char* label = visualScaleModeLabel(simulation.visualScaleMode);
+    const float screenW = static_cast<float>(GetScreenWidth());
+    const float textW = static_cast<float>(MeasureText(label, 11));
+    const Rectangle badge = {screenW * 0.5f - (textW + 28.0f) * 0.5f,
+                             static_cast<float>(GetScreenHeight()) - 58.0f,
+                             textW + 28.0f, 22.0f};
+    DrawRectangleRounded(badge, 0.4f, 6, withAlpha(t.surfaceAlt, 0.85f));
+    DrawRectangleRoundedLines(badge, 0.4f, 6, withAlpha(t.borderSoft, 0.9f));
+    DrawText(label, static_cast<int>(badge.x + 14.0f), static_cast<int>(badge.y + 5.0f), 11,
+             simulation.visualScaleMode == VisualScaleMode::Realistic ? t.warn : t.textDim);
+}
+
+void HUD::viewControls(const Simulation& simulation) const {
+    const auto& t = theme();
+    const ui::HudLayout layout = ui::buildHudLayout(static_cast<float>(GetScreenWidth()),
+                                               static_cast<float>(GetScreenHeight()),
+                                               simulation.selected >= 0, simulation.soloStudy);
+    const Rectangle box = layout.viewControls;
+    ui::drawGlassPanel(box, false, 0.08f);
+
+    // Header
+    text("VIEW CONTROLS", box.x + 14.0f, box.y + 8.0f, 10.0f, t.textDim);
+    text("⌃", box.x + box.width - 20.0f, box.y + 8.0f, 11.0f, t.textDim);
+
+    // 3 Buttons: Solar View (F1), Earth Orbit (F2), Empty Space (F3)
+    const Vector2 mouse = GetMousePosition();
+    const float btnW = (box.width - 28.0f) / 3.0f;
+    const float btnH = 46.0f;
+    const float btnY = box.y + 24.0f;
+
+    struct ViewBtn { const char* label; const char* badge; const char* scenario; };
+    constexpr ViewBtn kViews[] = {
+        {"Solar View", "F1", "default_solar_system"},
+        {"Earth–Moon", "F2", "earth_orbit"},
+        {"Empty Space", "F3", "empty_space"},
+    };
+
+    for (int i = 0; i < 3; ++i) {
+        const Rectangle btnRect = {box.x + 10.0f + i * (btnW + 4.0f), btnY, btnW, btnH};
+        const bool isCur = (i == 1)
+            ? simulation.earthMoonFocus
+            : (simulation.scenarioId == kViews[i].scenario && !simulation.earthMoonFocus);
+        const bool hover = CheckCollisionPointRec(mouse, btnRect);
+
+        DrawRectangleRounded(btnRect, 0.2f, 8, isCur ? withAlpha(t.accent, 0.2f) : withAlpha(t.surfaceAlt, 0.65f));
+        DrawRectangleRoundedLines(btnRect, 0.2f, 8, isCur ? t.accent : withAlpha(t.borderSoft, 0.8f));
+
+        // Icon
+        const float cx = btnRect.x + btnRect.width * 0.5f;
+        if (i == 0) { // Solar icon
+            DrawCircleLines(static_cast<int>(cx), static_cast<int>(btnRect.y + 12.0f), 5.0f, isCur ? t.accentStrong : t.textMuted);
+            DrawCircle(static_cast<int>(cx), static_cast<int>(btnRect.y + 12.0f), 2.0f, t.warn);
+        } else if (i == 1) { // Earth orbit icon
+            DrawCircleLines(static_cast<int>(cx), static_cast<int>(btnRect.y + 12.0f), 6.0f, isCur ? t.accentStrong : t.textMuted);
+            DrawCircle(static_cast<int>(cx + 4.0f), static_cast<int>(btnRect.y + 10.0f), 2.0f, t.accent);
+        } else { // Empty space icon
+            DrawCircleLines(static_cast<int>(cx), static_cast<int>(btnRect.y + 12.0f), 5.0f, isCur ? t.accentStrong : t.textMuted);
+        }
+
+        const int fontSize = 10;
+        const float textW = static_cast<float>(MeasureText(kViews[i].label, fontSize));
+        DrawText(kViews[i].label, static_cast<int>(cx - textW * 0.5f), static_cast<int>(btnRect.y + 22.0f), fontSize,
+                 isCur ? t.text : (hover ? t.accentStrong : t.textMuted));
+        const float badgeW = static_cast<float>(MeasureText(kViews[i].badge, 9));
+        DrawText(kViews[i].badge, static_cast<int>(cx - badgeW * 0.5f), static_cast<int>(btnRect.y + 34.0f), 9, t.textDim);
+    }
+}
+
+void HUD::visualizationControls(const Simulation& simulation) const {
+    const auto& t = theme();
+    const ui::HudLayout layout = ui::buildHudLayout(static_cast<float>(GetScreenWidth()),
+                                               static_cast<float>(GetScreenHeight()),
+                                               simulation.selected >= 0, simulation.soloStudy);
+    const Rectangle box = layout.visualizationToggles;
+    ui::drawGlassPanel(box, false, 0.45f);
+
+    struct ToggleItem { const char* label; bool active; };
+    const ToggleItem items[] = {
+        {"Orbits", simulation.showOrbits},
+        {"Trails", simulation.showTrails},
+        {"Forces", simulation.showVectors},
+        {"Gravity", simulation.gravityMode},
+    };
+
+    const float itemW = box.width / 4.0f;
+    for (int i = 0; i < 4; ++i) {
+        const float itemX = box.x + i * itemW;
+        text(items[i].label, itemX + 8.0f, box.y + 11.0f, 11.0f, items[i].active ? t.text : t.textMuted);
+
+        // Rounded pill toggle switch
+        const float pillX = itemX + itemW - 28.0f;
+        const float pillY = box.y + 10.0f;
+        const Rectangle pillRect = {pillX, pillY, 24.0f, 14.0f};
+
+        DrawRectangleRounded(pillRect, 0.5f, 8, items[i].active ? withAlpha(t.accent, 0.5f) : withAlpha(t.surfaceAlt, 0.9f));
+        DrawRectangleRoundedLines(pillRect, 0.5f, 8, items[i].active ? t.accent : withAlpha(t.borderSoft, 0.8f));
+
+        const float knobX = items[i].active ? (pillX + 17.0f) : (pillX + 7.0f);
+        const float knobY = pillY + 7.0f;
+        DrawCircle(static_cast<int>(knobX), static_cast<int>(knobY), 4.5f, items[i].active ? t.text : t.textDim);
+        if (items[i].active) {
+            DrawCircleGradient({knobX, knobY}, 7.0f, withAlpha(t.accentStrong, 0.4f), withAlpha(t.accentStrong, 0.0f));
         }
     }
 }
 
-void HUD::draw(const Simulation& simulation) const {
+void HUD::orientationIndicator(float cameraYaw) const {
+    const auto& t = theme();
+    const ui::HudLayout layout = ui::buildHudLayout(static_cast<float>(GetScreenWidth()),
+                                               static_cast<float>(GetScreenHeight()),
+                                               false, false);
+    const float cx = layout.orientationCompass.x + layout.orientationCompass.width * 0.5f;
+    const float cy = layout.orientationCompass.y + layout.orientationCompass.height * 0.5f;
+    const float r = 24.0f;
+
+    DrawCircleLines(static_cast<int>(cx), static_cast<int>(cy), r, withAlpha(t.accent, 0.55f));
+    DrawCircleLines(static_cast<int>(cx), static_cast<int>(cy), r * 0.5f, withAlpha(t.borderSoft, 0.5f));
+
+    // Compass crosshair ticks
+    DrawLine(static_cast<int>(cx - r), static_cast<int>(cy), static_cast<int>(cx - r + 5.0f), static_cast<int>(cy), t.accent);
+    DrawLine(static_cast<int>(cx + r - 5.0f), static_cast<int>(cy), static_cast<int>(cx + r), static_cast<int>(cy), t.accent);
+    DrawLine(static_cast<int>(cx), static_cast<int>(cy - r), static_cast<int>(cx), static_cast<int>(cy - r + 5.0f), t.accent);
+    DrawLine(static_cast<int>(cx), static_cast<int>(cy + r - 5.0f), static_cast<int>(cx), static_cast<int>(cy + r), t.accent);
+
+    // Cardinal directions
+    DrawText("N", static_cast<int>(cx - 3.0f), static_cast<int>(cy - r - 12.0f), 10, t.accentStrong);
+    DrawText("E", static_cast<int>(cx + r + 4.0f), static_cast<int>(cy - 5.0f), 10, t.textDim);
+    DrawText("S", static_cast<int>(cx - 3.0f), static_cast<int>(cy + r + 3.0f), 10, t.textDim);
+    DrawText("W", static_cast<int>(cx - r - 12.0f), static_cast<int>(cy - 5.0f), 10, t.textDim);
+
+    // Rotating pointer based on cameraYaw
+    const float needleAngle = -cameraYaw - PI * 0.5f;
+    const float tipX = cx + (r - 6.0f) * std::cos(needleAngle);
+    const float tipY = cy + (r - 6.0f) * std::sin(needleAngle);
+    DrawLineEx({cx, cy}, {tipX, tipY}, 1.5f, t.accentStrong);
+    DrawCircle(static_cast<int>(cx), static_cast<int>(cy), 2.0f, t.accentStrong);
+}
+
+void HUD::draw(const Simulation& simulation, float cameraYaw) const {
     switch (simulation.screen) {
     case AppScreen::Simulation:
         topBar(simulation);
+        toolRail(simulation);
+        viewControls(simulation);
         selectedInfo(simulation);
-        bottomBar(simulation);
+        visualizationControls(simulation);
+        orientationIndicator(cameraYaw);
+        scaleModeBadge(simulation);
+        classificationOverlay(simulation);
+        forcesMotionOverlay(simulation);
+        gravityModeOverlay(simulation);
+        earthMoonOverlay(simulation);
+        screenshotFeedback();
         break;
     case AppScreen::Education: educationScreenPanel(simulation); break;
     case AppScreen::LearningLab: learningLabScreenPanel(simulation); break;
@@ -518,10 +1115,11 @@ void HUD::settingsScreen(const Simulation& simulation) const {
     ui::drawLabelValue("Timestep", (format(simulation.settings.timestepSeconds, 1) + " s").c_str(), left.x + 24, left.y + 88);
     ui::drawLabelValue("Speed", formatSpeed(simulation.speed).c_str(), left.x + 24, left.y + 116);
     ui::drawLabelValue("Trails", simulation.showTrails ? "On" : "Off", left.x + 24, left.y + 144);
-    ui::drawLabelValue("Vectors", simulation.showVectors ? "On" : "Off", left.x + 24, left.y + 172);
+    ui::drawLabelValue("Forces (V)", simulation.showVectors ? "On" : "Off", left.x + 24, left.y + 172);
     ui::drawLabelValue("Orbits", simulation.showOrbits ? "On" : "Off", left.x + 24, left.y + 200);
-    ui::drawLabelValue("Grid", simulation.showGrid ? "On" : "Off", left.x + 24, left.y + 228);
-    ui::drawLabelValue("Highlight", simulation.settings.selectionHighlightEnabled ? "On" : "Off", left.x + 24, left.y + 256);
+    ui::drawLabelValue("Gravity (G)", simulation.gravityMode ? "On" : "Off", left.x + 24, left.y + 228);
+    ui::drawLabelValue("Grid (Ctrl+G)", simulation.showGrid ? "On" : "Off", left.x + 24, left.y + 256);
+    ui::drawLabelValue("Highlight", simulation.settings.selectionHighlightEnabled ? "On" : "Off", left.x + 24, left.y + 284);
     DrawRectangleLinesEx({left.x + 20, left.y + 246, 500, 30}, 1.0f, withAlpha(t.accent, 0.45f));
     text("Click Highlight row or press H to toggle", left.x + 24, left.y + 300, 13, t.textMuted);
     text(("Lab grade " + std::string(gradeIdString(simulation.learnerGrade)) + " · " +
@@ -559,13 +1157,13 @@ void HUD::helpScreen(const Simulation& simulation) const {
 
     text("Simulate", left.x + 24, left.y + 200, 12, t.accent);
     text("Space pause   ± speed   R reset", left.x + 24, left.y + 234, 15, t.text);
-    text("V O T G overlays   P pulse probe", left.x + 24, left.y + 264, 15, t.text);
-    text("1/2/3/4/5/6 speed ×1 … ×100000", left.x + 24, left.y + 294, 14, t.text);
-    text("Click select · Z zoom · Q back one step", left.x + 24, left.y + 324, 14, t.textMuted);
+    text("V Forces & Motion   G Gravity mass mode", left.x + 24, left.y + 264, 14, t.text);
+    text("F2 Earth–Moon   Ctrl+N Names   / scale", left.x + 24, left.y + 294, 14, t.text);
+    text("1–6 speed   Ctrl+G grid   P probe", left.x + 24, left.y + 324, 14, t.textMuted);
 
     text("Camera", left.x + 24, left.y + 370, 12, t.accent);
     text("Drag orbit · Right/Middle pan · Wheel zoom", left.x + 24, left.y + 404, 14, t.text);
-    text("Z zoom · Q back · Home reset · Click select", left.x + 24, left.y + 434, 14, t.text);
+    text("Z isolate · Q back · Home reset · Click select", left.x + 24, left.y + 434, 14, t.text);
 
     text("Learn / Lab", right.x + 24, right.y + 22, 12, t.accent);
     text("A/D lessons   Enter start   B observe", right.x + 24, right.y + 56, 15, t.text);
@@ -575,9 +1173,10 @@ void HUD::helpScreen(const Simulation& simulation) const {
     text("Telemetry", right.x + 24, right.y + 180, 12, t.accent);
     text("K start/stop   J JSON   C CSV", right.x + 24, right.y + 214, 15, t.text);
 
-    text("Tips", right.x + 24, right.y + 280, 12, t.accent);
-    text("Keep Sim uncluttered — open Learn or Lab for teaching flows.", right.x + 24, right.y + 314, 14, t.textMuted);
-    text("Selection highlight can be toggled in Settings.", right.x + 24, right.y + 344, 14, t.textMuted);
+    text("Physics modes", right.x + 24, right.y + 280, 12, t.accent);
+    text("V velocity + gravity vectors (live physics).", right.x + 24, right.y + 314, 13, t.textMuted);
+    text("G then ↑/↓ changes mass — orbits respond.", right.x + 24, right.y + 344, 13, t.textMuted);
+    text("Paused: zoom/pan never advances physics.", right.x + 24, right.y + 374, 13, t.textMuted);
 
     text("Esc back", ui::pagePad(), static_cast<float>(GetScreenHeight()) - 28.0f, 13, t.textDim);
 }

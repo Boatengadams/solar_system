@@ -97,6 +97,12 @@ The CTest targets `bagsolar_resource_smoke`, `bagsolar_install_smoke`, and
 `bagsolar_package_smoke` exercise source-tree resolution, a temporary install,
 and an extracted TGZ package without requiring a display or network access.
 
+`bagsolar_package_smoke` dependency rules follow the configured raylib mode:
+`shared-dev` when `BAGS_LAB_BUNDLE_RAYLIB=OFF` (bundled `libraylib`, host
+`libglfw` allowed), and `portable` when bundling is on (no dynamic
+`libraylib`/`libglfw`/`libtiff`). The USB portable gate remains
+`./tools/package_portable.sh linux-x64`.
+
 The development build uses `build/` and source-tree data discovery. The
 installed build uses `bin/` plus `${prefix}/share/bags_lab/data` (legacy
 `share/bagsolar/data` still accepted); run it from an unrelated directory with

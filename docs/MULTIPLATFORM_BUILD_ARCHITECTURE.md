@@ -120,7 +120,7 @@ Forbidden as baked-in requirements: `/home/…`, `/run/media/…`,
 | Target | Strategy | Status |
 | --- | --- | --- |
 | Linux portable | Static raylib 6.0 via FetchContent; bundled GLFW (static) + host X11/GL | VERIFIED |
-| Linux developer | System pkg-config raylib allowed | supported for `build/` |
+| Linux developer | System pkg-config raylib allowed | VERIFIED for `build/` |
 | Windows | Bundle static raylib 6.0 (`USE_EXTERNAL_GLFW=OFF`) | BUILD-READY / NOT YET TESTED |
 | macOS | Bundle static raylib 6.0 | BUILD-READY / NOT YET TESTED |
 | Linux ARM64 | Same static strategy as linux-x64 | BUILD-READY / NOT YET TESTED |
@@ -129,6 +129,20 @@ Portable Linux must not regress to requiring `libraylib.so`, `libtiff.so.3`, or
 `libglfw.so.3`. Do not copy a developer-machine `libglfw.so.3` into `lib/`.
 Only redistributable, actually-needed libraries may be staged into `lib/` /
 DLL folders.
+
+Dependency audit profiles (`tools/audit_portable_libs.py`):
+
+| Profile | When | Rules |
+| --- | --- | --- |
+| `portable` | `package_linux.sh` / bundled builds | Forbid dynamic `libraylib` / `libglfw` / `libtiff` |
+| `shared-dev` | default `build/` CPack smoke | Bundled `libraylib` required; host `libglfw` allowed; unbundled `libtiff` forbidden |
+
+`bagsolar_package_smoke` selects the profile from `BAGS_LAB_BUNDLE_RAYLIB`.
+
+Portable configure on Linux also requires **Xinerama development headers**
+(`libxinerama-dev` / `libXinerama-devel`). CMake fails early if
+`X11/extensions/Xinerama.h` is missing; use `CMAKE_PREFIX_PATH` for a
+non-standard prefix — never `CPATH=/tmp/...` staging.
 
 ---
 
@@ -244,13 +258,15 @@ redistribution rights.
 
 | Check | linux-x64 | others |
 | --- | --- | --- |
-| Configure + build | VERIFIED | host-specific |
-| Full CTest | VERIFIED on Linux host | when native |
-| Portable audit (no libtiff/libraylib/libglfw) | VERIFIED | TBD |
-| Package smoke | VERIFIED | TBD |
+| Configure + build (dev shared raylib) | VERIFIED | host-specific |
+| Configure + build (portable static raylib) | VERIFIED | NOT YET TESTED |
+| Full CTest on `build/` (shared-dev package smoke) | VERIFIED | when native |
+| Portable audit `portable` (no libtiff/libraylib/libglfw) | VERIFIED | TBD |
+| CPack package smoke `shared-dev` | VERIFIED | TBD |
 | ResourceRoot layouts (incl. `.app` path sim) | VERIFIED path tests | Darwin TBD |
-| VFAT USB launcher | VERIFIED | N/A / TBD |
-| GUI acceptance on virgin host | partial / open | open |
+| VFAT USB launcher / `BAGS_LAB.EXE` | VERIFIED | N/A / TBD |
+| GUI acceptance + starfield hang regression | VERIFIED on USB | open |
+| Windows / macOS / linux-arm64 runtime | NOT YET TESTED | NOT YET TESTED |
 
 ---
 
@@ -258,12 +274,13 @@ redistribution rights.
 
 - Only linux-x64 portable runtime is verified.
 - CI does not yet build the portable multi-OS matrix.
-- Windows/macOS packages are documentation stubs.
-- linux-arm64 packaging refused on x86_64 until verified.
+- Windows/macOS packages are documentation stubs (**PLANNED** / **NOT YET TESTED**).
+- linux-arm64 packaging refused on x86_64 until verified (**BUILD-READY**).
 - Horizons still depends on a host `curl` binary when online queries are used.
 - macOS codesign/notarize not implemented.
-- `platform/linux` previously documented shared `libraylib` staging; portable
-  reference is now static raylib (docs corrected in Phase 2).
+- Portable Linux build hosts need `libxinerama-dev` (or equivalent) installed.
+- Automated WM close under Wayland may fail; app-level `CloseWindow` exit is verified.
+- Starfield must remain `DrawPoint3D` (per-star `DrawSphere` caused ~227 ms/frame hangs).
 
 ---
 

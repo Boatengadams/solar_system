@@ -60,6 +60,87 @@ fi
 # Required when the ELF runs from a temporary copy under /tmp (VFAT).
 export BAGS_LAB_RESOURCE_ROOT="$PACKAGE_DIR"
 
+# A raw ELF cannot repair a missing library: Linux resolves libraries before
+# the application starts. This launcher is therefore the supported first-run
+# USB entrypoint. Installed packages persist on the host; later launches only
+# perform this inexpensive check and do not reinstall anything.
+runtime_missing() {
+  local line library missing=""
+  if ! command -v ldd >/dev/null 2>&1; then
+    printf '%s\n' "ldd (cannot verify runtime libraries)"
+    return 0
+  fi
+  while IFS= read -r line; do
+    library=${line%% *}
+    [[ -n "$library" ]] && missing+="${library}"$'\n'
+  done < <(LC_ALL=C ldd "$APP" 2>&1 | awk '/=> not found/ { print $1 }')
+  # raylib loads OpenGL at runtime, so it may not appear in the ELF NEEDED
+  # list above. Check the loader cache explicitly before opening the window.
+  if command -v ldconfig >/dev/null 2>&1 && \
+     ! LC_ALL=C ldconfig -p 2>/dev/null | awk '$1 == "libGL.so.1" { found=1 } END { exit !found }'; then
+    missing+="libGL.so.1"$'\n'
+  fi
+  printf '%s' "$missing"
+}
+
+install_runtime_packages() {
+  local manager=$1
+  shift
+  local -a command=("$@")
+  if [[ ${EUID:-$(id -u)} -ne 0 ]]; then
+    if ! command -v sudo >/dev/null 2>&1; then
+      printf '%s\n' "BAGS_LAB: administrator access is required to install missing runtime packages." >&2
+      return 1
+    fi
+    command=(sudo "${command[@]}")
+  fi
+  trace "installing Linux runtime dependencies with $manager"
+  "${command[@]}"
+}
+
+ensure_runtime() {
+  local missing manager
+  missing=$(runtime_missing)
+  [[ -z "$missing" ]] && return 0
+
+  printf '%s\n' "BAGS_LAB: required Linux runtime libraries are missing:" >&2
+  printf '%s' "$missing" >&2
+  if [[ "${BAGS_LAB_NO_AUTO_INSTALL:-}" == "1" ]]; then
+    printf '%s\n' "Automatic installation disabled (BAGS_LAB_NO_AUTO_INSTALL=1)." >&2
+    return 1
+  fi
+
+  # Target machines need runtime packages only—never raylib, GLFW, TIFF,
+  # compilers, or development headers.
+  if command -v apt-get >/dev/null 2>&1; then
+    manager=apt-get
+    install_runtime_packages "$manager" apt-get update && \
+      install_runtime_packages "$manager" apt-get install -y --no-install-recommends libx11-6 libgl1 libstdc++6 libgcc-s1
+  elif command -v dnf >/dev/null 2>&1; then
+    manager=dnf
+    install_runtime_packages "$manager" dnf install -y libX11 mesa-libGL libstdc++ libgcc
+  elif command -v pacman >/dev/null 2>&1; then
+    manager=pacman
+    install_runtime_packages "$manager" pacman -Sy --needed --noconfirm libx11 mesa gcc-libs
+  elif command -v zypper >/dev/null 2>&1; then
+    manager=zypper
+    install_runtime_packages "$manager" zypper --non-interactive install libX11-6 Mesa-libGL1 libstdc++6 libgcc_s1
+  else
+    printf '%s\n' "BAGS_LAB: no supported Linux package manager was found (apt-get, dnf, pacman, zypper)." >&2
+    return 1
+  fi
+
+  missing=$(runtime_missing)
+  if [[ -n "$missing" ]]; then
+    printf '%s\n' "BAGS_LAB: installation completed but these libraries are still unavailable:" >&2
+    printf '%s' "$missing" >&2
+    return 1
+  fi
+  printf '%s\n' "BAGS_LAB: runtime dependencies are installed; starting the application." >&2
+}
+
+ensure_runtime
+
 can_exec_directly() {
   local path=$1
   # Must be a regular file with +x. Directories can be +x — already excluded.

@@ -5,6 +5,17 @@ set(install_bindir "@CMAKE_INSTALL_BINDIR@")
 set(install_libdir "@CMAKE_INSTALL_LIBDIR@")
 set(install_datadir "@CMAKE_INSTALL_DATADIR@")
 set(smoke_name "bagsolar_resource_smoke")
+# Mirror the CMake option that produced this build tree.
+# ON  → portable/static raylib audit (USB release rules)
+# OFF → shared-dev audit (system raylib + host GLFW allowed; libraylib must be staged)
+set(bags_lab_bundle_raylib "@BAGS_LAB_BUNDLE_RAYLIB@")
+if(bags_lab_bundle_raylib)
+    set(dependency_audit_profile "portable")
+    message(STATUS "bagsolar_package_smoke: validating PORTABLE/static-raylib CPack layout")
+else()
+    set(dependency_audit_profile "shared-dev")
+    message(STATUS "bagsolar_package_smoke: validating SHARED-DEV/system-raylib CPack layout (not the USB portable release)")
+endif()
 
 if(DEFINED ENV{TMPDIR})
     set(temp_root "$ENV{TMPDIR}")
@@ -108,8 +119,9 @@ if(NOT planet_check_result EQUAL 0)
     message(FATAL_ERROR "packaged planet presentation assets incomplete (${planet_check_result})\n${planet_check_output}\n${planet_check_error}")
 endif()
 
-# Runtime dependency / relocatable search-path regression (libtiff.so.3 class of failures).
-# Do not require the developer machine's libtiff to be installed.
+# Runtime dependency / relocatable search-path regression.
+# Profile is selected from BAGS_LAB_BUNDLE_RAYLIB so shared-dev CPack is not
+# judged by portable/static USB rules (and vice versa).
 set(package_libdir "${package_root}/${install_libdir}")
 set(sidecar_libdir "${package_root}/${install_bindir}/lib")
 set(root_libdir "${package_root}/lib")
@@ -117,6 +129,7 @@ set(root_libdir "${package_root}/lib")
 execute_process(
     COMMAND python3 "${source_dir}/tools/audit_portable_libs.py"
             "${bags_lab_executable}"
+            --profile "${dependency_audit_profile}"
             --require-origin-lib
             --libdir "${sidecar_libdir}"
     RESULT_VARIABLE audit_result
@@ -128,13 +141,16 @@ if(NOT audit_result EQUAL 0)
     execute_process(
         COMMAND python3 "${source_dir}/tools/audit_portable_libs.py"
                 "${bags_lab_executable}"
+                --profile "${dependency_audit_profile}"
                 --require-origin-lib
         RESULT_VARIABLE audit_result
         OUTPUT_VARIABLE audit_output
         ERROR_VARIABLE audit_error)
 endif()
 if(NOT audit_result EQUAL 0)
-    message(FATAL_ERROR "packaged BAGS_LAB dependency audit failed (${audit_result})\n${audit_output}\n${audit_error}")
+    message(FATAL_ERROR
+        "packaged BAGS_LAB dependency audit failed (profile=${dependency_audit_profile}, rc=${audit_result})\n"
+        "${audit_output}\n${audit_error}")
 endif()
 
 execute_process(

@@ -111,8 +111,17 @@ bool Simulation::loadScenario(const std::string& id) {
     speed = settings.timeScale;
     showTrails = settings.trailsEnabled;
     showVectors = settings.vectorsEnabled;
+    showClassification = false;
+    gravityMode = false;
+    earthMoonFocus = false;
+    showIndividualGravity = false;
     selected = -1;
     soloStudy = false;
+    for (Body& body : bodies) {
+        if (body.baseMass <= 0.0) body.baseMass = body.mass;
+        body.massMultiplier = 1.0;
+        body.mass = body.baseMass;
+    }
     simTime = 0.0;
     accumulator = 0.0;
     actualTimestep = settings.timestepSeconds;
@@ -768,14 +777,21 @@ bool Simulation::isolateSelected() {
 
 void Simulation::exitIsolation() {
     soloStudy = false;
+    earthMoonFocus = false;
 }
 
 void Simulation::clearSelection() {
     selected = -1;
     soloStudy = false;
+    earthMoonFocus = false;
 }
 
 bool Simulation::stepBack() {
+    if (earthMoonFocus) {
+        earthMoonFocus = false;
+        exitIsolation();
+        return true;
+    }
     if (soloStudy) {
         exitIsolation();
         return true;
@@ -791,6 +807,9 @@ bool Simulation::bodyVisibleInView(int index) const {
     if (index < 0 || index >= static_cast<int>(bodies.size())) return false;
     const Body& candidate = bodies[static_cast<std::size_t>(index)];
     if (!candidate.active) return false;
+    if (earthMoonFocus) {
+        return candidate.id == "earth" || candidate.id == "moon" || candidate.id == "sun" || candidate.type == "Moon";
+    }
     if (!soloStudy || selected < 0) return true;
     if (index == selected) return true;
 
@@ -808,6 +827,67 @@ bool Simulation::bodyVisibleInView(int index) const {
         return true;
     }
     return false;
+}
+
+CelestialBodyInfo Simulation::selectedCelestialInfo() const {
+    if (selected < 0 || selected >= static_cast<int>(bodies.size())) {
+        return {};
+    }
+    const Body& body = bodies[static_cast<std::size_t>(selected)];
+    return lookupCelestialInfo(body.id, body.type, body.luminous);
+}
+
+void Simulation::applyEffectiveMass(int index) {
+    if (index < 0 || index >= static_cast<int>(bodies.size())) return;
+    Body& body = bodies[static_cast<std::size_t>(index)];
+    if (body.baseMass <= 0.0) body.baseMass = body.mass;
+    if (!std::isfinite(body.massMultiplier) || body.massMultiplier <= 0.0) body.massMultiplier = 1.0;
+    body.mass = body.baseMass * body.massMultiplier;
+}
+
+void Simulation::resetMassMultipliers() {
+    for (int i = 0; i < static_cast<int>(bodies.size()); ++i) {
+        Body& body = bodies[static_cast<std::size_t>(i)];
+        if (body.baseMass <= 0.0) body.baseMass = body.mass;
+        body.massMultiplier = 1.0;
+        applyEffectiveMass(i);
+    }
+}
+
+bool Simulation::adjustSelectedMassMultiplier(int direction) {
+    if (!gravityMode || selected < 0 || selected >= static_cast<int>(bodies.size())) return false;
+    if (direction == 0) return false;
+    Body& body = bodies[static_cast<std::size_t>(selected)];
+    if (body.baseMass <= 0.0) body.baseMass = body.mass;
+    // Discrete educational multipliers — physics uses effective mass = base * multiplier.
+    constexpr double steps[] = {0.1, 0.25, 0.5, 1.0, 2.0, 5.0, 10.0, 25.0, 50.0, 100.0};
+    int nearest = 0;
+    for (int i = 1; i < static_cast<int>(std::size(steps)); ++i) {
+        if (std::abs(steps[i] - body.massMultiplier) < std::abs(steps[nearest] - body.massMultiplier)) {
+            nearest = i;
+        }
+    }
+    const int next = std::clamp(nearest + (direction > 0 ? 1 : -1), 0, static_cast<int>(std::size(steps)) - 1);
+    body.massMultiplier = steps[next];
+    applyEffectiveMass(selected);
+    refreshScientificState();
+    return true;
+}
+
+bool Simulation::resetSelectedMass() {
+    if (!gravityMode || selected < 0 || selected >= static_cast<int>(bodies.size())) return false;
+    Body& body = bodies[static_cast<std::size_t>(selected)];
+    if (body.baseMass <= 0.0) body.baseMass = body.mass;
+    body.massMultiplier = 1.0;
+    applyEffectiveMass(selected);
+    refreshScientificState();
+    return true;
+}
+
+void Simulation::toggleVisualScaleMode() {
+    visualScaleMode = (visualScaleMode == VisualScaleMode::Educational)
+        ? VisualScaleMode::Realistic
+        : VisualScaleMode::Educational;
 }
 
 std::string Simulation::selectedBodyLesson() const {

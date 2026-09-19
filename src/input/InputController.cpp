@@ -99,9 +99,48 @@ void focusEarthIfPresent(Simulation& simulation, Renderer& renderer) {
     renderer.resetSystemView();
 }
 
+void focusEarthMoonEducational(Simulation& simulation, Renderer& renderer) {
+    // F2: dedicated Earth–Moon system framing (not the same as select Earth + Z).
+    int earthIndex = -1;
+    for (int index = 0; index < static_cast<int>(simulation.bodies.size()); ++index) {
+        if (simulation.bodies[static_cast<std::size_t>(index)].id == "earth" &&
+            simulation.bodies[static_cast<std::size_t>(index)].active) {
+            earthIndex = index;
+            break;
+        }
+    }
+    if (earthIndex < 0) {
+        if (simulation.loadScenario("earth_orbit")) {
+            for (int index = 0; index < static_cast<int>(simulation.bodies.size()); ++index) {
+                if (simulation.bodies[static_cast<std::size_t>(index)].id == "earth") {
+                    earthIndex = index;
+                    break;
+                }
+            }
+        }
+    }
+    if (earthIndex < 0) {
+        renderer.resetSystemView();
+        return;
+    }
+    // Ensure sun is active for Earth-Moon view
+    for (std::size_t index = 0; index < simulation.bodies.size(); ++index) {
+        if (simulation.bodies[index].id == "sun") {
+            simulation.bodies[index].active = true;
+            break;
+        }
+    }
+    if (!simulation.soloStudy && !simulation.earthMoonFocus) renderer.saveViewBeforeIsolate();
+    simulation.selectBody(earthIndex);
+    simulation.isolateSelected();
+    simulation.earthMoonFocus = true;
+    renderer.focusEarthMoonSystem(simulation, true);
+}
+
 void focusSelectedAlone(Simulation& simulation, Renderer& renderer) {
     if (simulation.selected < 0) return;
     if (!simulation.soloStudy) renderer.saveViewBeforeIsolate();
+    simulation.earthMoonFocus = false;
     if (!simulation.isolateSelected()) return;
     // Same snap-follow framing used for fill-screen study of the selected body.
     renderer.focusBodyIndex(simulation, simulation.selected, true);
@@ -120,6 +159,14 @@ void InputController::update(Simulation& simulation, Renderer& renderer) {
     if (simulation.screen == AppScreen::Simulation && controlDown && IsKeyPressed(KEY_S)) {
         selectionMode = true;
         if (!simulation.bodies.empty()) simulation.selectBody(0);
+        return;
+    }
+    if (simulation.screen == AppScreen::Simulation && controlDown && IsKeyPressed(KEY_N)) {
+        simulation.showClassification = !simulation.showClassification;
+        return;
+    }
+    if (simulation.screen == AppScreen::Simulation && controlDown && IsKeyPressed(KEY_G)) {
+        simulation.showGrid = !simulation.showGrid;
         return;
     }
     if (keyboardSelectSimulationBody(simulation, selectionMode)) return;
@@ -162,6 +209,11 @@ void InputController::update(Simulation& simulation, Renderer& renderer) {
     // Q loop: un-isolate (restore screen) → deselect → leave selection mode.
     if (IsKeyPressed(KEY_Q)) {
         if (simulation.screen == AppScreen::Simulation) {
+            if (simulation.gravityMode) {
+                simulation.gravityMode = false;
+                simulation.resetMassMultipliers();
+                return;
+            }
             if (simulation.soloStudy) {
                 simulation.exitIsolation();
                 renderer.restoreViewAfterIsolate();
@@ -303,8 +355,14 @@ void InputController::update(Simulation& simulation, Renderer& renderer) {
     if (IsKeyPressed(KEY_A)) simulation.selectEducationActivity(EducationActivityType::Lesson, simulation.lesson - 1);
     if (IsKeyPressed(KEY_D)) simulation.selectEducationActivity(EducationActivityType::Lesson, simulation.lesson + 1);
     if (IsKeyPressed(KEY_E)) simulation.selectEducationActivity(EducationActivityType::Experiment, simulation.experiment + 1);
-    if (IsKeyPressed(KEY_UP)) simulation.selectEducationActivity(EducationActivityType::Experiment, simulation.experiment - 1);
-    if (IsKeyPressed(KEY_DOWN)) simulation.selectEducationActivity(EducationActivityType::Experiment, simulation.experiment + 1);
+    // In gravity mode, ↑/↓ adjust the selected body's mass multiplier (affects real physics).
+    if (simulation.gravityMode && simulation.selected >= 0) {
+        if (IsKeyPressed(KEY_UP)) simulation.adjustSelectedMassMultiplier(1);
+        if (IsKeyPressed(KEY_DOWN)) simulation.adjustSelectedMassMultiplier(-1);
+    } else {
+        if (IsKeyPressed(KEY_UP)) simulation.selectEducationActivity(EducationActivityType::Experiment, simulation.experiment - 1);
+        if (IsKeyPressed(KEY_DOWN)) simulation.selectEducationActivity(EducationActivityType::Experiment, simulation.experiment + 1);
+    }
     if (IsKeyPressed(KEY_ENTER)) simulation.startEducationActivity();
     if (IsKeyPressed(KEY_B)) simulation.beginEducationObservation();
     if (IsKeyPressed(KEY_Y)) simulation.evaluateCurrentExperiment();
@@ -313,7 +371,8 @@ void InputController::update(Simulation& simulation, Renderer& renderer) {
     if (IsKeyPressed(KEY_LEFT_BRACKET)) simulation.adjustChallengeAnswer(-0.05);
     if (IsKeyPressed(KEY_RIGHT_BRACKET)) simulation.adjustChallengeAnswer(0.05);
     if (IsKeyPressed(KEY_I)) simulation.cycleChallengeIntegrator();
-    if (IsKeyPressed(KEY_N)) simulation.continueEducationActivity();
+    // Plain N advances education; Ctrl+N toggles classification overlay (handled above with Ctrl).
+    if (!controlDown && IsKeyPressed(KEY_N)) simulation.continueEducationActivity();
     if (IsKeyPressed(KEY_V)) {
         simulation.showVectors = !simulation.showVectors;
         simulation.settings.vectorsEnabled = simulation.showVectors;
@@ -323,17 +382,38 @@ void InputController::update(Simulation& simulation, Renderer& renderer) {
         simulation.showTrails = !simulation.showTrails;
         simulation.settings.trailsEnabled = simulation.showTrails;
     }
-    if (IsKeyPressed(KEY_G)) simulation.showGrid = !simulation.showGrid;
-    if (IsKeyPressed(KEY_R)) simulation.reset();
+    // G = Gravity Simulation mode (mass analysis). Grid moved to Ctrl+G.
+    if (!controlDown && IsKeyPressed(KEY_G)) {
+        simulation.gravityMode = !simulation.gravityMode;
+        if (!simulation.gravityMode) {
+            // Leaving gravity mode restores base masses so experiments stay reversible.
+            simulation.resetMassMultipliers();
+        }
+    }
+    if (controlDown && IsKeyPressed(KEY_G)) simulation.showGrid = !simulation.showGrid;
+    if (IsKeyPressed(KEY_SLASH)) simulation.toggleVisualScaleMode();
+    if (IsKeyPressed(KEY_R)) {
+        if (simulation.gravityMode && simulation.selected >= 0) {
+            // In gravity mode: reset selected body's mass to default
+            simulation.resetSelectedMass();
+        } else {
+            // Normal mode: reset entire simulation
+            simulation.reset();
+            simulation.resetMassMultipliers();
+        }
+    }
     if (IsKeyPressed(KEY_F1)) {
+        simulation.earthMoonFocus = false;
         if (simulation.loadScenario("default_solar_system")) applyScenarioCamera(simulation, renderer, "default_solar_system");
     }
     if (IsKeyPressed(KEY_F2)) {
-        if (simulation.loadScenario("earth_orbit")) applyScenarioCamera(simulation, renderer, "earth_orbit");
+        focusEarthMoonEducational(simulation, renderer);
     }
     if (IsKeyPressed(KEY_F3)) {
+        simulation.earthMoonFocus = false;
         if (simulation.loadScenario("empty_space")) applyScenarioCamera(simulation, renderer, "empty_space");
     }
+    if (IsKeyPressed(KEY_F4)) renderer.togglePlanetLighting();
     if (IsKeyPressed(KEY_ONE)) simulation.setSpeed(1.0);
     if (IsKeyPressed(KEY_TWO)) simulation.setSpeed(10.0);
     if (IsKeyPressed(KEY_THREE)) simulation.setSpeed(100.0);

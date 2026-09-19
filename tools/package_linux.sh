@@ -20,6 +20,33 @@ STAGE=$(mktemp -d "${TMPDIR:-/tmp}/bags-lab-package.XXXXXX")
 trap 'rm -rf "$STAGE"' EXIT
 
 printf '%s\n' "== configure ($PLATFORM) =="
+# Bundled GLFW (X11) needs Xinerama headers. Prefer the system -dev package;
+# allow CMAKE_PREFIX_PATH for a non-root prefix that provides
+# include/X11/extensions/Xinerama.h. Never rely on CPATH=/tmp staging.
+if [[ -z "${BAGS_LAB_SKIP_XINERAMA_CHECK:-}" ]]; then
+  _xinerama_h=""
+  if [[ -f /usr/include/X11/extensions/Xinerama.h ]]; then
+    _xinerama_h=/usr/include/X11/extensions/Xinerama.h
+  elif [[ -n "${CMAKE_PREFIX_PATH:-}" ]]; then
+    IFS=':' read -r -a _prefixes <<< "${CMAKE_PREFIX_PATH}"
+    for _p in "${_prefixes[@]}"; do
+      if [[ -f "${_p}/include/X11/extensions/Xinerama.h" ]]; then
+        _xinerama_h="${_p}/include/X11/extensions/Xinerama.h"
+        break
+      fi
+    done
+  fi
+  if [[ -z "${_xinerama_h}" ]]; then
+    printf '%s\n' "ERROR: portable Linux configure requires Xinerama development headers." >&2
+    printf '%s\n' "  Missing: X11/extensions/Xinerama.h" >&2
+    printf '%s\n' "  Debian/Ubuntu/Kali:  sudo apt-get install libxinerama-dev" >&2
+    printf '%s\n' "  Fedora/RHEL:        sudo dnf install libXinerama-devel" >&2
+    printf '%s\n' "  Or: cmake -DCMAKE_PREFIX_PATH=/path/to/prefix (with include/X11/extensions/Xinerama.h)" >&2
+    printf '%s\n' "  Do not set CPATH to temporary staging directories." >&2
+    exit 2
+  fi
+  printf '%s\n' "Xinerama headers: ${_xinerama_h}"
+fi
 CMAKE_EXTRA=()
 if [[ "$PLATFORM" == "linux-arm64" && "$(uname -m)" != "aarch64" && "$(uname -m)" != "arm64" ]]; then
   CMAKE_EXTRA+=(-DCMAKE_TOOLCHAIN_FILE="$SOURCE_DIR/cmake/toolchains/linux-arm64.cmake")
@@ -51,6 +78,7 @@ chmod +x "$DIST_DIR/BAGS_LAB" "$DIST_DIR/BAGS_LAB.EXE" || true
 
 cp -a "$SOURCE_DIR/data/." "$DIST_DIR/data/"
 cp -a "$SOURCE_DIR/assets/planets/manifest.json" "$DIST_DIR/assets/planets/"
+cp -a "$SOURCE_DIR/assets/milkyway.glb" "$DIST_DIR/assets/"
 # Stage only the GLB paths referenced by the presentation manifest (includes
 # prepared/*.glb). Do not copy unrelated development-only variants.
 python3 - "$SOURCE_DIR/assets/planets" "$DIST_DIR/assets/planets" <<'PY'
@@ -98,6 +126,7 @@ else
   cp -a "$SOURCE_DIR/README.md" "$DIST_DIR/README.md"
 fi
 install -m 0755 "$SOURCE_DIR/launcher/linux/BAGS_LAB.sh" "$DIST_DIR/BAGS_LAB.sh"
+# The shell launcher repairs missing host runtime packages on first use.
 # FAT-executable launcher alias for USB showexec mounts.
 cp -a "$DIST_DIR/BAGS_LAB.sh" "$DIST_DIR/BAGS_LAB.BAT"
 chmod +x "$DIST_DIR/BAGS_LAB.sh" "$DIST_DIR/BAGS_LAB.BAT" || true
@@ -245,6 +274,7 @@ fi
 printf '%s\n' "== audit portable dependencies =="
 python3 "$SOURCE_DIR/tools/audit_portable_libs.py" \
   "$DIST_DIR/BAGS_LAB" \
+  --profile portable \
   --libdir "$DIST_DIR/lib" \
   --require-origin-lib
 
