@@ -1096,6 +1096,7 @@ void Renderer::scene(const Simulation& simulation) {
     EndMode3D();
     if (selectedBody != nullptr) drawSelectionIndicator(*selectedBody, simulation);
     if (simulation.showClassification) drawBodyLabels(simulation);
+    if (simulation.showClassification && simulation.showPlanetGroups) drawPlanetGroupLabels(simulation);
     if (trace && sceneFrames < 3) {
         const double totalMs = std::chrono::duration<double, std::milli>(Clock::now() - sceneStart).count();
         logInfo("[FRAME] scene total #" + std::to_string(sceneFrames) + " " + std::to_string(totalMs) + " ms");
@@ -1161,6 +1162,108 @@ void Renderer::drawBodyLabels(const Simulation& simulation) const {
             const float typeX = screenPos.x - typeWidth * 0.5f;
             DrawText(body.type.c_str(), static_cast<int>(typeX), static_cast<int>(labelY + 14), 10, {180, 180, 180, 255});
         }
+    }
+}
+
+void Renderer::drawPlanetGroupLabels(const Simulation& simulation) const {
+    // Identify terrestrial and Jovian planets on screen
+    std::vector<std::pair<Vector2, std::string>> terrestrial; // screen positions
+    std::vector<std::pair<Vector2, std::string>> jovian;
+    
+    for (int index = 0; index < static_cast<int>(simulation.bodies.size()); ++index) {
+        if (!simulation.bodyVisibleInView(index)) continue;
+        const Body& body = simulation.bodies[static_cast<std::size_t>(index)];
+        if (!body.active || body.type.empty()) continue;
+        
+        const Vector3 position = bodyWorldPosition(body, simulation);
+        const Vector2 screenPos = GetWorldToScreen(position, camera);
+        
+        // Only draw if on screen
+        if (screenPos.x < 0 || screenPos.x > GetScreenWidth() || 
+            screenPos.y < 0 || screenPos.y > GetScreenHeight()) continue;
+        
+        // Categorize planets
+        if (body.type == "Terrestrial Planet") {
+            terrestrial.push_back({screenPos, body.name});
+        } else if (body.type == "Jovian Planet") {
+            jovian.push_back({screenPos, body.name});
+        }
+    }
+    
+    const Color terrestrialColor = {100, 200, 255, 255}; // Blue
+    const Color jovianColor = {255, 180, 100, 255};       // Orange
+    
+    // Draw terrestrial group
+    if (!terrestrial.empty()) {
+        float minX = terrestrial[0].first.x;
+        float maxX = terrestrial[0].first.x;
+        float minY = terrestrial[0].first.y;
+        float maxY = terrestrial[0].first.y;
+        
+        for (const auto& p : terrestrial) {
+            minX = std::min(minX, p.first.x);
+            maxX = std::max(maxX, p.first.x);
+            minY = std::min(minY, p.first.y);
+            maxY = std::max(maxY, p.first.y);
+        }
+        
+        // Draw left brace
+        const float braceGap = 30.0f;
+        const float braceX = minX - braceGap;
+        const float braceTopY = minY - 15.0f;
+        const float braceBotY = maxY + 15.0f;
+        const float braceW = 20.0f;
+        
+        DrawText("}", static_cast<int>(braceX), static_cast<int>(braceTopY), 60, terrestrialColor);
+        DrawText("}", static_cast<int>(braceX), static_cast<int>(braceBotY - 45), 60, terrestrialColor);
+        
+        // Label: "Terrestrial"
+        const int labelWidth = MeasureText("Terrestrial", 14);
+        DrawText("Terrestrial", static_cast<int>(braceX - braceW - 80), 
+                static_cast<int>((braceTopY + braceBotY) * 0.5f - 7), 14, terrestrialColor);
+    }
+    
+    // Draw Jovian group
+    if (!jovian.empty()) {
+        float minX = jovian[0].first.x;
+        float maxX = jovian[0].first.x;
+        float minY = jovian[0].first.y;
+        float maxY = jovian[0].first.y;
+        
+        for (const auto& p : jovian) {
+            minX = std::min(minX, p.first.x);
+            maxX = std::max(maxX, p.first.x);
+            minY = std::min(minY, p.first.y);
+            maxY = std::max(maxY, p.first.y);
+        }
+        
+        // Draw right brace
+        const float braceGap = 30.0f;
+        const float braceX = maxX + braceGap;
+        const float braceTopY = minY - 15.0f;
+        const float braceBotY = maxY + 15.0f;
+        
+        DrawText("{", static_cast<int>(braceX), static_cast<int>(braceTopY), 60, jovianColor);
+        DrawText("{", static_cast<int>(braceX), static_cast<int>(braceBotY - 45), 60, jovianColor);
+        
+        // Label: "Jovian"
+        DrawText("Jovian", static_cast<int>(braceX + 20), 
+                static_cast<int>((braceTopY + braceBotY) * 0.5f - 7), 14, jovianColor);
+    }
+    
+    // Draw separator line in the middle if both groups present
+    if (!terrestrial.empty() && !jovian.empty()) {
+        float maxTerrestrial = terrestrial[0].first.x;
+        float minJovian = jovian[0].first.x;
+        for (const auto& p : terrestrial) maxTerrestrial = std::max(maxTerrestrial, p.first.x);
+        for (const auto& p : jovian) minJovian = std::min(minJovian, p.first.x);
+        
+        const float separatorX = (maxTerrestrial + minJovian) * 0.5f;
+        const float screenH = static_cast<float>(GetScreenHeight());
+        DrawLineEx({separatorX, 60.0f}, {separatorX, screenH - 60.0f}, 2.0f, {150, 150, 150, 100});
+        
+        // Draw separator label
+        DrawText("Asteroid Belt", static_cast<int>(separatorX - 50), 20, 12, {150, 150, 150, 180});
     }
 }
 

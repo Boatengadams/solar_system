@@ -464,7 +464,14 @@ void InputController::update(Simulation& simulation, Renderer& renderer) {
         if (simulation.loadScenario("empty_space")) applyScenarioCamera(simulation, renderer, "empty_space");
     }
     if (IsKeyPressed(KEY_F4)) renderer.togglePlanetLighting();
-    if (IsKeyPressed(KEY_ONE)) simulation.setSpeed(1.0);
+    // KEY_ONE: Toggle planet group classification if Ctrl+N is active, else set speed
+    if (IsKeyPressed(KEY_ONE)) {
+        if (simulation.showClassification) {
+            simulation.showPlanetGroups = !simulation.showPlanetGroups;
+        } else {
+            simulation.setSpeed(1.0);
+        }
+    }
     if (IsKeyPressed(KEY_TWO)) simulation.setSpeed(10.0);
     if (IsKeyPressed(KEY_THREE)) simulation.setSpeed(100.0);
     if (IsKeyPressed(KEY_FOUR)) simulation.setSpeed(1000.0);

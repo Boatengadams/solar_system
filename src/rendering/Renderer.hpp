@@ -114,6 +114,7 @@ private:
     void drawGravityField(const Simulation& simulation) const;
     void drawBody(const Body& body, const Simulation& simulation) const;
     void drawBodyLabels(const Simulation& simulation) const;
+    void drawPlanetGroupLabels(const Simulation& simulation) const;
     void drawStudySpinCues(const Body& body, float radius) const;
     void drawAxes() const;
     void drawSelectionIndicator(const Body& body, const Simulation& simulation) const;

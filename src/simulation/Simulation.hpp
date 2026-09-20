@@ -68,6 +68,7 @@ public:
     bool showVectors = false;          // V — Forces & Motion visualization
     bool showGrid = false;             // Ctrl+G — reference grid
     bool showClassification = false;   // Ctrl+N — naming / classification overlay
+    bool showPlanetGroups = false;     // 1 (in Ctrl+N) — terrestrial/Jovian grouping with braces
     bool gravityMode = false;          // G — gravity simulation / mass analysis
     bool earthMoonFocus = false;       // F2 — dedicated Earth–Moon system focus
     bool showIndividualGravity = false; // optional per-body gravity contributions (V/G)
