@@ -1023,7 +1023,7 @@ void Renderer::scene(const Simulation& simulation) {
     if (simulation.showGrid) DrawGrid(40, 10.0f);
     if (simulation.showGrid) drawAxes();
     if (!simulation.bodies.empty()) {
-        if (simulation.showVectors || simulation.gravityMode) {
+        if (simulation.showVectors && !simulation.gravityMode) {
             drawGravityField(simulation);
         }
         const Body& centralBody = simulation.bodies.front();

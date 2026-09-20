@@ -554,41 +554,35 @@ void HUD::forcesMotionOverlay(const Simulation& simulation) const {
 void HUD::gravityModeOverlay(const Simulation& simulation) const {
     if (!simulation.gravityMode) return;
     const auto& t = theme();
-    // Position at bottom of screen instead of top
+    // Position at bottom of screen - smaller panel (350x320) to reduce screen coverage
     const float screenH = static_cast<float>(GetScreenHeight());
-    const Rectangle panel = {ui::pagePad() + 58.0f, screenH - 520.0f - 14.0f, 520.0f, 520.0f};
+    const Rectangle panel = {ui::pagePad() + 58.0f, screenH - 320.0f - 14.0f, 350.0f, 320.0f};
     ui::drawGlassPanel(panel, true, 0.1f);
 
-    text("GRAVITY SIMULATION - INTERACTIVE VALUES", panel.x + 14.0f, panel.y + 12.0f, 12.0f, t.accent);
-    text("↑/↓ adjust   TAB cycle field   R reset   G/Q exit", panel.x + 14.0f, panel.y + 30.0f, 10.0f, t.textDim);
+    text("GRAVITY - INTERACTIVE", panel.x + 14.0f, panel.y + 8.0f, 11.0f, t.accent);
+    text("↑/↓ adjust  TAB cycle  R reset  Q exit", panel.x + 14.0f, panel.y + 22.0f, 9.0f, t.textDim);
 
     if (simulation.selected < 0 || simulation.selected >= static_cast<int>(simulation.bodies.size())) {
-        text("Select a body to analyse gravity.", panel.x + 14.0f, panel.y + 70.0f, 12.0f, t.textMuted);
+        text("Select a body", panel.x + 14.0f, panel.y + 40.0f, 11.0f, t.textMuted);
         return;
     }
 
     const Body& body = simulation.bodies[static_cast<std::size_t>(simulation.selected)];
     const double base = body.baseMass > 0.0 ? body.baseMass : body.mass;
-    const double mult = body.massMultiplier > 0.0 ? body.massMultiplier : 1.0;
     const double effective = body.mass;
     const double baseRadius = body.realRadius > 0.0 ? body.realRadius : 1.0;
-    const double radiusRatio = body.radius / baseRadius;
 
-    ui::drawLabelValue("Selected Body", body.name.c_str(), panel.x + 14.0f, panel.y + 54.0f, 150.0f);
+    ui::drawLabelValue("Body", body.name.c_str(), panel.x + 14.0f, panel.y + 40.0f, 120.0f);
     
     // Mass field (editable)
     const Color massBg = simulation.gravityModeEditField == 0 ? t.accentStrong : t.surface;
-    DrawRectangle(static_cast<int>(panel.x + 14.0f) - 4, static_cast<int>(panel.y + 76.0f) - 4, 350, 20, massBg);
-    ui::drawLabelValue("Base Mass", (scientific(base) + " kg").c_str(), panel.x + 14.0f, panel.y + 76.0f, 150.0f);
-    ui::drawLabelValue("Multiplier", (format(mult, 2) + "×").c_str(), panel.x + 240.0f, panel.y + 76.0f, 150.0f);
+    DrawRectangle(static_cast<int>(panel.x + 14.0f) - 4, static_cast<int>(panel.y + 58.0f) - 4, 280, 16, massBg);
+    ui::drawLabelValue("Mass", (scientific(base) + " kg").c_str(), panel.x + 14.0f, panel.y + 58.0f, 130.0f);
     
     // Radius field (editable)
     const Color radiusBg = simulation.gravityModeEditField == 1 ? t.accentStrong : t.surface;
-    DrawRectangle(static_cast<int>(panel.x + 14.0f) - 4, static_cast<int>(panel.y + 98.0f) - 4, 350, 20, radiusBg);
-    ui::drawLabelValue("Radius", (format(body.radius / 1000.0, 1) + " M km").c_str(), panel.x + 14.0f, panel.y + 98.0f, 150.0f);
-    ui::drawLabelValue("Scale", (format(radiusRatio, 2) + "×").c_str(), panel.x + 240.0f, panel.y + 98.0f, 150.0f);
-    
-    ui::drawLabelValue("Effective Mass", (scientific(effective) + " kg").c_str(), panel.x + 14.0f, panel.y + 120.0f, 150.0f);
+    DrawRectangle(static_cast<int>(panel.x + 14.0f) - 4, static_cast<int>(panel.y + 74.0f) - 4, 280, 16, radiusBg);
+    ui::drawLabelValue("Radius", (format(body.radius / 1000.0, 1) + " Mkm").c_str(), panel.x + 14.0f, panel.y + 74.0f, 130.0f);
 
     // Dominant gravitational source: parent, else Sun, else nearest massive body.
     const Body* source = nullptr;
@@ -618,37 +612,29 @@ void HUD::gravityModeOverlay(const Simulation& simulation) const {
         const double orbitalVelocity = std::sqrt(sourceMu / std::max(dist, 1.0));
         const double orbitalPeriod = TAU * std::sqrt((dist * dist * dist) / std::max(sourceMu, 1.0));
         
-        ui::drawLabelValue("Source", source->name.c_str(), panel.x + 14.0f, panel.y + 150.0f, 150.0f);
-        ui::drawLabelValue("Distance", distance(dist).c_str(), panel.x + 14.0f, panel.y + 172.0f, 150.0f);
+        ui::drawLabelValue("Source", source->name.c_str(), panel.x + 14.0f, panel.y + 92.0f, 120.0f);
+        ui::drawLabelValue("Dist", distance(dist).c_str(), panel.x + 180.0f, panel.y + 92.0f, 120.0f);
         
         // Force and acceleration calculations
-        ui::drawLabelValue("Force |F|", (scientific(force) + " N").c_str(), panel.x + 14.0f, panel.y + 194.0f, 150.0f);
-        ui::drawLabelValue("Accel. |g|", (scientific(accel) + " m/s²").c_str(), panel.x + 14.0f, panel.y + 216.0f, 150.0f);
-        ui::drawLabelValue("Weight |W|", (scientific(weight) + " N").c_str(), panel.x + 14.0f, panel.y + 238.0f, 150.0f);
+        ui::drawLabelValue("Force", (scientific(force, 2) + "N").c_str(), panel.x + 14.0f, panel.y + 108.0f, 120.0f);
+        ui::drawLabelValue("Accel", (scientific(accel, 2) + "m/s²").c_str(), panel.x + 180.0f, panel.y + 108.0f, 120.0f);
+        ui::drawLabelValue("Weight", (scientific(weight, 2) + "N").c_str(), panel.x + 14.0f, panel.y + 124.0f, 120.0f);
         
         // Orbital mechanics calculations
-        ui::drawLabelValue("Orbital Velocity", (format(orbitalVelocity, 1) + " m/s").c_str(), 
-                          panel.x + 14.0f, panel.y + 260.0f, 150.0f);
+        ui::drawLabelValue("Vel", (format(orbitalVelocity, 0) + " m/s").c_str(), 
+                          panel.x + 14.0f, panel.y + 140.0f, 120.0f);
         
         const int days = static_cast<int>(orbitalPeriod / 86400.0);
         const int hours = static_cast<int>((orbitalPeriod - days * 86400.0) / 3600.0);
-        const int minutes = static_cast<int>((orbitalPeriod - days * 86400.0 - hours * 3600.0) / 60.0);
-        std::string periodStr = std::to_string(days) + "d " + std::to_string(hours) + "h " + std::to_string(minutes) + "m";
-        ui::drawLabelValue("Orbital Period", periodStr.c_str(), panel.x + 14.0f, panel.y + 282.0f, 150.0f);
+        std::string periodStr = std::to_string(days) + "d " + std::to_string(hours) + "h";
+        ui::drawLabelValue("Period", periodStr.c_str(), panel.x + 14.0f, panel.y + 156.0f, 120.0f);
         
-        ui::drawLabelValue("Force Direction", "Toward source", panel.x + 14.0f, panel.y + 304.0f, 150.0f);
-        
-        // Formula display
-        text("Formulas:", panel.x + 14.0f, panel.y + 330.0f, 11.0f, t.accentStrong);
-        text("F = GMm/r²    g = GM/R²    W = mg", panel.x + 14.0f, panel.y + 346.0f, 10.0f, t.textMuted);
-        text("v = √(GM/r)    T = 2π√(r³/GM)", panel.x + 14.0f, panel.y + 362.0f, 10.0f, t.textMuted);
+        // Compact formula display
+        text("Formulas:", panel.x + 14.0f, panel.y + 180.0f, 9.0f, t.accentStrong);
+        text("F=GMm/r²  g=GM/R²  W=mg", panel.x + 14.0f, panel.y + 192.0f, 8.0f, t.textMuted);
+        text("v=√(GM/r)  T=2π√(r³/GM)", panel.x + 14.0f, panel.y + 204.0f, 8.0f, t.textMuted);
     }
-
-    text("Changing mass updates formulas in the", panel.x + 14.0f, panel.y + 395.0f, 10.0f, t.textMuted);
-    text("live physics engine — orbits respond.", panel.x + 14.0f, panel.y + 411.0f, 10.0f, t.textMuted);
-    text("Press R to reset body mass to default.", panel.x + 14.0f, panel.y + 427.0f, 10.0f, t.textMuted);
 }
-
 void HUD::earthMoonOverlay(const Simulation& simulation) const {
     if (!simulation.earthMoonFocus) return;
     const auto& t = theme();
