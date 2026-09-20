@@ -168,6 +168,11 @@ Renderer::Renderer(std::filesystem::path planetAssetDirectory) : planetAssets(pl
     if (std::filesystem::exists(villaPath)) {
         villaModel = LoadModel(villaPath.string().c_str());
     }
+    // Load Einstein spacetime curvature model for gravity visualization
+    std::filesystem::path spacetimePath = planetAssetDirectory.parent_path() / "warped_spacetime.glb";
+    if (std::filesystem::exists(spacetimePath)) {
+        spacetimeModel = LoadModel(spacetimePath.string().c_str());
+    }
     if (trace) {
         const double ms =
             std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - loadStart).count();
@@ -188,6 +193,10 @@ void Renderer::unloadAssets() {
     if (villaModel.meshCount > 0) {
         UnloadModel(villaModel);
         villaModel = {};
+    }
+    if (spacetimeModel.meshCount > 0) {
+        UnloadModel(spacetimeModel);
+        spacetimeModel = {};
     }
     planetAssets.unload();
     if (planetLightShader.id != 0) {
@@ -1097,11 +1106,18 @@ void Renderer::scene(const Simulation& simulation) {
             }
         }
         const auto bodiesStart = Clock::now();
-        for (int index = 0; index < static_cast<int>(simulation.bodies.size()); ++index) {
-            if (!simulation.bodyVisibleInView(index)) continue;
-            const Body& body = simulation.bodies[static_cast<std::size_t>(index)];
-            if (!body.active) continue;
-            drawBody(body, simulation);
+        
+        // Draw Einstein spacetime visualization if enabled
+        if (simulation.einsteinMode) {
+            drawEinsteinSpacetime(simulation);
+        } else {
+            // Normal body rendering
+            for (int index = 0; index < static_cast<int>(simulation.bodies.size()); ++index) {
+                if (!simulation.bodyVisibleInView(index)) continue;
+                const Body& body = simulation.bodies[static_cast<std::size_t>(index)];
+                if (!body.active) continue;
+                drawBody(body, simulation);
+            }
         }
         if (trace && sceneFrames < 3) {
             const double bodiesMs =
@@ -1290,6 +1306,57 @@ void Renderer::drawPlanetGroupLabels(const Simulation& simulation) const {
         
         // Draw separator label
         DrawText("Asteroid Belt", static_cast<int>(separatorX - 50), 20, 12, {150, 150, 150, 180});
+    }
+}
+
+void Renderer::drawEinsteinSpacetime(const Simulation& simulation) const {
+    if (spacetimeModel.meshCount == 0) return;
+    
+    // Draw the warped spacetime as the base plane
+    // Centered at origin with large scale to show gravity well
+    rlPushMatrix();
+    rlScalef(150.0f, 150.0f, 150.0f);  // Large scale to show entire solar system
+    DrawModel(spacetimeModel, {0.0f, -5.0f, 0.0f}, 1.0f, {200, 200, 200, 255});
+    rlPopMatrix();
+    
+    // Draw Sun at center as the primary mass causing spacetime curvature
+    const Body* sun = findBodyById(simulation, "sun");
+    if (sun != nullptr) {
+        const Vector3 sunPos = bodyWorldPosition(*sun, simulation);
+        // Draw sun as the central massive object on the spacetime
+        rlPushMatrix();
+        rlTranslatef(sunPos.x, sunPos.y, sunPos.z);
+        DrawSphere({0.0f, 0.0f, 0.0f}, presentationRadius(*sun, simulation) * 1.5f, 
+                  {255, 200, 0, 255});
+        DrawSphereWires({0.0f, 0.0f, 0.0f}, presentationRadius(*sun, simulation) * 1.5f, 8, 8, 
+                       {255, 255, 100, 180});
+        rlPopMatrix();
+    }
+    
+    // Draw other planets on the spacetime surface (projected down to the warped grid)
+    for (int index = 0; index < static_cast<int>(simulation.bodies.size()); ++index) {
+        if (!simulation.bodyVisibleInView(index)) continue;
+        const Body& body = simulation.bodies[static_cast<std::size_t>(index)];
+        if (!body.active || body.type == "Star" || body.id == "sun") continue;
+        
+        const Vector3 position = bodyWorldPosition(body, simulation);
+        const float radius = presentationRadius(body, simulation);
+        
+        // Draw body on the warped spacetime surface
+        rlPushMatrix();
+        rlTranslatef(position.x, position.y, position.z);
+        // Draw sphere representing the planet
+        DrawSphereEx({0.0f, 0.0f, 0.0f}, radius, 12, 16, color(body.color));
+        // Draw orbit path projection on spacetime
+        rlPopMatrix();
+        
+        // Draw gravity wells around each planet (subtle indicator of mass)
+        const float wellRadius = radius * 0.8f;
+        rlPushMatrix();
+        rlTranslatef(position.x, position.y, position.z);
+        DrawSphereWires({0.0f, 0.0f, 0.0f}, wellRadius, 6, 6, 
+                       {200, 150, 100, 100});
+        rlPopMatrix();
     }
 }
 

@@ -78,7 +78,8 @@ private:
     bool leftPressValid = false;
     Vector2 leftPressPos{};
     PlanetAssetManager planetAssets;
-    Model villaModel{};  // Earth surface village model
+    Model villaModel{};              // Earth surface village model
+    Model spacetimeModel{};          // Einstein spacetime curvature visualization
     // The galaxy is a presentation-only backdrop: simulation positions retain SI units.
     struct GalaxyPoint {
         Vector3 position{};
@@ -113,6 +114,7 @@ private:
     void drawMilkyWay() const;
     // A small, presentation-only field makes the Sun's pull readable at a glance.
     void drawGravityField(const Simulation& simulation) const;
+    void drawEinsteinSpacetime(const Simulation& simulation) const;
     void drawBody(const Body& body, const Simulation& simulation) const;
     void drawBodyLabels(const Simulation& simulation) const;
     void drawPlanetGroupLabels(const Simulation& simulation) const;
