@@ -554,7 +554,9 @@ void HUD::forcesMotionOverlay(const Simulation& simulation) const {
 void HUD::gravityModeOverlay(const Simulation& simulation) const {
     if (!simulation.gravityMode) return;
     const auto& t = theme();
-    const Rectangle panel = {ui::pagePad() + 58.0f, ui::topBarHeight() + 14.0f, 520.0f, 520.0f};
+    // Position at bottom of screen instead of top
+    const float screenH = static_cast<float>(GetScreenHeight());
+    const Rectangle panel = {ui::pagePad() + 58.0f, screenH - 520.0f - 14.0f, 520.0f, 520.0f};
     ui::drawGlassPanel(panel, true, 0.1f);
 
     text("GRAVITY SIMULATION - INTERACTIVE VALUES", panel.x + 14.0f, panel.y + 12.0f, 12.0f, t.accent);

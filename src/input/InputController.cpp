@@ -220,7 +220,7 @@ void InputController::update(Simulation& simulation, Renderer& renderer) {
     if (IsKeyPressed(KEY_F7)) selectScreen(simulation, AppScreen::MissionDesigner);
     if (IsKeyPressed(KEY_F8)) selectScreen(simulation, AppScreen::Settings);
 
-    // Q loop: un-isolate (restore screen) → deselect → leave selection mode.
+    // Q loop: un-isolate (restore screen) → deselect → leave selection mode → turn off V mode
     if (IsKeyPressed(KEY_Q)) {
         if (simulation.screen == AppScreen::Simulation) {
             if (simulation.gravityMode) {
@@ -239,6 +239,12 @@ void InputController::update(Simulation& simulation, Renderer& renderer) {
             }
             if (selectionMode) {
                 selectionMode = false;
+                return;
+            }
+            // Deactivate V mode vectors
+            if (simulation.showVectors) {
+                simulation.showVectors = false;
+                simulation.settings.vectorsEnabled = false;
                 return;
             }
         } else if (simulation.screen == AppScreen::Education) {

@@ -1049,20 +1049,19 @@ void Renderer::scene(const Simulation& simulation) {
                 if (body.active) drawTrail(body);
             }
         }
+        // V mode (showVectors) OR G mode (gravityMode) - show force vectors
         if (simulation.showVectors || simulation.gravityMode) {
-            // V / G: selected body gets detailed vectors
-            // When a body is selected: V shows only that body's forces
-            // When no body selected: V shows all bodies' forces
+            // When a body is selected: ONLY show that body's forces
             if (simulation.selected >= 0 &&
                 simulation.selected < static_cast<int>(simulation.bodies.size())) {
                 const Body& selected = simulation.bodies[static_cast<std::size_t>(simulation.selected)];
                 if (selected.active && selected.type != "Star") {
                     drawForceMotionVectors(selected, simulation);
                 }
-                // When V is on and a body is selected, only show that body's forces
-                // (Skip drawing other bodies when a selection is active)
-            } else if (simulation.showVectors) {
-                // No body selected: show forces for all bodies
+                // In G mode or when body selected: only selected body's forces shown
+                // Do NOT draw other bodies
+            } else if (simulation.showVectors && !simulation.gravityMode) {
+                // V mode only (NOT G mode) + no selection: show all bodies' forces
                 for (int index = 0; index < static_cast<int>(simulation.bodies.size()); ++index) {
                     if (!simulation.bodyVisibleInView(index)) continue;
                     const Body& body = simulation.bodies[static_cast<std::size_t>(index)];
