@@ -70,7 +70,6 @@ public:
     bool showClassification = false;   // Ctrl+N — naming / classification overlay
     bool showPlanetGroups = false;     // 1 (in Ctrl+N) — terrestrial/Jovian grouping with braces
     bool gravityMode = false;          // G — gravity simulation / mass analysis
-    bool einsteinMode = false;         // W — Einstein spacetime curvature visualization
     bool earthMoonFocus = false;       // F2 — dedicated Earth–Moon system focus
     bool showIndividualGravity = false; // optional per-body gravity contributions (V/G)
     int gravityModeEditField = 0;      // 0=mass, 1=radius, 2=density

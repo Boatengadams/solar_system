@@ -419,8 +419,6 @@ void InputController::update(Simulation& simulation, Renderer& renderer) {
         simulation.showTrails = !simulation.showTrails;
         simulation.settings.trailsEnabled = simulation.showTrails;
     }
-    // W = Einstein spacetime visualization (gravity as curvature)
-    if (IsKeyPressed(KEY_W)) simulation.einsteinMode = !simulation.einsteinMode;
     // G = Gravity Simulation mode (mass analysis). Grid moved to Ctrl+G.
     if (!controlDown && IsKeyPressed(KEY_G)) {
         simulation.gravityMode = !simulation.gravityMode;

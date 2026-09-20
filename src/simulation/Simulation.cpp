@@ -115,7 +115,6 @@ bool Simulation::loadScenario(const std::string& id) {
     gravityMode = false;
     earthMoonFocus = false;
     showIndividualGravity = false;
-    einsteinMode = false;
     selected = -1;
     soloStudy = false;
     for (Body& body : bodies) {
