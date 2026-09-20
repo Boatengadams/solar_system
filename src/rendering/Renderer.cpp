@@ -163,6 +163,11 @@ Renderer::Renderer(std::filesystem::path planetAssetDirectory) : planetAssets(pl
     planetAssets.load();
     loadPlanetLighting();
     loadMilkyWayAsset(planetAssetDirectory.parent_path() / "milkyway.glb");
+    // Load Earth villa model for close-up surface view
+    std::filesystem::path villaPath = planetAssetDirectory / "earth" / "bags_villa.glb";
+    if (std::filesystem::exists(villaPath)) {
+        villaModel = LoadModel(villaPath.string().c_str());
+    }
     if (trace) {
         const double ms =
             std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - loadStart).count();
@@ -180,6 +185,10 @@ void Renderer::unloadAssets() {
     milkyWayPoints.clear();
     milkyWaySourceDiameter = 0.0f;
     milkyWayCenter = {};
+    if (villaModel.meshCount > 0) {
+        UnloadModel(villaModel);
+        villaModel = {};
+    }
     planetAssets.unload();
     if (planetLightShader.id != 0) {
         UnloadShader(planetLightShader);
@@ -940,6 +949,10 @@ void Renderer::drawBody(const Body& body, const Simulation& simulation) const {
         simulation.selected >= 0 &&
         simulation.selected < static_cast<int>(simulation.bodies.size()) &&
         simulation.bodies[static_cast<std::size_t>(simulation.selected)].id == body.id;
+    
+    // Check if this is Earth and we're zoomed in very close for surface detail view
+    const bool showVilla = (body.id == "earth" && villaModel.meshCount > 0 && cameraDistance < 15.0f);
+    
     if (body.luminous) {
         // Give the Sun a layered corona even when its GLB is available.  The
         // model supplies the surface detail; these transparent shells supply
@@ -950,6 +963,20 @@ void Renderer::drawBody(const Body& body, const Simulation& simulation) const {
         DrawSphere(position, radius * 1.70f * pulse, alpha({255, 164, 38, 255}, 0.10f));
         DrawSphere(position, radius * 1.28f, alpha({255, 211, 102, 255}, 0.22f));
     }
+    
+    // Render villa when zoomed in close to Earth
+    if (showVilla) {
+        rlPushMatrix();
+        rlTranslatef(position.x, position.y, position.z);
+        applyBodyOrientation(body, orientClock, studyMotion);
+        // Scale villa to roughly Earth's presentation size
+        const float villaScale = radius / 5.0f;  // Villa model sized appropriately
+        rlScalef(villaScale, villaScale, villaScale);
+        DrawModel(villaModel, {0.0f, 0.0f, 0.0f}, 1.0f, WHITE);
+        rlPopMatrix();
+        return;  // Don't draw the regular planet model when villa is shown
+    }
+    
     if (model != nullptr && presentation != nullptr) {
         const float localRadius = planetAssets.modelRadius(body.id);
         const float scale = radius / localRadius;
@@ -1218,7 +1245,6 @@ void Renderer::drawPlanetGroupLabels(const Simulation& simulation) const {
         DrawText("}", static_cast<int>(braceX), static_cast<int>(braceBotY - 45), 60, terrestrialColor);
         
         // Label: "Terrestrial"
-        const int labelWidth = MeasureText("Terrestrial", 14);
         DrawText("Terrestrial", static_cast<int>(braceX - braceW - 80), 
                 static_cast<int>((braceTopY + braceBotY) * 0.5f - 7), 14, terrestrialColor);
     }

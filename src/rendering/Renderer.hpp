@@ -78,6 +78,7 @@ private:
     bool leftPressValid = false;
     Vector2 leftPressPos{};
     PlanetAssetManager planetAssets;
+    Model villaModel{};  // Earth surface village model
     // The galaxy is a presentation-only backdrop: simulation positions retain SI units.
     struct GalaxyPoint {
         Vector3 position{};
