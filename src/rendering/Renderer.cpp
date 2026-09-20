@@ -1107,25 +1107,25 @@ void Renderer::scene(const Simulation& simulation) {
         }
         const auto bodiesStart = Clock::now();
         
-        // Draw warped spacetime grid when classification view is active
+        // Draw warped spacetime grid when gravity mode (Ctrl+G) is active
         // (Einstein spacetime background showing gravity well from sun)
-        if (simulation.showClassification && spacetimeModel.meshCount > 0) {
+        if (simulation.gravityMode && spacetimeModel.meshCount > 0) {
             const Body* sun = findBodyById(simulation, "sun");
             if (sun != nullptr) {
                 const Vector3 sunPos = bodyWorldPosition(*sun, simulation);
                 const float sunRadius = presentationRadius(*sun, simulation);
                 
-                // Draw spacetime grid centered on sun, scaled to sun's size
+                // Draw spacetime grid centered on sun, scaled to sun's size (white background)
                 rlPushMatrix();
                 rlTranslatef(sunPos.x, sunPos.y, sunPos.z);
                 // Scale spacetime grid to match sun's size (2x sun radius)
                 rlScalef(sunRadius * 2.0f, sunRadius * 2.0f, sunRadius * 2.0f);
-                DrawModel(spacetimeModel, {0.0f, 0.0f, 0.0f}, 1.0f, {200, 200, 200, 200});
+                DrawModel(spacetimeModel, {0.0f, 0.0f, 0.0f}, 1.0f, {255, 255, 255, 255});
                 rlPopMatrix();
             }
         }
         
-        // Always render normal bodies
+        // Always render normal bodies (on top of spacetime grid)
         for (int index = 0; index < static_cast<int>(simulation.bodies.size()); ++index) {
             if (!simulation.bodyVisibleInView(index)) continue;
             const Body& body = simulation.bodies[static_cast<std::size_t>(index)];
