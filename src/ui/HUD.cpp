@@ -554,9 +554,9 @@ void HUD::forcesMotionOverlay(const Simulation& simulation) const {
 void HUD::gravityModeOverlay(const Simulation& simulation) const {
     if (!simulation.gravityMode) return;
     const auto& t = theme();
-    // Position at bottom of screen - smaller panel (350x320) to reduce screen coverage
+    // Expanded panel (350x380) to fit centripetal/centrifugal calculations
     const float screenH = static_cast<float>(GetScreenHeight());
-    const Rectangle panel = {ui::pagePad() + 58.0f, screenH - 320.0f - 14.0f, 350.0f, 320.0f};
+    const Rectangle panel = {ui::pagePad() + 58.0f, screenH - 380.0f - 14.0f, 350.0f, 380.0f};
     ui::drawGlassPanel(panel, true, 0.1f);
 
     text("GRAVITY - INTERACTIVE", panel.x + 14.0f, panel.y + 8.0f, 11.0f, t.accent);
@@ -570,7 +570,6 @@ void HUD::gravityModeOverlay(const Simulation& simulation) const {
     const Body& body = simulation.bodies[static_cast<std::size_t>(simulation.selected)];
     const double base = body.baseMass > 0.0 ? body.baseMass : body.mass;
     const double effective = body.mass;
-    const double baseRadius = body.realRadius > 0.0 ? body.realRadius : 1.0;
 
     ui::drawLabelValue("Body", body.name.c_str(), panel.x + 14.0f, panel.y + 40.0f, 120.0f);
     
@@ -611,30 +610,37 @@ void HUD::gravityModeOverlay(const Simulation& simulation) const {
         const double weight = effective * accel;
         const double orbitalVelocity = std::sqrt(sourceMu / std::max(dist, 1.0));
         const double orbitalPeriod = TAU * std::sqrt((dist * dist * dist) / std::max(sourceMu, 1.0));
+        const double centripetal = effective * orbitalVelocity * orbitalVelocity / std::max(dist, 1.0);
         
         ui::drawLabelValue("Source", source->name.c_str(), panel.x + 14.0f, panel.y + 92.0f, 120.0f);
         ui::drawLabelValue("Dist", distance(dist).c_str(), panel.x + 180.0f, panel.y + 92.0f, 120.0f);
         
-        // Force and acceleration calculations
+        // Row 1: Gravitational force
         ui::drawLabelValue("Force", (scientific(force, 2) + "N").c_str(), panel.x + 14.0f, panel.y + 108.0f, 120.0f);
         ui::drawLabelValue("Accel", (scientific(accel, 2) + "m/s²").c_str(), panel.x + 180.0f, panel.y + 108.0f, 120.0f);
+        
+        // Row 2: Weight & Orbital velocity
         ui::drawLabelValue("Weight", (scientific(weight, 2) + "N").c_str(), panel.x + 14.0f, panel.y + 124.0f, 120.0f);
+        ui::drawLabelValue("Vel", (format(orbitalVelocity, 0) + "m/s").c_str(), panel.x + 180.0f, panel.y + 124.0f, 120.0f);
         
-        // Orbital mechanics calculations
-        ui::drawLabelValue("Vel", (format(orbitalVelocity, 0) + " m/s").c_str(), 
-                          panel.x + 14.0f, panel.y + 140.0f, 120.0f);
-        
+        // Row 3: Orbital period
         const int days = static_cast<int>(orbitalPeriod / 86400.0);
         const int hours = static_cast<int>((orbitalPeriod - days * 86400.0) / 3600.0);
         std::string periodStr = std::to_string(days) + "d " + std::to_string(hours) + "h";
-        ui::drawLabelValue("Period", periodStr.c_str(), panel.x + 14.0f, panel.y + 156.0f, 120.0f);
+        ui::drawLabelValue("Period", periodStr.c_str(), panel.x + 14.0f, panel.y + 140.0f, 120.0f);
         
-        // Compact formula display
+        // Row 4: Centripetal & Centrifugal forces
+        ui::drawLabelValue("Centripetal", (scientific(centripetal, 2) + "N").c_str(), panel.x + 14.0f, panel.y + 156.0f, 120.0f);
+        ui::drawLabelValue("Centrifugal", (scientific(centripetal, 2) + "N").c_str(), panel.x + 180.0f, panel.y + 156.0f, 120.0f);
+        
+        // Formulas section
         text("Formulas:", panel.x + 14.0f, panel.y + 180.0f, 9.0f, t.accentStrong);
-        text("F=GMm/r²  g=GM/R²  W=mg", panel.x + 14.0f, panel.y + 192.0f, 8.0f, t.textMuted);
-        text("v=√(GM/r)  T=2π√(r³/GM)", panel.x + 14.0f, panel.y + 204.0f, 8.0f, t.textMuted);
-    }
+        text("F=GMm/r²    g=GM/R²    W=mg", panel.x + 14.0f, panel.y + 192.0f, 7.5f, t.textMuted);
+        text("v=√(GM/r)    T=2π√(r³/GM)", panel.x + 14.0f, panel.y + 203.0f, 7.5f, t.textMuted);
+        text("Fc=mv²/r    Fcf=-mv²/r", panel.x + 14.0f, panel.y + 214.0f, 7.5f, t.textMuted);
+     }
 }
+
 void HUD::earthMoonOverlay(const Simulation& simulation) const {
     if (!simulation.earthMoonFocus) return;
     const auto& t = theme();

@@ -193,7 +193,8 @@ void InputController::update(Simulation& simulation, Renderer& renderer) {
                 renderer.restoreViewAfterIsolate();
             }
             if (hit < 0) simulation.clearSelection();
-            else simulation.selectBody(hit);
+            else if (!simulation.showVectors) simulation.selectBody(hit);
+            else simulation.clearSelection();
             return;
         }
     }
