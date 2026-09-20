@@ -384,6 +384,7 @@ void InputController::update(Simulation& simulation, Renderer& renderer) {
            } else if (simulation.gravityModeEditField == 1) {
                simulation.adjustSelectedRadius(1);
            }
+           return;
        }
        if (IsKeyPressed(KEY_DOWN)) {
            if (simulation.gravityModeEditField == 0) {
@@ -391,6 +392,7 @@ void InputController::update(Simulation& simulation, Renderer& renderer) {
            } else if (simulation.gravityModeEditField == 1) {
                simulation.adjustSelectedRadius(-1);
            }
+           return;
        }
     } else if (!simulation.gravityMode) {
        if (IsKeyPressed(KEY_UP)) simulation.selectEducationActivity(EducationActivityType::Experiment, simulation.experiment - 1);
