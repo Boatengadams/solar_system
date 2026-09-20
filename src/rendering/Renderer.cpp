@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
+#include <iostream>
 #include <limits>
 #include <string>
 #include <vector>
@@ -172,6 +173,13 @@ Renderer::Renderer(std::filesystem::path planetAssetDirectory) : planetAssets(pl
     std::filesystem::path spacetimePath = planetAssetDirectory.parent_path() / "warped_spacetime.glb";
     if (std::filesystem::exists(spacetimePath)) {
         spacetimeModel = LoadModel(spacetimePath.string().c_str());
+        if (spacetimeModel.meshCount > 0) {
+            logInfo("Loaded spacetime model: meshCount=" + std::to_string(spacetimeModel.meshCount));
+        } else {
+            logError("Failed to load spacetime model - invalid mesh count");
+        }
+    } else {
+        logError("Spacetime model file not found: " + spacetimePath.string());
     }
     if (trace) {
         const double ms =
@@ -1120,6 +1128,11 @@ void Renderer::scene(const Simulation& simulation) {
                 rlTranslatef(sunPos.x, sunPos.y, sunPos.z);
                 // Scale spacetime grid to match sun's size (2x sun radius)
                 rlScalef(sunRadius * 2.0f, sunRadius * 2.0f, sunRadius * 2.0f);
+                static bool logged = false;
+                if (!logged) {
+                    logInfo("[RENDER] Drawing spacetime at sun position, meshCount=" + std::to_string(spacetimeModel.meshCount));
+                    logged = true;
+                }
                 DrawModel(spacetimeModel, {0.0f, 0.0f, 0.0f}, 1.0f, {255, 255, 255, 255});
                 rlPopMatrix();
             }
