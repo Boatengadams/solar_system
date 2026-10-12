@@ -5,6 +5,7 @@
 #include <raylib.h>
 
 #include "../simulation/Simulation.hpp"
+#include "SpacetimeGrid.hpp"
 #include "RenderTransform.hpp"
 #include "Selection.hpp"
 #include "PlanetAssetManager.hpp"
@@ -18,11 +19,19 @@ public:
 
     explicit Renderer(std::filesystem::path planetAssetDirectory = {});
     void unloadAssets();
+    // Loads deferred planet models incrementally after the first frame.
+    void loadDeferredAssets();
+    void drawDeferredLoadingOverlay() const;
+    bool isDeferredLoading() const { return deferredAssetsPending_; }
 
     void update(const Simulation& simulation);
+    // UI panels consume pointer input before the renderer begins a camera gesture.
+    // Rendering, camera interpolation, and simulation state remain independent.
+    void setPointerInputEnabled(bool enabled) { pointerInputEnabled_ = enabled; }
     void background(const Simulation& simulation);
     void scene(const Simulation& simulation);
     int hitTest(const Simulation& simulation, Vector2 mouse) const;
+    bool villaFocusActive() const { return villaFocus || villaTransition; }
     // True while orbit/pan is active, and until all mouse buttons release afterward
     // so button transitions cannot accidentally change selection.
     bool isCameraManipulating() const { return cameraManipulating || suppressBodyPick; }
@@ -30,8 +39,14 @@ public:
     bool consumePendingBodyPick(Vector2& mouseOut);
     bool consumePendingFocusPick(Vector2& mouseOut);
     void focusBodyIndex(const Simulation& simulation, int index, bool snap = false);
+    void focusEarthVilla(const Simulation& simulation);
+    void exitEarthVilla();
+    void selectVillaArea(int area);
+    void focusEarthForest(const Simulation& simulation);
     // Frame Earth and Moon together (F2 educational system focus — not solo Z zoom).
     void focusEarthMoonSystem(const Simulation& simulation, bool snap = false);
+    // Frame a selected body with the mass currently exerting its strongest pull.
+    void frameGravityInteraction(const Simulation& simulation, int index, bool snap = false);
     void resetSystemView();
     void saveViewBeforeIsolate();
     void restoreViewAfterIsolate();
@@ -73,30 +88,53 @@ private:
     bool pendingBodyPick = false;
     bool pendingFocusPick = false;
     bool planetLightingEnabled_ = false;
+    bool deferredAssetsPending_ = true;
+    bool pointerInputEnabled_ = true;
     Vector2 pendingPickMouse{};
     bool leftDragActive = false;
     bool leftPressValid = false;
+    // Latched at the frame the press begins: was it over the scene or over the
+    // shell? The whole gesture is then classified from this value alone.
+    bool leftPressOverScene = false;
     Vector2 leftPressPos{};
     PlanetAssetManager planetAssets;
     Model villaModel{};              // Earth surface village model
+    BoundingBox villaBounds{};       // Bounds used to fit the villa to Earth's display globe
+    Model forestModel{};             // Earth surface forest model
+    BoundingBox forestBounds{};
     Model spacetimeModel{};          // Einstein spacetime curvature visualization
+    BoundingBox spacetimeBounds{};   // Computed bounding box of spacetime model
+    float spacetimeModelScale = 1.0f; // Computed scale to match Sun diameter
     // The galaxy is a presentation-only backdrop: simulation positions retain SI units.
     struct GalaxyPoint {
         Vector3 position{};
         Color color{};
     };
     std::vector<GalaxyPoint> milkyWayPoints;
+    struct AsteroidParticle {
+        float semiMajorAxisAU = 0.0f;
+        float phase = 0.0f;
+        float angularSpeed = 0.0f;
+        float height = 0.0f;
+        float size = 1.0f;
+        Color color{};
+    };
+    std::vector<AsteroidParticle> asteroidParticles;
     float milkyWaySourceDiameter = 0.0f;
     Vector3 milkyWayCenter{};
     Shader planetLightShader{};
     int sunLightPositionLocation = -1;
+    SpacetimeGrid grid{160.0f, 72};
+    mutable std::vector<Vector3> gridSamplePositions;
+    mutable std::vector<double> gridSampleMasses;
+    mutable bool gridSamplesValid = false;
 
     Vector3 worldPosition(Vec3 position) const { return transform.position(position); }
     const Body* findBodyById(const Simulation& simulation, const std::string& id) const;
     Vector3 cameraPosition() const;
     void updateCamera(const Simulation& simulation);
     void drawOrbit(const Body& body, const Body& centralBody, const Simulation& simulation) const;
-    void drawTrail(const Body& body) const;
+    void drawTrail(const Body& body, const Simulation& simulation) const;
     void drawVector(const Body& body, const Simulation& simulation) const;
     void drawForceMotionVectors(const Body& body, const Simulation& simulation) const;
     void drawArrow3D(Vector3 start, Vector3 direction, float length, Color color) const;
@@ -105,6 +143,8 @@ private:
     float presentationRadius(const Body& body, const Simulation& simulation) const;
     bool isolatingEarthMoon(const Simulation& simulation) const;
     Vector3 bodyWorldPosition(const Body& body, const Simulation& simulation) const;
+    // When Ctrl+G grid is on, seat the body into its local well for draw/pick.
+    Vector3 seatedBodyPosition(const Body& body, const Simulation& simulation) const;
     double presentationClock(const Simulation& simulation) const;
     void drawMoonOrbit(const Simulation& simulation) const;
     void drawStars(const Simulation& simulation) const;
@@ -112,6 +152,7 @@ private:
     void loadPlanetLighting();
     void setPlanetLightingEnabled(bool enabled);
     void drawMilkyWay() const;
+    void drawAsteroidParticles(const Simulation& simulation) const;
     // A small, presentation-only field makes the Sun's pull readable at a glance.
     void drawGravityField(const Simulation& simulation) const;
     void drawBody(const Body& body, const Simulation& simulation) const;
@@ -120,10 +161,18 @@ private:
     void drawStudySpinCues(const Body& body, float radius) const;
     void drawAxes() const;
     void drawSelectionIndicator(const Body& body, const Simulation& simulation) const;
+    void drawMotionLegend(const Simulation& simulation) const;
     float focusDistanceFor(const Body& body, const Simulation& simulation) const;
 
     // Wall-clock used for Z-study spin/Moon cues; frozen while paused so zoom cannot fake motion.
     mutable double studyPresentationClock = 0.0;
+    bool villaTransition = false;
+    float villaTransitionTime = 0.0f;
+    bool villaFocus = false;
+    bool forestFocus = false;
+    bool villaExiting = false;
+    float villaSwapTime = 0.0f;
+    Vector3 villaLookOffset{};
 };
 
 } // namespace bag

@@ -39,6 +39,15 @@ if(old_packages)
     file(REMOVE ${old_packages})
 endif()
 
+# CPack can leave stale staging/temp artifacts behind after interrupted or repeated
+# packaging runs. These temp files prevent a clean rename into the final package
+# artifact and cause the package smoke test to fail even though the application build is fine.
+file(REMOVE_RECURSE "${build_dir}/_CPack_Packages")
+file(GLOB old_tmp_packages "${build_dir}/BAGS_LAB-*.tar.gz.*")
+if(old_tmp_packages)
+    file(REMOVE ${old_tmp_packages})
+endif()
+
 execute_process(
     COMMAND "${cmake_command}" --build "${build_dir}" --target package --parallel 2
     RESULT_VARIABLE package_result

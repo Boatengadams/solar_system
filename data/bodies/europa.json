@@ -1,0 +1,13 @@
+{
+  "id": "europa",
+  "name": "Europa",
+  "type": "Moon",
+  "mass_kg": 4.7998e+22,
+  "radius_m": 1560800.0,
+  "initial_position_m": [743664028682.8724, 0.0, 0.0],
+  "initial_velocity_mps": [0.0, 29950.0, 0.0],
+  "parent_id": "jupiter",
+  "visual": {"color_rgba": [210, 220, 205, 255], "accent_rgba": [145, 205, 220, 255], "display_radius_px": 1.3},
+  "orbital": {"semi_major_axis_m": 671034000.0, "eccentricity": 0.0094, "orbital_period_s": 306822.0},
+  "rotation": {"sidereal_period_s": 306822.0, "axial_tilt_deg": 0.47}
+}

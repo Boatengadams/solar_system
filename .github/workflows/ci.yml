@@ -1,21 +1,49 @@
-# BAGS_LAB CI
-#
-# Current job: Linux x64 developer build/test/package smoke (system raylib).
-# Portable multi-OS matrix (windows-x64, macos-*, linux-arm64, static raylib 6.0)
-# is documented in docs/MULTIPLATFORM_BUILD_ARCHITECTURE.md §12 and is Phase 8.
-# Do not treat configure-only success as platform verification.
-name: BAGS_LAB CI
+name: BAGS_LAB CI/CD
 
 on:
   push:
+    branches: ["**"]
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bags-lab-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  linux:
-    runs-on: ubuntu-latest
+  build:
+    name: Build ${{ matrix.name }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux x64
+            runner: ubuntu-latest
+            artifact: BAGS_LAB-linux-x64
+            bundle_raylib: "OFF"
+            portable: "OFF"
+          - name: Windows x64
+            runner: windows-latest
+            artifact: BAGS_LAB-windows-x64
+            bundle_raylib: "ON"
+            portable: "ON"
+          - name: macOS
+            runner: macos-latest
+            artifact: BAGS_LAB-macos
+            bundle_raylib: "ON"
+            portable: "ON"
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Install build dependencies
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        shell: bash
         run: |
           sudo apt-get update
           sudo apt-get install -y g++ cmake pkg-config git \
@@ -30,22 +58,41 @@ jobs:
           sudo ldconfig
           echo "PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/usr/local/lib/x86_64-linux-gnu/pkgconfig:${PKG_CONFIG_PATH}" >> "$GITHUB_ENV"
           echo "LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
-          pkg-config --modversion raylib
+
       - name: Configure
-        run: cmake --preset debug
+        shell: bash
+        run: |
+          cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_TESTING=${{ runner.os == 'Linux' && 'ON' || 'OFF' }} \
+            -DBAGS_LAB_BUNDLE_RAYLIB=${{ matrix.bundle_raylib }} \
+            -DBAGS_LAB_PORTABLE=${{ matrix.portable }} \
+            -DBAGS_LAB_INSTALL_PLANET_MODELS=ON
+
       - name: Build
-        run: cmake --build --preset debug --parallel 2
-      - name: Test
-        run: ctest --preset debug --output-on-failure
-      - name: Scientific validation
-        run: ./build/bagsolar_validation
-      - name: Education validation
-        run: ./build/bagsolar_education_tests
-      - name: Offline local ephemeris validation
-        run: ./build/bagsolar_ephemeris --local earth 2451545.0 heliocentric
-      - name: Install smoke
-        run: ctest --test-dir build -R '^bagsolar_install_smoke$' --output-on-failure
-      - name: Package
-        run: cmake --build build --target package
-      - name: Package smoke
-        run: ctest --test-dir build -R '^bagsolar_package_smoke$' --output-on-failure
+        shell: bash
+        run: cmake --build build --config Release --parallel 2
+
+      - name: Test and validate Linux build
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          ctest --test-dir build --output-on-failure
+          ./build/bagsolar_validation
+          ./build/bagsolar_education_tests
+          ./build/bagsolar_ephemeris --local earth 2451545.0 heliocentric
+
+      - name: Create package
+        shell: bash
+        run: cmake --build build --config Release --target package
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: |
+            build/*.tar.gz
+            build/*.tgz
+            build/*.zip
+          if-no-files-found: error
+          retention-days: 14

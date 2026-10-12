@@ -1,6 +1,7 @@
 # Local build trees
 /build/
 /build-*/
+/remove/
 /out/
 /dist-temp/
 /CMakeFiles/

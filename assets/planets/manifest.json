@@ -130,6 +130,42 @@
       "preparation_notes": "Removed satellite meshes + animation; u16 indices; JPEG\u2192PNG."
     },
     {
+      "body_id": "io",
+      "model": "moon/Jupiter/lo.glb",
+      "enabled": true,
+      "visual_scale": 1.0,
+      "local_rotation_degrees": [0.0, 0.0, 0.0],
+      "local_translation": [0.0, 0.0, 0.0],
+      "model_includes_rings": false
+    },
+    {
+      "body_id": "europa",
+      "model": "moon/Jupiter/europa.glb",
+      "enabled": true,
+      "visual_scale": 1.0,
+      "local_rotation_degrees": [0.0, 0.0, 0.0],
+      "local_translation": [0.0, 0.0, 0.0],
+      "model_includes_rings": false
+    },
+    {
+      "body_id": "ganymede",
+      "model": "moon/Jupiter/ganymede_moon.glb",
+      "enabled": true,
+      "visual_scale": 1.0,
+      "local_rotation_degrees": [0.0, 0.0, 0.0],
+      "local_translation": [0.0, 0.0, 0.0],
+      "model_includes_rings": false
+    },
+    {
+      "body_id": "callisto",
+      "model": "moon/Jupiter/callisto_moon.glb",
+      "enabled": true,
+      "visual_scale": 1.0,
+      "local_rotation_degrees": [0.0, 0.0, 0.0],
+      "local_translation": [0.0, 0.0, 0.0],
+      "model_includes_rings": false
+    },
+    {
       "body_id": "saturn",
       "model": "prepared/saturn.glb",
       "enabled": true,
@@ -147,6 +183,26 @@
       "model_includes_rings": true,
       "preparation_notes": "metalrough; removed Mimas/Enceladus; dropped dense saturn2_A (~3.2M verts); kept planet + saturn2_B ring disk. 149992412 \u2192 6932632 bytes (~95.4% reduction)."
     },
+    {"body_id":"phobos","model":"moon/mars/phobos.glb","enabled":true,"visual_scale":1.0,"local_rotation_degrees":[0,0,0],"local_translation":[0,0,0],"model_includes_rings":false},
+    {"body_id":"deimos","model":"moon/mars/deimos.glb","enabled":true,"visual_scale":1.0,"local_rotation_degrees":[0,0,0],"local_translation":[0,0,0],"model_includes_rings":false},
+    {"body_id":"mimas","model":"moon/saturn/mimas.glb","enabled":true,"visual_scale":1.0,"local_rotation_degrees":[0,0,0],"local_translation":[0,0,0],"model_includes_rings":false},
+    {"body_id":"enceladus","model":"moon/saturn/enceladus.glb","enabled":true,"visual_scale":1.0,"local_rotation_degrees":[0,0,0],"local_translation":[0,0,0],"model_includes_rings":false},
+    {"body_id":"tethys","model":"moon/saturn/tethys.glb","enabled":true,"visual_scale":1.0,"local_rotation_degrees":[0,0,0],"local_translation":[0,0,0],"model_includes_rings":false},
+    {"body_id":"dione","model":"moon/saturn/dione.glb","enabled":true,"visual_scale":1.0,"local_rotation_degrees":[0,0,0],"local_translation":[0,0,0],"model_includes_rings":false},
+    {"body_id":"rhea","model":"moon/saturn/rhea.glb","enabled":true,"visual_scale":1.0,"local_rotation_degrees":[0,0,0],"local_translation":[0,0,0],"model_includes_rings":false},
+    {"body_id":"titan","model":"moon/saturn/titan.glb","enabled":true,"visual_scale":1.0,"local_rotation_degrees":[0,0,0],"local_translation":[0,0,0],"model_includes_rings":false},
+    {"body_id":"hyperion","model":"moon/saturn/hyperion.glb","enabled":true,"visual_scale":1.0,"local_rotation_degrees":[0,0,0],"local_translation":[0,0,0],"model_includes_rings":false},
+    {"body_id":"iapetus","model":"moon/saturn/iapetus.glb","enabled":true,"visual_scale":1.0,"local_rotation_degrees":[0,0,0],"local_translation":[0,0,0],"model_includes_rings":false},
+    {"body_id":"ariel","model":"moon/Uranus/ariel.glb","enabled":true,"visual_scale":1.0,"local_rotation_degrees":[0,0,0],"local_translation":[0,0,0],"model_includes_rings":false},
+    {"body_id":"miranda","model":"moon/Uranus/miranda.glb","enabled":true,"visual_scale":1.0,"local_rotation_degrees":[0,0,0],"local_translation":[0,0,0],"model_includes_rings":false},
+    {"body_id":"oberon","model":"moon/Uranus/oberon.glb","enabled":true,"visual_scale":1.0,"local_rotation_degrees":[0,0,0],"local_translation":[0,0,0],"model_includes_rings":false},
+    {"body_id":"titania","model":"moon/Uranus/titania.glb","enabled":true,"visual_scale":1.0,"local_rotation_degrees":[0,0,0],"local_translation":[0,0,0],"model_includes_rings":false},
+    {"body_id":"umbriel","model":"moon/Uranus/umbriel.glb","enabled":true,"visual_scale":1.0,"local_rotation_degrees":[0,0,0],"local_translation":[0,0,0],"model_includes_rings":false},
+    {"body_id":"triton","model":"moon/Neptune/triton.glb","enabled":true,"visual_scale":1.0,"local_rotation_degrees":[0,0,0],"local_translation":[0,0,0],"model_includes_rings":false},
+    {"body_id":"ceres","model":"asteroids/ceres.glb","enabled":true,"visual_scale":1.0,"local_rotation_degrees":[0,0,0],"local_translation":[0,0,0],"model_includes_rings":false},
+    {"body_id":"daphne","model":"asteroids/daphne.glb","enabled":true,"visual_scale":1.0,"local_rotation_degrees":[0,0,0],"local_translation":[0,0,0],"model_includes_rings":false},
+    {"body_id":"psyche","model":"asteroids/psyche.glb","enabled":true,"visual_scale":1.0,"local_rotation_degrees":[0,0,0],"local_translation":[0,0,0],"model_includes_rings":false},
+    {"body_id":"vesta","model":"asteroids/vesta.glb","enabled":true,"visual_scale":1.0,"local_rotation_degrees":[0,0,0],"local_translation":[0,0,0],"model_includes_rings":false},
     {
       "body_id": "uranus",
       "model": "prepared/uranus.glb",

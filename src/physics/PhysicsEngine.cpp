@@ -10,6 +10,10 @@ bool finiteVec(Vec3 value) {
     return std::isfinite(value.x) && std::isfinite(value.y) && std::isfinite(value.z);
 }
 
+bool participatesInPhysics(const Body& body) {
+    return body.active && body.type != "Asteroid";
+}
+
 bool validPolicy(const CloseApproachPolicy& policy) {
     return std::isfinite(policy.minimumSafeSeparation) && policy.minimumSafeSeparation > 0.0;
 }
@@ -27,8 +31,9 @@ std::vector<Vec3> accelerations(const std::vector<Body>& bodies, const CloseAppr
             if (bodies[i].active) valid = false;
             continue;
         }
+        if (!participatesInPhysics(bodies[i])) continue;
         for (std::size_t j = i + 1; j < bodies.size(); ++j) {
-            if (!bodies[j].active) continue;
+            if (!participatesInPhysics(bodies[j])) continue;
             const Vec3 delta = bodies[j].position - bodies[i].position;
             const double distance = length(delta);
             if (!std::isfinite(distance)) { valid = false; continue; }
@@ -179,7 +184,7 @@ PhysicsStepResult PhysicsEngine::integrate(std::vector<Body>& bodies, double dt,
 
     if (integrator == Integrator::Euler || integrator == Integrator::SemiImplicitEuler) {
         for (std::size_t i = 0; i < bodies.size(); ++i) {
-            if (!bodies[i].active) continue;
+            if (!participatesInPhysics(bodies[i])) continue;
             if (integrator == Integrator::Euler) bodies[i].position = bodies[i].position + bodies[i].velocity * dt;
             bodies[i].velocity = bodies[i].velocity + initialAcceleration[i] * dt;
             if (integrator == Integrator::SemiImplicitEuler) bodies[i].position = bodies[i].position + bodies[i].velocity * dt;
@@ -192,7 +197,7 @@ PhysicsStepResult PhysicsEngine::integrate(std::vector<Body>& bodies, double dt,
 
     if (integrator == Integrator::VelocityVerlet) {
         for (std::size_t i = 0; i < bodies.size(); ++i) {
-            if (!bodies[i].active) continue;
+            if (!participatesInPhysics(bodies[i])) continue;
             bodies[i].velocity = bodies[i].velocity + initialAcceleration[i] * (0.5 * dt);
             bodies[i].position = bodies[i].position + bodies[i].velocity * dt;
         }
@@ -202,7 +207,7 @@ PhysicsStepResult PhysicsEngine::integrate(std::vector<Body>& bodies, double dt,
         result.interactions.collisions.insert(result.interactions.collisions.end(), updatedReport.collisions.begin(), updatedReport.collisions.end());
         if (!valid) { result.error = "invalid state during updated acceleration calculation"; result.numericalInstability = true; return failWithoutMutation(); }
         for (std::size_t i = 0; i < bodies.size(); ++i) {
-            if (bodies[i].active) bodies[i].velocity = bodies[i].velocity + updatedAcceleration[i] * (0.5 * dt);
+            if (participatesInPhysics(bodies[i])) bodies[i].velocity = bodies[i].velocity + updatedAcceleration[i] * (0.5 * dt);
         }
         result.success = finiteBodies(bodies);
         result.accepted = result.success;
@@ -214,7 +219,7 @@ PhysicsStepResult PhysicsEngine::integrate(std::vector<Body>& bodies, double dt,
                                const std::vector<Vec3>& kVelocity, double scale) {
         std::vector<Body> stage = source;
         for (std::size_t i = 0; i < stage.size(); ++i) {
-            if (!stage[i].active) continue;
+            if (!participatesInPhysics(stage[i])) continue;
             stage[i].position = stage[i].position + kPosition[i] * scale;
             stage[i].velocity = stage[i].velocity + kVelocity[i] * scale;
         }
@@ -222,22 +227,22 @@ PhysicsStepResult PhysicsEngine::integrate(std::vector<Body>& bodies, double dt,
     };
     std::vector<Vec3> k1Position(bodies.size()), k2Position(bodies.size()), k3Position(bodies.size()), k4Position(bodies.size());
     std::vector<Vec3> k1Velocity = initialAcceleration, k2Velocity, k3Velocity, k4Velocity;
-    for (std::size_t i = 0; i < bodies.size(); ++i) if (bodies[i].active) k1Position[i] = bodies[i].velocity;
+    for (std::size_t i = 0; i < bodies.size(); ++i) if (participatesInPhysics(bodies[i])) k1Position[i] = bodies[i].velocity;
     auto stage = makeStage(bodies, k1Position, k1Velocity, 0.5 * dt);
     InteractionReport stageReport;
     k2Velocity = accelerations(stage, policy, stageReport, valid);
     if (!valid) { result.error = "invalid RK4 intermediate state"; result.numericalInstability = true; return failWithoutMutation(); }
-    for (std::size_t i = 0; i < bodies.size(); ++i) if (bodies[i].active) k2Position[i] = stage[i].velocity;
+    for (std::size_t i = 0; i < bodies.size(); ++i) if (participatesInPhysics(bodies[i])) k2Position[i] = stage[i].velocity;
     stage = makeStage(bodies, k2Position, k2Velocity, 0.5 * dt);
     k3Velocity = accelerations(stage, policy, stageReport, valid);
     if (!valid) { result.error = "invalid RK4 intermediate state"; result.numericalInstability = true; return failWithoutMutation(); }
-    for (std::size_t i = 0; i < bodies.size(); ++i) if (bodies[i].active) k3Position[i] = stage[i].velocity;
+    for (std::size_t i = 0; i < bodies.size(); ++i) if (participatesInPhysics(bodies[i])) k3Position[i] = stage[i].velocity;
     stage = makeStage(bodies, k3Position, k3Velocity, dt);
     k4Velocity = accelerations(stage, policy, stageReport, valid);
     if (!valid) { result.error = "invalid RK4 intermediate state"; result.numericalInstability = true; return failWithoutMutation(); }
-    for (std::size_t i = 0; i < bodies.size(); ++i) if (bodies[i].active) k4Position[i] = stage[i].velocity;
+    for (std::size_t i = 0; i < bodies.size(); ++i) if (participatesInPhysics(bodies[i])) k4Position[i] = stage[i].velocity;
     for (std::size_t i = 0; i < bodies.size(); ++i) {
-        if (!bodies[i].active) continue;
+        if (!participatesInPhysics(bodies[i])) continue;
         bodies[i].position = bodies[i].position + (k1Position[i] + k2Position[i] * 2.0 + k3Position[i] * 2.0 + k4Position[i]) * (dt / 6.0);
         bodies[i].velocity = bodies[i].velocity + (k1Velocity[i] + k2Velocity[i] * 2.0 + k3Velocity[i] * 2.0 + k4Velocity[i]) * (dt / 6.0);
     }
@@ -307,9 +312,9 @@ InteractionReport PhysicsEngine::inspectInteractions(const std::vector<Body>& bo
     if (!validPolicy(policy)) { report.closeApproach.unstable = true; return report; }
     if (!finiteBodies(bodies)) { report.closeApproach.unstable = true; return report; }
     for (std::size_t i = 0; i < bodies.size(); ++i) {
-        if (!bodies[i].active) continue;
+        if (!participatesInPhysics(bodies[i])) continue;
         for (std::size_t j = i + 1; j < bodies.size(); ++j) {
-            if (!bodies[j].active) continue;
+            if (!participatesInPhysics(bodies[j])) continue;
             const double distance = length(bodies[j].position - bodies[i].position);
             if (!std::isfinite(distance)) { report.closeApproach.unstable = true; continue; }
             if (distance < report.closeApproach.minimumDistance) {
@@ -340,11 +345,12 @@ Vec3 PhysicsEngine::acceleration(const std::vector<Body>& bodies, std::size_t bo
 
 double PhysicsEngine::totalEnergy(const std::vector<Body>& bodies) {
     double energy = 0.0;
-    for (const Body& body : bodies) if (body.active) energy += 0.5 * body.mass * dot(body.velocity, body.velocity);
+    for (const Body& body : bodies) if (participatesInPhysics(body)) energy += 0.5 * body.mass * dot(body.velocity, body.velocity);
     for (std::size_t i = 0; i < bodies.size(); ++i) {
         if (!bodies[i].active) continue;
+        if (!participatesInPhysics(bodies[i])) continue;
         for (std::size_t j = i + 1; j < bodies.size(); ++j) {
-            if (!bodies[j].active) continue;
+            if (!participatesInPhysics(bodies[j])) continue;
             const double distance = length(bodies[j].position - bodies[i].position);
             if (distance > 0.0 && std::isfinite(distance)) energy -= G * bodies[i].mass * bodies[j].mass / distance;
         }
@@ -354,7 +360,7 @@ double PhysicsEngine::totalEnergy(const std::vector<Body>& bodies) {
 
 Vec3 PhysicsEngine::totalMomentum(const std::vector<Body>& bodies) {
     Vec3 momentum;
-    for (const Body& body : bodies) if (body.active) momentum = momentum + body.velocity * body.mass;
+    for (const Body& body : bodies) if (participatesInPhysics(body)) momentum = momentum + body.velocity * body.mass;
     return momentum;
 }
 

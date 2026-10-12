@@ -252,9 +252,9 @@ int main() {
     simulationWithoutTelemetry.setSpeed(3600.0);
     assert(simulationWithTelemetry.speed == 3600.0);
     simulationWithTelemetry.setSpeed(1.0e9);
-    assert(simulationWithTelemetry.speed == 100000.0);
+    assert(simulationWithTelemetry.speed == 10000000.0);
     simulationWithTelemetry.adjustSpeed(1);
-    assert(simulationWithTelemetry.speed == 100000.0);
+    assert(simulationWithTelemetry.speed == 10000000.0);
     simulationWithTelemetry.setSpeed(5000.0);
     simulationWithTelemetry.adjustSpeed(1);
     assert(simulationWithTelemetry.speed == 10000.0);

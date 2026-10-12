@@ -42,6 +42,11 @@ enum class AppScreen {
     Help,
 };
 
+// Presentation only.  Physics, units, and integration are deliberately kept
+// independent of the way an explanation is drawn on screen.
+enum class VisualizationMode { Realistic, Learning, ExploreKids };
+const char* visualizationModeName(VisualizationMode mode);
+
 const char* appScreenName(AppScreen screen);
 
 class Simulation {
@@ -72,6 +77,11 @@ public:
     bool gravityMode = false;          // G — gravity simulation / mass analysis
     bool earthMoonFocus = false;       // F2 — dedicated Earth–Moon system focus
     bool showIndividualGravity = false; // optional per-body gravity contributions (V/G)
+    VisualizationMode visualizationMode = VisualizationMode::Realistic;
+    bool showMoons = false;
+    bool searchActive = false;
+    bool searchMoonScope = false;
+    std::string searchQuery;
     int gravityModeEditField = 0;      // 0=mass, 1=radius, 2=density
     VisualScaleMode visualScaleMode = VisualScaleMode::Educational;
     bool education = true;
@@ -133,6 +143,8 @@ public:
     void applyEffectiveMass(int index);
     void resetMassMultipliers();
     void toggleVisualScaleMode();
+    void cycleVisualizationMode();
+    bool educationalVisualization() const { return visualizationMode != VisualizationMode::Realistic; }
     void adjustTimestep(double factor);
     void cycleIntegrator(int direction = 1);
     void setScreen(AppScreen next);
@@ -195,6 +207,7 @@ private:
     double initialEnergy = 0.0;
     LocalEphemerisProvider offlineReferenceProvider = LocalEphemerisProvider::deterministicFixture();
     EphemerisProvider* comparisonProvider = &offlineReferenceProvider;
+    void advanceAsteroidBelt(double dt);
     void refreshScientificState();
     bool runConfiguredPredictionComparison();
 };

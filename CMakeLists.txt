@@ -16,6 +16,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 option(BAGSOLAR_ENABLE_SPICE "Enable CSPICE-backed ephemeris queries (optional; BAGS_LAB runs without it)" OFF)
 option(BAGS_LAB_INSTALL_PLANET_MODELS "Install planet GLB presentation models with the package" ON)
 option(BAGS_LAB_BUNDLE_RAYLIB "Statically link project-controlled raylib 6.0 (portable USB builds; no TIFF)" OFF)
+option(BAGS_LAB_ENABLE_RAYM3 "Enable the Raym3 modern UI layer" ON)
 set(CSPICE_INCLUDE_DIR "" CACHE PATH "Directory containing SpiceUsr.h")
 set(CSPICE_LIBRARY "" CACHE FILEPATH "Path to the CSPICE library")
 
@@ -103,8 +104,43 @@ else()
     set(BAGS_LAB_RAYLIB_TARGET PkgConfig::RAYLIB)
 endif()
 
+# Raym3 is a C++20 raylib UI library. Reuse the selected raylib target rather
+# than allowing Raym3 to fetch a second raylib copy into the same executable.
+if(BAGS_LAB_ENABLE_RAYM3)
+    set(CMAKE_CXX_STANDARD 20)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    include(FetchContent)
+    FetchContent_Declare(
+        raym3
+        GIT_REPOSITORY https://github.com/fovea-engine/raym3.git
+        GIT_TAG master
+        GIT_SHALLOW TRUE
+        GIT_SUBMODULES ""
+        GIT_SUBMODULES_RECURSE FALSE
+    )
+    set(RAYM3_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+    set(RAYM3_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+    set(RAYM3_FETCH_DEPS OFF CACHE BOOL "" FORCE)
+    if(NOT TARGET raylib)
+        add_library(raylib INTERFACE)
+        target_link_libraries(raylib INTERFACE ${BAGS_LAB_RAYLIB_TARGET})
+    endif()
+    FetchContent_MakeAvailable(raym3)
+    if(NOT TARGET raym3)
+        message(FATAL_ERROR "BAGS_LAB_ENABLE_RAYM3=ON but the raym3 CMake target was not created")
+    endif()
+    # Current Raym3 Renderer.cpp uses std::clamp without including <algorithm>.
+    # Supply the missing standard header without patching fetched sources.
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        target_compile_options(raym3 PRIVATE -include algorithm)
+    elseif(MSVC)
+        target_compile_options(raym3 PRIVATE /FIalgorithm)
+    endif()
+endif()
+
 set(BAGSOLAR_SOURCES
     src/app/main.cpp
+    src/SpacetimeGrid.cpp
     src/astronomy/EphemerisTypes.cpp
     src/astronomy/EphemerisComparison.cpp
     src/astronomy/CelestialBodyCatalog.cpp
@@ -148,6 +184,7 @@ set(BAGSOLAR_SOURCES
     src/telemetry/TelemetryExporter.cpp
     src/telemetry/TelemetrySession.cpp
     src/ui/HUD.cpp
+    src/ui/UIManager.cpp
     src/validation/PredictionComparison.cpp
 )
 
@@ -171,8 +208,16 @@ else()
     add_executable(BAGS_LAB ${BAGSOLAR_SOURCES})
 endif()
 target_include_directories(BAGS_LAB PRIVATE src)
+target_include_directories(BAGS_LAB PRIVATE include)
 target_include_directories(BAGS_LAB PRIVATE third_party/nlohmann-json3-dev/usr/include)
 target_link_libraries(BAGS_LAB PRIVATE ${BAGS_LAB_RAYLIB_TARGET})
+if(BAGS_LAB_ENABLE_RAYM3)
+    target_link_libraries(BAGS_LAB PRIVATE raym3)
+    if(UNIX AND NOT APPLE)
+        find_package(OpenGL REQUIRED)
+        target_link_libraries(BAGS_LAB PRIVATE OpenGL::GL)
+    endif()
+endif()
 target_compile_definitions(BAGS_LAB PRIVATE BAGSOLAR_ENABLE_SPICE=$<BOOL:${BAGSOLAR_ENABLE_SPICE}>)
 target_compile_definitions(BAGS_LAB PRIVATE BAGS_LAB_INSTALL_DATA_SUBDIR="${CMAKE_INSTALL_DATADIR}/bags_lab/data")
 target_compile_definitions(BAGS_LAB PRIVATE BAGSOLAR_INSTALL_DATA_SUBDIR="${CMAKE_INSTALL_DATADIR}/bags_lab/data")
@@ -468,6 +513,18 @@ if(BUILD_TESTING)
     endif()
     add_test(NAME bagsolar_selection_tests COMMAND bagsolar_selection_tests)
     set_tests_properties(bagsolar_selection_tests PROPERTIES LABELS "unit;rendering;input")
+
+    # Shell layout invariants. These are what keep pointer hit-testing honest:
+    # the rectangles the UI draws and the rectangles it hit-tests are the same
+    # ChromeLayout, and this test is what proves they stay that way.
+    add_executable(bagsolar_ui_layout_tests tests/ui_layout_tests.cpp)
+    target_include_directories(bagsolar_ui_layout_tests PRIVATE src)
+    target_link_libraries(bagsolar_ui_layout_tests PRIVATE ${BAGS_LAB_RAYLIB_TARGET})
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        target_compile_options(bagsolar_ui_layout_tests PRIVATE -Wall -Wextra -Wpedantic)
+    endif()
+    add_test(NAME bagsolar_ui_layout_tests COMMAND bagsolar_ui_layout_tests)
+    set_tests_properties(bagsolar_ui_layout_tests PROPERTIES LABELS "unit;ui;input")
 
     add_executable(bagsolar_planet_presentation_tests tests/planet_presentation_tests.cpp)
     target_include_directories(bagsolar_planet_presentation_tests PRIVATE src third_party/nlohmann-json3-dev/usr/include)

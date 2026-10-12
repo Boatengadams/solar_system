@@ -21,11 +21,14 @@ struct Body {
     double baseMass = 0.0;
     double massMultiplier = 1.0;
     double radius = 1.0;
+    // Presentation-only size for lightweight procedural bodies such as asteroids.
+    double visualRadius = 1.0;
     double realRadius = 1.0;
     double axialTilt = 0.0;
     double rotationPeriod = 86400.0;
     double semiMajorAxis = 0.0;
     double eccentricity = 0.0;
+    double orbitalPhase = 0.0;
     double orbitalPeriod = 0.0;
     ColorRGBA color;
     ColorRGBA accent;
@@ -35,6 +38,7 @@ struct Body {
     bool userCreated = false;
     int parent = -1;
     std::string parentId;
+    std::string visualAssetId;
     // Historical physical positions in astronomical units. Rendering applies
     // the same presentation transform as the current body position.
     std::vector<Vec3> trail;

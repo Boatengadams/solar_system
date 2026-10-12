@@ -18,7 +18,10 @@ int main() {
     assert(manifest.at("format") == "bagsolar_planet_presentation_v1");
 
     const std::set<std::string> expected = {
-        "sun", "mercury", "venus", "earth", "moon", "mars", "jupiter", "saturn", "uranus", "neptune",
+        "sun", "mercury", "venus", "earth", "moon", "mars", "jupiter", "io", "europa", "ganymede",
+        "callisto", "saturn", "phobos", "deimos", "mimas", "enceladus", "tethys", "dione", "rhea",
+        "titan", "hyperion", "iapetus", "ariel", "miranda", "oberon", "titania", "umbriel", "triton",
+        "ceres", "daphne", "psyche", "vesta", "uranus", "neptune",
     };
     std::set<std::string> mapped;
     for (const auto& entry : manifest.at("models")) {

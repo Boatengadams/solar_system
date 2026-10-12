@@ -98,6 +98,10 @@ DataResult<BodyDefinition> ScenarioLoader::loadBodyDefinition(const std::string&
         if (!json["parent_id"].is_string()) return DataResult<BodyDefinition>::failure(context + " field 'parent_id' must be a string");
         definition.parentId = json["parent_id"].get<std::string>();
     }
+    if (json.contains("visual_asset_id")) {
+        if (!json["visual_asset_id"].is_string()) return DataResult<BodyDefinition>::failure(context + " field 'visual_asset_id' must be a string");
+        definition.visualAssetId = json["visual_asset_id"].get<std::string>();
+    }
     if (json.contains("visual")) {
         if (!json["visual"].is_object()) return DataResult<BodyDefinition>::failure(context + " field 'visual' must be an object");
         const auto& visual = json["visual"];

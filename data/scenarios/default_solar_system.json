@@ -4,7 +4,7 @@
   "description": "The Sun, eight planets, the Moon, and the BAGSOLAR-1 educational spacecraft.",
   "epoch": "J2000",
   "reference_frame": "heliocentric",
-  "body_references": ["sun", "mercury", "venus", "earth", "moon", "mars", "jupiter", "saturn", "uranus", "neptune", "bagsolar-1"],
+  "body_references": ["sun", "mercury", "venus", "earth", "moon", "mars", "phobos", "deimos", "jupiter", "io", "europa", "ganymede", "callisto", "saturn", "mimas", "enceladus", "tethys", "dione", "rhea", "titan", "hyperion", "iapetus", "uranus", "ariel", "miranda", "oberon", "titania", "umbriel", "neptune", "triton"],
   "settings": {
     "timestep_s": 3600.0,
     "time_scale": 10000.0,

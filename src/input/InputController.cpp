@@ -3,8 +3,10 @@
 #include <algorithm>
 #include <array>
 #include <cctype>
+#include <string>
 
 #include "../education/EducationContent.hpp"
+#include "../ui/UiLayout.hpp"
 #include "../ui/UiTheme.hpp"
 
 namespace bag {
@@ -17,18 +19,25 @@ void selectScreen(Simulation& simulation, AppScreen screen) {
     simulation.setScreen(screen);
 }
 
-bool navigationClick(Simulation& simulation) {
-    if (!IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) return false;
-    const Vector2 mouse = GetMousePosition();
-    if (mouse.y > ui::topBarHeight()) return false;
-    const ui::NavLayout nav = ui::buildNavLayout(static_cast<float>(GetScreenWidth()));
-    for (std::size_t index = 0; index < ui::kNavTabs.size(); ++index) {
-        if (CheckCollisionPointRec(mouse, nav.hits[index])) {
-            selectScreen(simulation, ui::kNavTabs[index].screen);
-            return true;
-        }
+// Contextual tabs are independent overlays: opening one closes the other
+// analysis panels, while scene-only toggles (grid, moons, lighting) remain
+// independent of the sidebar and of each other.
+void closeContextualTabs(Simulation& simulation, bool keepVectors = false,
+                         bool keepGravity = false, bool keepClassification = false,
+                         bool keepSearch = false) {
+    if (!keepVectors) {
+        simulation.showVectors = false;
+        simulation.settings.vectorsEnabled = false;
     }
-    return false;
+    if (!keepGravity && simulation.gravityMode) {
+        simulation.gravityMode = false;
+        simulation.resetMassMultipliers();
+    }
+    if (!keepClassification) simulation.showClassification = false;
+    if (!keepSearch) {
+        simulation.searchActive = false;
+        simulation.searchQuery.clear();
+    }
 }
 
 void cycleScreen(Simulation& simulation) {
@@ -49,18 +58,28 @@ bool keyboardSelectSimulationBody(Simulation& simulation, bool selectionMode) {
     std::vector<int> activeIndices;
     activeIndices.reserve(simulation.bodies.size());
     for (int i = 0; i < static_cast<int>(simulation.bodies.size()); ++i) {
-        if (simulation.bodies[static_cast<std::size_t>(i)].active) activeIndices.push_back(i);
+        if (simulation.bodies[static_cast<std::size_t>(i)].active &&
+            simulation.bodyVisibleInView(i)) {
+            activeIndices.push_back(i);
+        }
     }
     return simulation.selectBody(cycleActiveBody(simulation.selected, activeIndices, direction));
 }
 
+// Body letter-picking is a selection-mode affordance. It must not shadow the
+// global display toggles, so it only claims letters that are otherwise free.
+// V is deliberately absent: it is reserved for Forces & Motion. S is also
+// absent, because Ctrl+S is the shortcut that turns selection mode on --
+// listing it here meant that once selection mode was active, pressing V or S
+// silently selected a body instead of toggling anything, which is exactly how
+// those two shortcuts came to look broken.
 bool letterSelectSimulationBody(Simulation& simulation, bool selectionMode) {
     if (simulation.screen != AppScreen::Simulation || !selectionMode) return false;
 
     struct KeyBody { KeyboardKey key; char initial; };
     constexpr KeyBody keys[] = {
         {KEY_B, 'b'}, {KEY_E, 'e'}, {KEY_J, 'j'}, {KEY_M, 'm'},
-        {KEY_N, 'n'}, {KEY_S, 's'}, {KEY_U, 'u'}, {KEY_V, 'v'},
+        {KEY_N, 'n'}, {KEY_U, 'u'},
     };
     char pressedInitial = 0;
     for (const KeyBody& key : keys) {
@@ -68,13 +87,14 @@ bool letterSelectSimulationBody(Simulation& simulation, bool selectionMode) {
             pressedInitial = key.initial;
             break;
         }
+
     }
     if (pressedInitial == 0) return false;
 
     std::vector<int> matches;
     for (int i = 0; i < static_cast<int>(simulation.bodies.size()); ++i) {
         const Body& body = simulation.bodies[static_cast<std::size_t>(i)];
-        if (body.active && !body.name.empty() &&
+        if (body.active && simulation.bodyVisibleInView(i) && !body.name.empty() &&
             static_cast<char>(std::tolower(static_cast<unsigned char>(body.name.front()))) == pressedInitial) {
             matches.push_back(i);
         }
@@ -86,6 +106,52 @@ bool letterSelectSimulationBody(Simulation& simulation, bool selectionMode) {
         ? matches.front()
         : matches[static_cast<std::size_t>((std::distance(matches.begin(), current) + 1) % matches.size())];
     return simulation.selectBody(next);
+}
+
+bool updateBodySearch(Simulation& simulation) {
+    if (!simulation.searchActive) return false;
+    if (IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_BACKSPACE)) {
+        if (IsKeyPressed(KEY_ESCAPE)) {
+            simulation.searchActive = false;
+            simulation.searchQuery.clear();
+        } else if (!simulation.searchQuery.empty()) {
+            simulation.searchQuery.pop_back();
+        }
+        return true;
+    }
+    if (IsKeyPressed(KEY_ENTER)) {
+        simulation.searchActive = false;
+        return true;
+    }
+    for (int code = GetCharPressed(); code > 0; code = GetCharPressed()) {
+        if (code >= 32 && code <= 126 && simulation.searchQuery.size() < 32) {
+            simulation.searchQuery.push_back(static_cast<char>(code));
+        }
+    }
+    std::string query = simulation.searchQuery;
+    std::transform(query.begin(), query.end(), query.begin(),
+                   [](unsigned char value) { return static_cast<char>(std::tolower(value)); });
+    if (query.empty()) return true;
+    int match = -1;
+    std::vector<std::string> seenAsteroidSources;
+    for (int index = 0; index < static_cast<int>(simulation.bodies.size()); ++index) {
+        const Body& body = simulation.bodies[static_cast<std::size_t>(index)];
+        if (!body.active || (simulation.searchMoonScope && body.type != "Moon")) continue;
+        if (body.type == "Asteroid") {
+            if (std::find(seenAsteroidSources.begin(), seenAsteroidSources.end(),
+                          body.visualAssetId) != seenAsteroidSources.end()) continue;
+            seenAsteroidSources.push_back(body.visualAssetId);
+        }
+        std::string haystack = body.name + " " + body.id + " " + body.visualAssetId;
+        std::transform(haystack.begin(), haystack.end(), haystack.begin(),
+                       [](unsigned char value) { return static_cast<char>(std::tolower(value)); });
+        if (haystack.find(query) != std::string::npos) {
+            match = index;
+            break;
+        }
+    }
+    if (match >= 0) simulation.selectBody(match);
+    return true;
 }
 
 void focusEarthIfPresent(Simulation& simulation, Renderer& renderer) {
@@ -155,23 +221,61 @@ void applyScenarioCamera(Simulation& simulation, Renderer& renderer, const std::
 
 void InputController::update(Simulation& simulation, Renderer& renderer) {
     if (simulation.screen == AppScreen::Simulation) renderer.update(simulation);
+    if (simulation.screen == AppScreen::Simulation && updateBodySearch(simulation)) return;
     const bool controlDown = IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL);
     if (simulation.screen == AppScreen::Simulation && controlDown && IsKeyPressed(KEY_S)) {
+        closeContextualTabs(simulation);
         selectionMode = true;
         if (!simulation.bodies.empty()) simulation.selectBody(0);
         return;
     }
     if (simulation.screen == AppScreen::Simulation && controlDown && IsKeyPressed(KEY_N)) {
+        closeContextualTabs(simulation, false, false, true);
         simulation.showClassification = !simulation.showClassification;
         return;
     }
-    if (simulation.screen == AppScreen::Simulation && controlDown && IsKeyPressed(KEY_G)) {
+    if (simulation.screen == AppScreen::Simulation && controlDown && IsKeyPressed(KEY_M)) {
+        simulation.showMoons = !simulation.showMoons;
+        simulation.showOrbits = false;
+        return;
+    }
+    if (simulation.screen == AppScreen::Simulation && controlDown && IsKeyPressed(KEY_L)) {
+        if (renderer.villaFocusActive()) renderer.exitEarthVilla();
+        else renderer.focusEarthVilla(simulation);
+        return;
+    }
+    if (simulation.screen == AppScreen::Simulation && renderer.villaFocusActive()) {
+        if (IsKeyPressed(KEY_F)) {
+            renderer.focusEarthForest(simulation);
+            return;
+        }
+        const int area =
+            IsKeyPressed(KEY_ZERO) ? 0 :
+            IsKeyPressed(KEY_ONE) ? 1 :
+            IsKeyPressed(KEY_TWO) ? 2 :
+            IsKeyPressed(KEY_THREE) ? 3 :
+            IsKeyPressed(KEY_FOUR) ? 4 :
+            IsKeyPressed(KEY_FIVE) ? 5 :
+            IsKeyPressed(KEY_SIX) ? 6 :
+            IsKeyPressed(KEY_SEVEN) ? 7 :
+            IsKeyPressed(KEY_EIGHT) ? 8 :
+            IsKeyPressed(KEY_NINE) ? 9 : -1;
+        if (area >= 0) {
+            renderer.selectVillaArea(area);
+            return;
+        }
+    }
+    // Ctrl+G toggles the reference grid. It is a display-only setting, so it is
+    // deliberately not gated on the active screen: the grid reads the same way
+    // on every page, and gating it made the shortcut appear to work or not work
+    // depending on which tab happened to be open.
+    if (controlDown && IsKeyPressed(KEY_G)) {
+        if (simulation.screen == AppScreen::Simulation) closeContextualTabs(simulation);
         simulation.showGrid = !simulation.showGrid;
         return;
     }
     if (keyboardSelectSimulationBody(simulation, selectionMode)) return;
     if (letterSelectSimulationBody(simulation, selectionMode)) return;
-    if (navigationClick(simulation)) return;
 
     if (simulation.screen == AppScreen::Simulation) {
         Vector2 pickMouse{};
@@ -180,13 +284,17 @@ void InputController::update(Simulation& simulation, Renderer& renderer) {
         const bool bodyClick = !focusClick && renderer.consumePendingBodyPick(pickMouse) &&
                                !renderer.isCameraManipulating();
         if (focusClick || bodyClick) {
-            // If F2 (Earth-Moon focus) is active, clicking deactivates it
+            const int hit = renderer.hitTest(simulation, pickMouse);
+            // F2: empty click / off-object click exits; hits stay on Sun/Earth/Moon only.
             if (simulation.earthMoonFocus) {
-                simulation.exitIsolation();
-                renderer.restoreViewAfterIsolate();
+                if (hit < 0) {
+                    simulation.exitIsolation();
+                    renderer.restoreViewAfterIsolate();
+                } else if (!simulation.showVectors) {
+                    simulation.selectBody(hit);
+                }
                 return;
             }
-            const int hit = renderer.hitTest(simulation, pickMouse);
             if (simulation.soloStudy) {
                 // Leave isolate and restore the previous screen, then apply the click.
                 simulation.exitIsolation();
@@ -221,7 +329,7 @@ void InputController::update(Simulation& simulation, Renderer& renderer) {
     if (IsKeyPressed(KEY_F7)) selectScreen(simulation, AppScreen::MissionDesigner);
     if (IsKeyPressed(KEY_F8)) selectScreen(simulation, AppScreen::Settings);
 
-    // Q loop: un-isolate (restore screen) → deselect → leave selection mode → turn off V mode
+    // Q loop: exit F2 / un-isolate (restore screen) → deselect → leave selection mode → turn off V mode
     if (IsKeyPressed(KEY_Q)) {
         if (simulation.screen == AppScreen::Simulation) {
             if (simulation.gravityMode) {
@@ -229,7 +337,7 @@ void InputController::update(Simulation& simulation, Renderer& renderer) {
                 simulation.resetMassMultipliers();
                 return;
             }
-            if (simulation.soloStudy) {
+            if (simulation.earthMoonFocus || simulation.soloStudy) {
                 simulation.exitIsolation();
                 renderer.restoreViewAfterIsolate();
                 return;
@@ -345,7 +453,7 @@ void InputController::update(Simulation& simulation, Renderer& renderer) {
         if (IsKeyPressed(KEY_MINUS) || IsKeyPressed(KEY_KP_SUBTRACT)) simulation.adjustTimestep(0.5);
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
             const Vector2 mouse = GetMousePosition();
-            const float leftX = ui::pagePad();
+            const float leftX = ui::contentGutter();
             const float leftY = ui::contentTop() + 70.0f;
             if (mouse.x >= leftX + 20.0f && mouse.x <= leftX + 520.0f &&
                 mouse.y >= leftY + 246.0f && mouse.y <= leftY + 276.0f) {
@@ -370,6 +478,15 @@ void InputController::update(Simulation& simulation, Renderer& renderer) {
     }
     if (IsKeyPressed(KEY_C)) {
         simulation.submitChallenge();
+    }
+
+    // Presentation state only: it turns on explanatory overlays without
+    // changing masses, forces, integration, or the user's camera controls.
+    if (IsKeyPressed(KEY_F10)) {
+        simulation.cycleVisualizationMode();
+        if (simulation.educationalVisualization() && simulation.selected >= 0) {
+            renderer.frameGravityInteraction(simulation, simulation.selected, false);
+        }
     }
 
     if (IsKeyPressed(KEY_SPACE)) simulation.paused = !simulation.paused;
@@ -411,16 +528,22 @@ void InputController::update(Simulation& simulation, Renderer& renderer) {
     // Plain N advances education; Ctrl+N toggles classification overlay (handled above with Ctrl).
     if (!controlDown && IsKeyPressed(KEY_N)) simulation.continueEducationActivity();
     if (IsKeyPressed(KEY_V)) {
+        closeContextualTabs(simulation, true);
         simulation.showVectors = !simulation.showVectors;
         simulation.settings.vectorsEnabled = simulation.showVectors;
     }
-    if (IsKeyPressed(KEY_O)) simulation.showOrbits = !simulation.showOrbits;
+    if (IsKeyPressed(KEY_O)) {
+        simulation.showOrbits = !simulation.showOrbits;
+        if (!simulation.showOrbits) simulation.showMoons = false;
+        return;
+    }
     if (IsKeyPressed(KEY_T)) {
         simulation.showTrails = !simulation.showTrails;
         simulation.settings.trailsEnabled = simulation.showTrails;
     }
     // G = Gravity Simulation mode (mass analysis). Grid moved to Ctrl+G.
     if (!controlDown && IsKeyPressed(KEY_G)) {
+        closeContextualTabs(simulation, false, true);
         simulation.gravityMode = !simulation.gravityMode;
         if (simulation.gravityMode) {
             // Entering gravity mode: auto-select first active body if none selected
@@ -440,7 +563,6 @@ void InputController::update(Simulation& simulation, Renderer& renderer) {
             simulation.resetMassMultipliers();
         }
     }
-    if (controlDown && IsKeyPressed(KEY_G)) simulation.showGrid = !simulation.showGrid;
     if (IsKeyPressed(KEY_SLASH)) simulation.toggleVisualScaleMode();
     if (IsKeyPressed(KEY_R)) {
         if (simulation.gravityMode && simulation.selected >= 0) {
@@ -457,7 +579,12 @@ void InputController::update(Simulation& simulation, Renderer& renderer) {
         if (simulation.loadScenario("default_solar_system")) applyScenarioCamera(simulation, renderer, "default_solar_system");
     }
     if (IsKeyPressed(KEY_F2)) {
-        focusEarthMoonEducational(simulation, renderer);
+        if (simulation.earthMoonFocus) {
+            simulation.exitIsolation();
+            renderer.restoreViewAfterIsolate();
+        } else {
+            focusEarthMoonEducational(simulation, renderer);
+        }
     }
     if (IsKeyPressed(KEY_F3)) {
         simulation.earthMoonFocus = false;
@@ -466,17 +593,25 @@ void InputController::update(Simulation& simulation, Renderer& renderer) {
     if (IsKeyPressed(KEY_F4)) renderer.togglePlanetLighting();
     // KEY_ONE: Toggle planet group classification if Ctrl+N is active, else set speed
     if (IsKeyPressed(KEY_ONE)) {
-        if (simulation.showClassification) {
+        if (simulation.showMoons) {
+            simulation.showOrbits = true;
+        } else if (simulation.showClassification) {
             simulation.showPlanetGroups = !simulation.showPlanetGroups;
         } else {
             simulation.setSpeed(1.0);
         }
     }
-    if (IsKeyPressed(KEY_TWO)) simulation.setSpeed(10.0);
+    if (IsKeyPressed(KEY_TWO)) {
+        closeContextualTabs(simulation, false, false, false, true);
+        simulation.searchActive = true;
+        simulation.searchQuery.clear();
+        simulation.searchMoonScope = simulation.showMoons;
+        return;
+    }
     if (IsKeyPressed(KEY_THREE)) simulation.setSpeed(100.0);
     if (IsKeyPressed(KEY_FOUR)) simulation.setSpeed(1000.0);
-    if (IsKeyPressed(KEY_FIVE)) simulation.setSpeed(10000.0);
-    if (IsKeyPressed(KEY_SIX)) simulation.setSpeed(100000.0);
+    if (IsKeyPressed(KEY_FIVE)) simulation.setSpeed(100000.0);
+    if (IsKeyPressed(KEY_SIX)) simulation.setSpeed(1000000.0);
     if (IsKeyPressed(KEY_EQUAL) || IsKeyPressed(KEY_KP_ADD)) simulation.adjustSpeed(1);
     if (IsKeyPressed(KEY_MINUS) || IsKeyPressed(KEY_KP_SUBTRACT)) simulation.adjustSpeed(-1);
     if (IsKeyPressed(KEY_P)) {

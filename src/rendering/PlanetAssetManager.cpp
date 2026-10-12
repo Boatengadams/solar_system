@@ -1,5 +1,6 @@
 #include "PlanetAssetManager.hpp"
 
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <fstream>
@@ -44,7 +45,7 @@ bool PlanetAssetManager::isValidGlbFile(const std::filesystem::path& path) {
     return valueAt(0) == GLB_MAGIC && valueAt(4) == 2U && valueAt(8) >= 20U;
 }
 
-bool PlanetAssetManager::load() {
+bool PlanetAssetManager::load(bool fast) {
     unload();
     metadata.clear();
     const auto manifestPath = planetDirectory / "manifest.json";
@@ -87,6 +88,11 @@ bool PlanetAssetManager::load() {
     }
 
     for (const auto& [bodyId, item] : metadata) {
+        // Fast startup defers every GLB; the main loop uploads one model per frame.
+        if (fast) {
+            logInfo("Fast startup: deferring planet model for " + bodyId);
+            continue;
+        }
         if (!item.enabled) {
             logInfo("Planet model disabled for " + bodyId + ": " + item.fallbackReason);
             continue;
@@ -98,8 +104,30 @@ bool PlanetAssetManager::load() {
         }
         Model loadedModel = LoadModel(path.string().c_str());
         if (loadedModel.meshCount <= 0 || loadedModel.meshes == nullptr) {
+            UnloadModel(loadedModel);
             logError("raylib could not load planet model for " + bodyId + "; using procedural sphere");
             continue;
+        }
+        if (bodyId == "jupiter" && loadedModel.meshCount > 1) {
+            // The source export contains one planet mesh followed by large
+            // transparent ring/overlay meshes. They dominate the bounds and
+            // make the planet render as a tiny dot at its presentation scale.
+            loadedModel.meshCount = 1;
+            logInfo("Jupiter presentation: using planet mesh 0; excluding overlay meshes");
+            for (int materialIndex = 0; materialIndex < loadedModel.materialCount; ++materialIndex) {
+                logInfo("Jupiter material " + std::to_string(materialIndex) +
+                        ": albedoTexture=" +
+                        std::to_string(loadedModel.materials[materialIndex]
+                                           .maps[MATERIAL_MAP_ALBEDO].texture.id) +
+                        " diffuseTexture=" +
+                        std::to_string(loadedModel.materials[materialIndex]
+                                           .maps[MATERIAL_MAP_DIFFUSE].texture.id));
+            }
+            // raylib keeps a default material in slot 0 for this converted
+            // asset; the surface texture is loaded in slot 1.
+            if (loadedModel.meshMaterial != nullptr && loadedModel.materialCount > 1) {
+                loadedModel.meshMaterial[0] = 1;
+            }
         }
         const BoundingBox bounds = GetModelBoundingBox(loadedModel);
         const Vector3 center = Vector3Scale(Vector3Add(bounds.min, bounds.max), 0.5f);
@@ -114,6 +142,37 @@ bool PlanetAssetManager::load() {
         logInfo("Loaded planet model: " + bodyId);
     }
     return !loaded.empty();
+}
+
+std::size_t PlanetAssetManager::totalEnabledCount() const {
+    return static_cast<std::size_t>(std::count_if(metadata.begin(), metadata.end(), [](const auto& entry) { return entry.second.enabled; }));
+}
+
+bool PlanetAssetManager::loadNext() {
+    for (const auto& [bodyId, item] : metadata) {
+        if (!item.enabled || loaded.find(bodyId) != loaded.end()) continue;
+        const auto path = planetDirectory / item.modelFile;
+        if (!isValidGlbFile(path)) { logError("Deferred planet model unavailable or invalid for " + bodyId); continue; }
+        Model model = LoadModel(path.string().c_str());
+        if (model.meshCount <= 0 || model.meshes == nullptr) {
+            UnloadModel(model);
+            logError("Deferred raylib model load failed for " + bodyId);
+            continue;
+        }
+        const BoundingBox bounds = GetModelBoundingBox(model);
+        const Vector3 center = Vector3Scale(Vector3Add(bounds.min, bounds.max), 0.5f);
+        const Vector3 extent = Vector3Scale(Vector3Subtract(bounds.max, bounds.min), 0.5f);
+        const float radius = Vector3Length(extent);
+        if (!std::isfinite(radius) || radius <= std::numeric_limits<float>::epsilon()) {
+            UnloadModel(model);
+            logError("Deferred planet model has invalid bounds for " + bodyId);
+            continue;
+        }
+        loaded.emplace(bodyId, LoadedAsset{item, model, radius, center});
+        logInfo("Loaded deferred planet model: " + bodyId);
+        return true;
+    }
+    return false;
 }
 
 bool PlanetAssetManager::has(const std::string& bodyId) const { return loaded.find(bodyId) != loaded.end(); }

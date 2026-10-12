@@ -1,0 +1,13 @@
+{
+  "id": "io",
+  "name": "Io",
+  "type": "Moon",
+  "mass_kg": 8.9319e+22,
+  "radius_m": 1821600.0,
+  "initial_position_m": [742722028682.8724, 0.0, 0.0],
+  "initial_velocity_mps": [0.0, 30754.0, 0.0],
+  "parent_id": "jupiter",
+  "visual": {"color_rgba": [225, 190, 125, 255], "accent_rgba": [255, 225, 150, 255], "display_radius_px": 1.4},
+  "orbital": {"semi_major_axis_m": 421700000.0, "eccentricity": 0.0041, "orbital_period_s": 152853.8},
+  "rotation": {"sidereal_period_s": 152853.8, "axial_tilt_deg": 0.05}
+}

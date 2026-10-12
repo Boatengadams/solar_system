@@ -98,6 +98,20 @@ ctest --preset release --output-on-failure
 
 Makefile convenience targets still exist for quick local builds.
 
+## Automated CI/CD
+
+Every push and pull request runs `.github/workflows/ci.yml` on Linux, Windows,
+and macOS. Each runner configures and builds the project with CMake; Linux also
+runs the test and scientific validation suites. Successful runs create
+downloadable packages in the workflow's **Artifacts** section:
+
+- `BAGS_LAB-linux-x64`
+- `BAGS_LAB-windows-x64`
+- `BAGS_LAB-macos`
+
+Local build directories and executables are ignored by Git, so generated
+binaries are not committed to the repository.
+
 Optional CSPICE:
 
 ```sh

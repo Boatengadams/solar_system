@@ -43,6 +43,7 @@ DataResult<Body> BodyFactory::create(const BodyDefinition& definition) {
     body.luminous = definition.luminous;
     body.ringed = definition.ringed;
     body.parentId = definition.parentId;
+    body.visualAssetId = definition.visualAssetId;
     body.semiMajorAxis = definition.semiMajorAxisM;
     body.eccentricity = definition.eccentricity;
     body.orbitalPeriod = definition.orbitalPeriodS;

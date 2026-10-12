@@ -1,9 +1,11 @@
 #include "Simulation.hpp"
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <iterator>
 #include <limits>
+#include <random>
 
 #include "../core/Logger.hpp"
 #include "../data/BodyFactory.hpp"
@@ -43,6 +45,15 @@ const char* appScreenName(AppScreen screen) {
     case AppScreen::Help: return "HELP";
     }
     return "SCREEN";
+}
+
+const char* visualizationModeName(VisualizationMode mode) {
+    switch (mode) {
+    case VisualizationMode::Realistic: return "REALISTIC";
+    case VisualizationMode::Learning: return "LEARNING";
+    case VisualizationMode::ExploreKids: return "EXPLORE / KIDS";
+    }
+    return "REALISTIC";
 }
 
 Simulation::Simulation(std::filesystem::path root)
@@ -99,6 +110,45 @@ bool Simulation::loadScenario(const std::string& id) {
     scenarioMetadata = result.value->metadata;
     settings = result.value->settings;
     bodies = result.value->bodies;
+    const std::array<const char*, 4> asteroidSources = {"ceres", "daphne", "psyche", "vesta"};
+    const std::array<double, 4> asteroidRadii = {2.25e11, 2.55e11, 2.85e11, 3.15e11};
+    const std::array<double, 4> asteroidPhases = {0.25, 1.85, 3.55, 5.15};
+    for (int index = 0; index < 4; ++index) {
+        const double radius = asteroidRadii[static_cast<std::size_t>(index)];
+        const double angle = asteroidPhases[static_cast<std::size_t>(index)];
+        const double orbitEccentricity = 0.025 + index * 0.01;
+        const double orbitInclination = (index - 1.5) * 0.018;
+        Body asteroid;
+        asteroid.id = asteroidSources[static_cast<std::size_t>(index)];
+        asteroid.name = asteroid.id == "ceres" ? "Ceres" :
+            asteroid.id == "daphne" ? "Daphne" :
+            asteroid.id == "psyche" ? "Psyche" : "Vesta";
+        asteroid.type = "Asteroid";
+        asteroid.mass = asteroid.baseMass = 1.0e15;
+        asteroid.radius = asteroid.realRadius = 2000.0;
+        asteroid.visualRadius = 0.32 + index * 0.06;
+        asteroid.semiMajorAxis = radius;
+        asteroid.eccentricity = orbitEccentricity;
+        asteroid.orbitalPhase = angle;
+        asteroid.axialTilt = orbitInclination;
+        const double orbitalRadius = radius * (1.0 - orbitEccentricity);
+        asteroid.position = {
+            orbitalRadius * std::cos(angle),
+            orbitalRadius * std::sin(angle) * std::sin(orbitInclination),
+            orbitalRadius * std::sin(angle) * std::cos(orbitInclination)
+        };
+        const double speed = std::sqrt(PhysicsEngine::G * PhysicsEngine::SOLAR_MASS / radius);
+        asteroid.velocity = {
+            -speed * std::sin(angle),
+            speed * std::cos(angle) * std::sin(orbitInclination),
+            speed * std::cos(angle) * std::cos(orbitInclination)
+        };
+        const unsigned char shade = static_cast<unsigned char>(105 + index * 16);
+        asteroid.color = {shade, static_cast<unsigned char>(shade - 8), static_cast<unsigned char>(shade - 18), 255};
+        asteroid.accent = {180, 155, 125, 255};
+        asteroid.visualAssetId = asteroid.id;
+        bodies.push_back(std::move(asteroid));
+    }
     stars = result.value->stars;
     // Keep the educational probe dormant until P pulses/launches it so it does not
     // look like a mystery body circling with the planets.
@@ -112,9 +162,15 @@ bool Simulation::loadScenario(const std::string& id) {
     showTrails = settings.trailsEnabled;
     showVectors = settings.vectorsEnabled;
     showClassification = false;
+    // Keep the Earth-Moon pair readable in the normal system view. Other moons
+    // remain available through Ctrl+M or direct search/selection.
+    showMoons = false;
+    searchActive = false;
+    searchQuery.clear();
     gravityMode = false;
     earthMoonFocus = false;
     showIndividualGravity = false;
+    visualizationMode = VisualizationMode::Realistic;
     selected = -1;
     soloStudy = false;
     for (Body& body : bodies) {
@@ -144,6 +200,54 @@ bool Simulation::loadScenario(const std::string& id) {
     lastPredictionComparison.reset();
     educationWorkflow.resetToSelection();
     return true;
+}
+
+void Simulation::cycleVisualizationMode() {
+    switch (visualizationMode) {
+    case VisualizationMode::Realistic:
+        visualizationMode = VisualizationMode::Learning;
+        showTrails = true;
+        showVectors = true;
+        break;
+    case VisualizationMode::Learning:
+        visualizationMode = VisualizationMode::ExploreKids;
+        showTrails = true;
+        showVectors = true;
+        break;
+    case VisualizationMode::ExploreKids:
+        visualizationMode = VisualizationMode::Realistic;
+        showTrails = true;
+        showVectors = false;
+        break;
+    }
+}
+
+void Simulation::advanceAsteroidBelt(double dt) {
+    const auto sun = std::find_if(bodies.begin(), bodies.end(), [](const Body& body) {
+        return body.id == "sun" && body.active;
+    });
+    if (sun == bodies.end() || !std::isfinite(dt) || dt <= 0.0) return;
+
+    for (Body& asteroid : bodies) {
+        if (!asteroid.active || asteroid.type != "Asteroid") continue;
+        const double radius = asteroid.semiMajorAxis > 0.0 ? asteroid.semiMajorAxis :
+            std::sqrt((asteroid.position.x - sun->position.x) * (asteroid.position.x - sun->position.x) +
+                      (asteroid.position.z - sun->position.z) * (asteroid.position.z - sun->position.z));
+        if (!std::isfinite(radius) || radius <= 0.0) continue;
+        const double angularSpeed = std::sqrt(PhysicsEngine::G * sun->mass / (radius * radius * radius));
+        asteroid.orbitalPhase = std::fmod(asteroid.orbitalPhase + angularSpeed * dt, 2.0 * 3.14159265358979323846);
+        const double phaseCosine = std::cos(asteroid.orbitalPhase);
+        const double phaseSine = std::sin(asteroid.orbitalPhase);
+        const double orbitalRadius = radius * (1.0 - asteroid.eccentricity * asteroid.eccentricity) /
+            (1.0 + asteroid.eccentricity * phaseCosine);
+        const double x = orbitalRadius * phaseCosine;
+        const double z = orbitalRadius * phaseSine;
+        const double inclination = asteroid.axialTilt;
+        asteroid.position = sun->position + Vec3{x, z * std::sin(inclination), z * std::cos(inclination)};
+        asteroid.velocity = sun->velocity + Vec3{-z * angularSpeed,
+                                                  x * angularSpeed * std::sin(inclination),
+                                                  x * angularSpeed * std::cos(inclination)};
+    }
 }
 
 bool Simulation::initializeFromEphemeris(const EphemerisSnapshot& snapshot) {
@@ -178,8 +282,8 @@ bool Simulation::initializeFromEphemeris(const EphemerisSnapshot& snapshot) {
 void Simulation::integrate(double realDeltaSeconds) {
     const double scaled = std::min(realDeltaSeconds, MAX_FRAME_DELTA) * speed;
     accumulator += scaled;
-    // High time-scales need more substeps so ×10000 / ×100000 still advance noticeably.
-    const int maxSteps = std::clamp(100 + static_cast<int>(speed / 40.0), 100, 2500);
+    // High time-scales need more substeps so extreme analysis speeds still advance.
+    const int maxSteps = std::clamp(100 + static_cast<int>(speed / 25.0), 100, 12000);
     int steps = 0;
     while (accumulator >= (settings.adaptiveTimestep ? nextTimestep : settings.timestepSeconds) && steps++ < maxSteps) {
         Integrator integrator = Integrator::VelocityVerlet;
@@ -216,6 +320,7 @@ void Simulation::integrate(double realDeltaSeconds) {
         actualTimestep = lastStepResult.timestepUsed;
         lastPredictionComparison.reset();
         nextTimestep = settings.adaptiveTimestep ? lastStepResult.suggestedTimestep : settings.timestepSeconds;
+        advanceAsteroidBelt(lastStepResult.timestepUsed);
         timestepHistory.push_back(actualTimestep);
         simTime += lastStepResult.timestepUsed;
         accumulator -= lastStepResult.timestepUsed;
@@ -235,7 +340,7 @@ void Simulation::integrate(double realDeltaSeconds) {
 
     if (!paused) {
         for (Body& body : bodies) {
-            if (!body.active || static_cast<int>(simTime) % 21600 >= 3600) {
+            if (!body.active || body.type == "Asteroid" || static_cast<int>(simTime) % 21600 >= 3600) {
                 continue;
             }
             const Vec3 trailPosition = body.position / PhysicsEngine::AU;
@@ -741,7 +846,7 @@ bool Simulation::submitCurriculumAssessment() {
 void Simulation::setSpeed(double value) {
     // Time scaling only feeds the existing bounded accumulator. Integration
     // still uses the configured/adaptive timestep and safety policies.
-    speed = std::max(0.1, std::min(100000.0, value));
+    speed = std::max(0.1, std::min(10000000.0, value));
     settings.timeScale = speed;
 }
 
@@ -749,7 +854,8 @@ void Simulation::adjustSpeed(int direction) {
     if (direction == 0) return;
     constexpr double steps[] = {
         0.1, 0.25, 0.5, 1.0, 2.0, 5.0, 10.0, 50.0, 100.0, 500.0,
-        1000.0, 5000.0, 10000.0, 50000.0, 100000.0,
+        1000.0, 5000.0, 10000.0, 50000.0, 100000.0, 250000.0, 500000.0,
+        1000000.0, 2500000.0, 5000000.0, 10000000.0,
     };
     int nearest = 0;
     for (int index = 1; index < static_cast<int>(std::size(steps)); ++index) {
@@ -762,6 +868,12 @@ void Simulation::adjustSpeed(int direction) {
 bool Simulation::selectBody(int index) {
     if (index < 0 || index >= static_cast<int>(bodies.size())) return false;
     if (!bodies[static_cast<std::size_t>(index)].active) return false;
+    if (earthMoonFocus &&
+        !(bodies[static_cast<std::size_t>(index)].id == "earth" ||
+          bodies[static_cast<std::size_t>(index)].id == "moon" ||
+          bodies[static_cast<std::size_t>(index)].id == "sun")) {
+        return false;
+    }
     selected = index;
     // Isolation is owned by Z / Q — selecting must not silently cancel zoom state here.
     // Callers that need to leave isolate restore the camera explicitly.
@@ -807,8 +919,11 @@ bool Simulation::bodyVisibleInView(int index) const {
     if (index < 0 || index >= static_cast<int>(bodies.size())) return false;
     const Body& candidate = bodies[static_cast<std::size_t>(index)];
     if (!candidate.active) return false;
+    if (candidate.type == "Moon" && !showMoons && candidate.id != "moon" &&
+        !earthMoonFocus && !soloStudy && selected != index) return false;
     if (earthMoonFocus) {
-        return candidate.id == "earth" || candidate.id == "moon" || candidate.id == "sun" || candidate.type == "Moon";
+        // F2 is the Sun + Earth + Moon teaching view; other planets stay hidden.
+        return candidate.id == "earth" || candidate.id == "moon" || candidate.id == "sun";
     }
     if (!soloStudy || selected < 0) return true;
     if (index == selected) return true;

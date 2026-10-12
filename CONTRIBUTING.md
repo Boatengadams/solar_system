@@ -1,27 +1,16 @@
-# Contributing to BAGS_LAB
+# Contributing
 
-## Principles
+Thank you for helping improve BAGS_LAB.
 
-1. Inspect existing code before changing it.
-2. Preserve scientific units, equations, and validation strength.
-3. Prefer small, testable changes.
-4. Keep physics independent of raylib.
-5. Do not store credentials or secrets in the repository.
+## Development workflow
 
-## Workflow
+1. Create a feature branch from the current branch.
+2. Keep changes focused and add or update tests for behavioral changes.
+3. Run the project test suite with `cmake --build build --parallel` and `ctest --test-dir build --output-on-failure`.
+4. Open a pull request with a concise summary of the change and validation performed.
 
-```sh
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON
-cmake --build build --parallel
-ctest --test-dir build --output-on-failure
-```
+## Coding expectations
 
-Commit locally with clear messages. Configure a remote only when you intend to
-publish. Authentication stays outside the project.
-
-## Documentation
-
-- User/developer entry: `README.md`
-- Architecture: `ARCHITECTURE.md`
-- Scientific docs: `docs/scientific/`
-- Historical phase notes: `docs/history/`
+- Prefer small, well-scoped changes.
+- Keep simulation data assets and package metadata in sync when updating the default scenario or install layout.
+- Preserve the project's scientific and educational validation checks.

@@ -72,7 +72,7 @@ int main() {
 
     const auto defaultScenario = loader.loadScenario("default_solar_system", rng);
     assert(defaultScenario);
-    assert(defaultScenario.value->bodies.size() == 11);
+    assert(defaultScenario.value->bodies.size() == 30);
     assert(defaultScenario.value->stars.size() == 1500);
     assert(defaultScenario.value->metadata.referenceFrame == "heliocentric");
 

@@ -23,6 +23,7 @@ struct BodyDefinition {
     bool luminous = false;
     bool ringed = false;
     std::string parentId;
+    std::string visualAssetId;
     double semiMajorAxisM = 0.0;
     double eccentricity = 0.0;
     double orbitalPeriodS = 0.0;

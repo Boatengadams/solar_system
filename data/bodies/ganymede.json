@@ -1,0 +1,13 @@
+{
+  "id": "ganymede",
+  "name": "Ganymede",
+  "type": "Moon",
+  "mass_kg": 1.4819e+23,
+  "radius_m": 2634100.0,
+  "initial_position_m": [744787028682.8724, 0.0, 0.0],
+  "initial_velocity_mps": [0.0, 29255.0, 0.0],
+  "parent_id": "jupiter",
+  "visual": {"color_rgba": [170, 165, 150, 255], "accent_rgba": [205, 195, 170, 255], "display_radius_px": 1.6},
+  "orbital": {"semi_major_axis_m": 1070412000.0, "eccentricity": 0.0013, "orbital_period_s": 618153.0},
+  "rotation": {"sidereal_period_s": 618153.0, "axial_tilt_deg": 0.2}
+}

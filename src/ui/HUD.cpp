@@ -5,6 +5,9 @@
 #include <cmath>
 #include <iomanip>
 #include <sstream>
+#include <cstring>
+
+#include <raym3/raym3.h>
 
 #include "../education/EducationContent.hpp"
 #include "../education/EducationChallenges.hpp"
@@ -13,6 +16,7 @@
 #include "../astronomy/CelestialBodyCatalog.hpp"
 #include "../physics/PhysicsEngine.hpp"
 #include "UiTheme.hpp"
+#include "../rendering/Renderer.hpp"
 
 namespace bag {
 namespace {
@@ -44,14 +48,6 @@ std::string distance(double meters) {
     return format(meters / 1000.0, 0) + " km";
 }
 
-std::string time(double seconds) {
-    const double absolute = std::abs(seconds);
-    if (absolute < 60) return format(absolute, 1) + " s";
-    if (absolute < PhysicsEngine::DAY) return format(absolute / 3600.0, 1) + " h";
-    if (absolute < PhysicsEngine::YEAR) return format(absolute / PhysicsEngine::DAY, 1) + " d";
-    return format(absolute / PhysicsEngine::YEAR, 2) + " y";
-}
-
 std::string dayLengthLabel(double periodSeconds) {
     if (!std::isfinite(periodSeconds) || periodSeconds == 0.0) return "—";
     const double absolute = std::abs(periodSeconds);
@@ -59,14 +55,8 @@ std::string dayLengthLabel(double periodSeconds) {
     return format(absolute / PhysicsEngine::DAY, 1) + " Earth days";
 }
 
-std::string spinDirectionLabel(const Body& body) {
-    if (!std::isfinite(body.rotationPeriod) || body.rotationPeriod == 0.0) return "—";
-    if (std::abs(body.axialTilt) >= 80.0) return "Sideways";
-    if (body.rotationPeriod < 0.0) return "Retrograde";
-    return "Prograde";
-}
-
 std::string formatSpeed(double speed) {
+    if (speed >= 1000000.0) return "×" + format(speed / 1000000.0, 0) + "M";
     if (speed >= 1000.0) return "×" + format(speed, 0);
     if (speed < 1.0) return "×" + format(speed, 2);
     if (speed < 10.0) return "×" + format(speed, 1);
@@ -116,6 +106,8 @@ void HUD::text(const char* value, float x, float y, float size, Color colorValue
 }
 
 static double g_screenshotFeedbackTime = 0.0;
+static int g_lastInspectorSelection = -2;
+static float g_inspectorReveal = 0.0f;
 
 void HUD::triggerScreenshotFeedback() {
     g_screenshotFeedbackTime = GetTime();
@@ -138,248 +130,55 @@ void HUD::screenshotFeedback() const {
              withAlpha(t.text, alphaVal));
 }
 
-void HUD::pageChrome(const Simulation& simulation, const char* title, const char* subtitle) const {
+// The application bar is drawn by UIManager above this page content, so the
+// page only supplies its own heading. No Simulation state is needed here: the
+// title and subtitle fully describe the page.
+void HUD::pageChrome(const char* title, const char* subtitle) const {
     const auto& t = theme();
     DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), t.bg);
     DrawRectangleGradientV(0, 0, GetScreenWidth(), GetScreenHeight(),
                            withAlpha(ui::rgba(14, 28, 44), 0.6f), t.bg);
-    topBar(simulation);
-    text(title, ui::pagePad(), ui::contentTop(), 26, t.text);
-    text(subtitle, ui::pagePad(), ui::contentTop() + 32.0f, 13, t.textMuted);
-}
-
-void HUD::topBar(const Simulation& simulation) const {
-    const auto& t = theme();
-    const float barW = static_cast<float>(GetScreenWidth());
-    const float barH = ui::topBarHeight();
-
-    // Dark translucent background with thin bottom border
-    DrawRectangle(0, 0, static_cast<int>(barW), static_cast<int>(barH), withAlpha(t.bgElevated, 0.96f));
-    DrawRectangleGradientV(0, 0, static_cast<int>(barW), 22, withAlpha(t.accent, 0.04f), withAlpha(t.accent, 0.0f));
-    DrawRectangle(0, static_cast<int>(barH) - 1, static_cast<int>(barW), 1, withAlpha(t.border, 0.85f));
-
-    // Left: Scientific BAGS_LAB Logo & wordmark
-    constexpr float logoCx = 26.0f;
-    constexpr float logoCy = 27.0f;
-    DrawCircleLines(static_cast<int>(logoCx), static_cast<int>(logoCy), 12.0f, withAlpha(t.accent, 0.5f));
-    DrawCircleLines(static_cast<int>(logoCx), static_cast<int>(logoCy), 7.0f, withAlpha(t.accentStrong, 0.8f));
-    DrawCircle(static_cast<int>(logoCx), static_cast<int>(logoCy), 3.0f, t.accentStrong);
-    // Orbiting electron/satellite pip
-    const float orbitAngle = static_cast<float>(GetTime() * 1.5);
-    DrawCircle(static_cast<int>(logoCx + 12.0f * std::cos(orbitAngle)),
-               static_cast<int>(logoCy + 12.0f * std::sin(orbitAngle)), 1.8f, t.accent);
-
-    text("BAGS_LAB", 48.0f, 12.0f, 18.0f, t.text);
-    text("C++17 ORBITAL MECHANICS LABORATORY", 48.0f, 33.0f, 9.0f, t.textDim);
-
-    // Center Navigation tabs
-    const ui::NavLayout nav = ui::buildNavLayout(barW);
-    const Vector2 mouse = GetMousePosition();
-    for (std::size_t index = 0; index < ui::kNavTabs.size(); ++index) {
-        const Rectangle hit = nav.hits[index];
-        const bool active = simulation.screen == ui::kNavTabs[index].screen;
-        const bool hover = CheckCollisionPointRec(mouse, hit);
-
-        if (active) {
-            DrawRectangleRounded({hit.x, hit.y + 4.0f, hit.width, hit.height - 6.0f}, 0.15f, 8,
-                                 withAlpha(t.accent, 0.14f));
-            DrawRectangle(static_cast<int>(hit.x + 4.0f), static_cast<int>(barH) - 3,
-                          static_cast<int>(hit.width - 8.0f), 2, t.accent);
-        } else if (hover) {
-            DrawRectangleRounded({hit.x, hit.y + 4.0f, hit.width, hit.height - 6.0f}, 0.15f, 8,
-                                 withAlpha(t.surfaceAlt, 0.5f));
-        }
-
-        const int fontSize = 11;
-        const float textWidth = static_cast<float>(MeasureText(ui::kNavTabs[index].label, fontSize));
-        DrawText(ui::kNavTabs[index].label,
-                 static_cast<int>(hit.x + (hit.width - textWidth) * 0.5f),
-                 static_cast<int>(hit.y + (hit.height - fontSize) * 0.5f - 1.0f),
-                 fontSize, active ? t.text : (hover ? t.accentStrong : t.textMuted));
-    }
-
-    // Right Side: SIM TIME, Speed Pill, Status, Settings, Exit
-    const float right = barW;
-
-    // Exit / Power Button
-    const Rectangle powerBtn = {right - 34.0f, 12.0f, 28.0f, 30.0f};
-    const bool powerHover = CheckCollisionPointRec(mouse, powerBtn);
-    if (powerHover) DrawRectangleRounded(powerBtn, 0.3f, 8, withAlpha(t.danger, 0.2f));
-    DrawCircleLines(static_cast<int>(powerBtn.x + 14.0f), static_cast<int>(powerBtn.y + 15.0f), 7.0f,
-                    powerHover ? t.danger : t.textMuted);
-    DrawLine(static_cast<int>(powerBtn.x + 14.0f), static_cast<int>(powerBtn.y + 9.0f),
-             static_cast<int>(powerBtn.x + 14.0f), static_cast<int>(powerBtn.y + 16.0f),
-             powerHover ? t.danger : t.textMuted);
-
-    // Settings Gear Icon
-    const Rectangle settingsBtn = {right - 66.0f, 12.0f, 28.0f, 30.0f};
-    const bool settingsHover = CheckCollisionPointRec(mouse, settingsBtn);
-    if (settingsHover) DrawRectangleRounded(settingsBtn, 0.3f, 8, withAlpha(t.surfaceAlt, 0.6f));
-    const float gearCx = settingsBtn.x + 14.0f;
-    const float gearCy = settingsBtn.y + 15.0f;
-    DrawCircleLines(static_cast<int>(gearCx), static_cast<int>(gearCy), 5.0f,
-                    settingsHover ? t.accentStrong : t.textMuted);
-    for (int i = 0; i < 6; ++i) {
-        const float a = static_cast<float>(i * PI / 3.0);
-        DrawLine(static_cast<int>(gearCx + 5.0f * std::cos(a)), static_cast<int>(gearCy + 5.0f * std::sin(a)),
-                 static_cast<int>(gearCx + 8.0f * std::cos(a)), static_cast<int>(gearCy + 8.0f * std::sin(a)),
-                 settingsHover ? t.accentStrong : t.textMuted);
-    }
-
-    // Wireless / Antenna Telemetry Status Icon
-    const float antX = right - 96.0f;
-    const float antY = 27.0f;
-    DrawCircleLines(static_cast<int>(antX), static_cast<int>(antY + 4.0f), 8.0f, withAlpha(t.accent, 0.7f));
-    DrawCircleLines(static_cast<int>(antX), static_cast<int>(antY + 4.0f), 4.0f, withAlpha(t.accent, 0.9f));
-    DrawCircle(static_cast<int>(antX), static_cast<int>(antY + 4.0f), 1.5f, t.accentStrong);
-
-    // Speed Control Pill [ ◀ | ⏵/⏸ x1.0 | ▶ ]
-    const Rectangle speedPill = {right - 216.0f, 11.0f, 108.0f, 32.0f};
-    DrawRectangleRounded(speedPill, 0.45f, 12, withAlpha(t.surface, 0.9f));
-    DrawRectangleRoundedLines(speedPill, 0.45f, 12, withAlpha(t.border, 0.8f));
-
-    // Play/pause symbol
-    if (simulation.paused) {
-        DrawTriangle({speedPill.x + 14.0f, speedPill.y + 10.0f},
-                     {speedPill.x + 14.0f, speedPill.y + 22.0f},
-                     {speedPill.x + 23.0f, speedPill.y + 16.0f}, t.warn);
-    } else {
-        DrawRectangle(static_cast<int>(speedPill.x + 14.0f), static_cast<int>(speedPill.y + 10.0f), 3, 12, t.success);
-        DrawRectangle(static_cast<int>(speedPill.x + 20.0f), static_cast<int>(speedPill.y + 10.0f), 3, 12, t.success);
-    }
-    const std::string spdStr = formatSpeed(simulation.speed);
-    text(spdStr.c_str(), speedPill.x + 30.0f, speedPill.y + 9.0f, 12, t.text);
-    // Chevrons on sides
-    text("‹", speedPill.x + 76.0f, speedPill.y + 6.0f, 14, t.textDim);
-    text("›", speedPill.x + 92.0f, speedPill.y + 6.0f, 14, t.textDim);
-
-    // SIM TIME Display: "SIM TIME" and "0.00 days"
-    const double days = simulation.simTime / PhysicsEngine::DAY;
-    std::string daysStr = format(days, 2) + " days";
-    text("SIM TIME", right - 336.0f, 12.0f, 9.0f, t.textDim);
-    text(daysStr.c_str(), right - 336.0f, 24.0f, 16.0f, t.accentStrong);
-
-    // Live status dot
-    DrawCircle(static_cast<int>(right - 350.0f), 27, 4.0f, simulation.paused ? t.warn : t.success);
-}
-
-void HUD::bottomBar(const Simulation& simulation) const {
-    (void)simulation;
-}
-
-void HUD::toolRail(const Simulation& simulation) const {
-    const auto& t = theme();
-    const ui::HudLayout layout = ui::buildHudLayout(static_cast<float>(GetScreenWidth()),
-                                               static_cast<float>(GetScreenHeight()),
-                                               simulation.selected >= 0, simulation.soloStudy);
-    const Vector2 mouse = GetMousePosition();
-
-    // Tool rail glass container
-    DrawRectangleRounded(layout.toolRail, 0.2f, 12, withAlpha(t.panelGlass, 0.92f));
-    DrawRectangleRoundedLines(layout.toolRail, 0.2f, 12, withAlpha(t.border, 0.8f));
-
-    // 7 technical tools:
-    // 0: Select (default active)
-    // 1: Focus
-    // 2: Screenshot
-    // 3: Coordinate/Grid
-    // 4: Orbit Analysis
-    // 5: Layers / Trails
-    // 6: Data / Objects
-    for (int i = 0; i < 7; ++i) {
-        const Rectangle btn = layout.toolButtons[static_cast<std::size_t>(i)];
-        bool isActive = false;
-        if (i == 0) isActive = (simulation.selected < 0);
-        else if (i == 1) isActive = (simulation.selected >= 0);
-        else if (i == 3) isActive = simulation.showGrid;
-        else if (i == 4) isActive = simulation.showOrbits;
-        else if (i == 5) isActive = simulation.showTrails || simulation.showVectors;
-
-        const bool hover = CheckCollisionPointRec(mouse, btn);
-
-        if (isActive) {
-            DrawRectangleRounded(btn, 0.25f, 8, withAlpha(t.accent, 0.24f));
-            DrawRectangleRoundedLines(btn, 0.25f, 8, t.accent);
-        } else if (hover) {
-            DrawRectangleRounded(btn, 0.25f, 8, withAlpha(t.surfaceAlt, 0.6f));
-            DrawRectangleRoundedLines(btn, 0.25f, 8, withAlpha(t.borderSoft, 0.9f));
-        }
-
-        const Color iconColor = isActive ? t.accentStrong : (hover ? t.text : t.textMuted);
-        const float cx = btn.x + btn.width * 0.5f;
-        const float cy = btn.y + btn.height * 0.5f;
-
-        switch (i) {
-        case 0: { // Cursor / Select arrow
-            DrawTriangle({cx - 5.0f, cy - 7.0f}, {cx - 5.0f, cy + 7.0f}, {cx + 6.0f, cy + 1.0f}, iconColor);
-            break;
-        }
-        case 1: { // Focus target / Crosshairs
-            DrawCircleLines(static_cast<int>(cx), static_cast<int>(cy), 7.0f, iconColor);
-            DrawCircle(static_cast<int>(cx), static_cast<int>(cy), 2.0f, iconColor);
-            DrawLine(static_cast<int>(cx - 10.0f), static_cast<int>(cy), static_cast<int>(cx - 7.0f), static_cast<int>(cy), iconColor);
-            DrawLine(static_cast<int>(cx + 7.0f), static_cast<int>(cy), static_cast<int>(cx + 10.0f), static_cast<int>(cy), iconColor);
-            DrawLine(static_cast<int>(cx), static_cast<int>(cy - 10.0f), static_cast<int>(cx), static_cast<int>(cy - 7.0f), iconColor);
-            DrawLine(static_cast<int>(cx), static_cast<int>(cy + 7.0f), static_cast<int>(cx), static_cast<int>(cy + 10.0f), iconColor);
-            break;
-        }
-        case 2: { // Camera / Capture
-            DrawRectangleRoundedLines({cx - 9.0f, cy - 5.0f, 18.0f, 13.0f}, 0.2f, 4, iconColor);
-            DrawCircleLines(static_cast<int>(cx), static_cast<int>(cy + 1.5f), 4.0f, iconColor);
-            DrawRectangle(static_cast<int>(cx - 3.0f), static_cast<int>(cy - 8.0f), 6, 3, iconColor);
-            break;
-        }
-        case 3: { // Globe / Grid
-            DrawCircleLines(static_cast<int>(cx), static_cast<int>(cy), 8.0f, iconColor);
-            DrawLine(static_cast<int>(cx - 8.0f), static_cast<int>(cy), static_cast<int>(cx + 8.0f), static_cast<int>(cy), iconColor);
-            DrawLine(static_cast<int>(cx), static_cast<int>(cy - 8.0f), static_cast<int>(cx), static_cast<int>(cy + 8.0f), iconColor);
-            break;
-        }
-        case 4: { // Orbit analysis
-            DrawCircleLines(static_cast<int>(cx), static_cast<int>(cy), 8.0f, iconColor);
-            DrawCircle(static_cast<int>(cx + 6.0f), static_cast<int>(cy - 3.0f), 2.5f, iconColor);
-            break;
-        }
-        case 5: { // Layers stack
-            DrawLine(static_cast<int>(cx - 8.0f), static_cast<int>(cy - 4.0f), static_cast<int>(cx), static_cast<int>(cy - 8.0f), iconColor);
-            DrawLine(static_cast<int>(cx), static_cast<int>(cy - 8.0f), static_cast<int>(cx + 8.0f), static_cast<int>(cy - 4.0f), iconColor);
-            DrawLine(static_cast<int>(cx + 8.0f), static_cast<int>(cy - 4.0f), static_cast<int>(cx), static_cast<int>(cy), iconColor);
-            DrawLine(static_cast<int>(cx), static_cast<int>(cy), static_cast<int>(cx - 8.0f), static_cast<int>(cy - 4.0f), iconColor);
-
-            DrawLine(static_cast<int>(cx - 8.0f), static_cast<int>(cy + 2.0f), static_cast<int>(cx), static_cast<int>(cy + 6.0f), iconColor);
-            DrawLine(static_cast<int>(cx), static_cast<int>(cy + 6.0f), static_cast<int>(cx + 8.0f), static_cast<int>(cy + 2.0f), iconColor);
-            break;
-        }
-        case 6: { // Data / Objects cylinders
-            DrawRectangleRoundedLines({cx - 8.0f, cy - 7.0f, 16.0f, 14.0f}, 0.3f, 4, iconColor);
-            DrawLine(static_cast<int>(cx - 8.0f), static_cast<int>(cy - 2.0f), static_cast<int>(cx + 8.0f), static_cast<int>(cy - 2.0f), iconColor);
-            DrawLine(static_cast<int>(cx - 8.0f), static_cast<int>(cy + 3.0f), static_cast<int>(cx + 8.0f), static_cast<int>(cy + 3.0f), iconColor);
-            break;
-        }
-        }
-    }
+    // The application bar is drawn by UIManager above this page content, so the
+    // page only supplies its own heading. Title and subtitle are inset past the
+    // navigation rail so the rail never crowds the text.
+    const float headingX = ui::contentGutter() + ui::kGapLoose;
+    text(title, headingX, ui::contentTop(), 26, t.text);
+    text(subtitle, headingX, ui::contentTop() + 32.0f, 13, t.textMuted);
 }
 
 void HUD::selectedInfo(const Simulation& simulation) const {
-    // Hide selection panel when in G (gravity) mode - gravity overlay shows the info
-    if (simulation.gravityMode) return;
-    if (simulation.selected < 0 || simulation.selected >= static_cast<int>(simulation.bodies.size())) return;
+    // Reveal the live inspector with a short, non-blocking transition when the
+    // selected object changes. This state is presentation-only.
+    const bool hasSelection = simulation.selected >= 0 &&
+                              simulation.selected < static_cast<int>(simulation.bodies.size()) &&
+                              !simulation.gravityMode;
+    if (simulation.selected != g_lastInspectorSelection) {
+        g_lastInspectorSelection = simulation.selected;
+        g_inspectorReveal = hasSelection ? 0.0f : 1.0f;
+    }
+    const float target = hasSelection ? 1.0f : 0.0f;
+    const float blend = 1.0f - std::exp(-14.0f * std::max(0.001f, GetFrameTime()));
+    g_inspectorReveal += (target - g_inspectorReveal) * blend;
+    if (std::abs(target - g_inspectorReveal) < 0.001f) g_inspectorReveal = target;
+    if (!hasSelection || g_inspectorReveal < 0.01f) return;
+    const float reveal = g_inspectorReveal;
     const Body& body = simulation.bodies[static_cast<std::size_t>(simulation.selected)];
     const CelestialBodyInfo info = lookupCelestialInfo(body.id, body.type, body.luminous);
     const auto& t = theme();
-    const ui::HudLayout layout = ui::buildHudLayout(static_cast<float>(GetScreenWidth()),
-                                               static_cast<float>(GetScreenHeight()),
-                                               true, simulation.soloStudy || simulation.earthMoonFocus);
-    const Rectangle box = layout.inspector;
-    ui::drawGlassPanel(box, true, 0.08f);
+    // The reveal offset is presentation-only and is applied to a copy, so the
+    // pointer-ownership rect in ChromeLayout always covers the settled panel.
+    const Rectangle box = shellLayout_.inspector;
+    Rectangle animatedBox = box;
+    animatedBox.x += (1.0f - reveal) * 18.0f;
+    animatedBox.y += (1.0f - reveal) * 8.0f;
+    const Rectangle drawBox = animatedBox;
+    raym3::Card(drawBox, raym3::CardVariant::Elevated);
 
-    DrawCircle(static_cast<int>(box.x + 18.0f), static_cast<int>(box.y + 20.0f), 4.5f, t.accentStrong);
-    text(body.name.c_str(), box.x + 30.0f, box.y + 11.0f, 16.0f, t.text);
+    raym3::Text(body.name.c_str(), {drawBox.x + 30.0f, drawBox.y + 10.0f, drawBox.width - 42.0f, 22.0f}, 16.0f, t.text, raym3::FontWeight::Bold);
+    raym3::Text(classificationLabel(info.classification), {drawBox.x + 30.0f, drawBox.y + 30.0f, drawBox.width - 42.0f, 16.0f}, 10.0f, t.textDim, raym3::FontWeight::Medium);
 
-    text(classificationLabel(info.classification), box.x + 30.0f, box.y + 30.0f, 10.0f, t.textDim);
-
-    const float thumbCx = box.x + 48.0f;
-    const float thumbCy = box.y + 88.0f;
+    const float thumbCx = drawBox.x + 48.0f;
+    const float thumbCy = drawBox.y + 88.0f;
     const float thumbR = 26.0f;
     DrawCircleGradient({thumbCx, thumbCy}, thumbR + 8.0f,
                        withAlpha({body.accent.r, body.accent.g, body.accent.b, 255}, 0.35f),
@@ -395,124 +194,129 @@ void HUD::selectedInfo(const Simulation& simulation) const {
                    withAlpha({body.accent.r, body.accent.g, body.accent.b, 255}, 0.9f));
     }
 
-    const float valX = box.x + 92.0f;
+    const float valX = drawBox.x + 92.0f;
     const float offset = 120.0f;
     const double displayMass = body.mass > 0.0 ? body.mass : body.baseMass;
-    ui::drawLabelValue("Mass", (scientific(displayMass) + " kg").c_str(), valX, box.y + 54.0f, offset);
-    ui::drawLabelValue("Radius", distance(body.realRadius).c_str(), valX, box.y + 74.0f, offset);
+    ui::drawLabelValue("Mass", (scientific(displayMass) + " kg").c_str(), valX, drawBox.y + 54.0f, offset);
+    ui::drawLabelValue("Radius", distance(body.realRadius).c_str(), valX, drawBox.y + 74.0f, offset);
 
     if (info.classification == BodyClassification::Star) {
-        ui::drawLabelValue("Role", info.role ? info.role : "Central star", valX, box.y + 94.0f, offset);
+        ui::drawLabelValue("Role", info.role ? info.role : "Central star", valX, drawBox.y + 94.0f, offset);
     } else if (info.classification == BodyClassification::NaturalSatellite) {
         ui::drawLabelValue("Parent", info.parentBodyId ? info.parentBodyId : body.parentId.c_str(),
-                           valX, box.y + 94.0f, offset);
+                           valX, drawBox.y + 94.0f, offset);
     } else if (info.orderFromSun > 0) {
         ui::drawLabelValue("Order", (std::string(ordinalFromSun(info.orderFromSun)) + " from Sun").c_str(),
-                           valX, box.y + 94.0f, offset);
+                           valX, drawBox.y + 94.0f, offset);
     } else {
         ui::drawLabelValue("Position", distance(simulation.distanceFromSun(body)).c_str(),
-                           valX, box.y + 94.0f, offset);
+                           valX, drawBox.y + 94.0f, offset);
     }
 
     ui::drawLabelValue("Velocity", (format(length(body.velocity) / 1000.0, 2) + " km/s").c_str(),
-                       box.x + 18.0f, box.y + 124.0f, 140.0f);
+                       drawBox.x + 18.0f, drawBox.y + 124.0f, 140.0f);
+
+    bool accelerationValid = false;
+    const Vec3 acceleration = PhysicsEngine::acceleration(simulation.bodies,
+        static_cast<std::size_t>(simulation.selected), {}, &accelerationValid);
+    if (simulation.educationalVisualization() && accelerationValid) {
+        ui::drawLabelValue("Acceleration", (scientific(length(acceleration), 2) + " m/s²").c_str(),
+                           drawBox.x + 18.0f, drawBox.y + 144.0f, 140.0f);
+        ui::drawLabelValue("Distance to Sun", distance(simulation.distanceFromSun(body)).c_str(),
+                           drawBox.x + 18.0f, drawBox.y + 164.0f, 140.0f);
+        text("AMBER ARROW = NET GRAVITY", drawBox.x + 18.0f, drawBox.y + 190.0f, 10.0f, t.warn);
+        return;
+    }
 
     if (info.classification == BodyClassification::Star) {
         ui::drawLabelValue("Spectral", info.spectralClass ? info.spectralClass : "—",
-                           box.x + 18.0f, box.y + 144.0f, 140.0f);
+                           drawBox.x + 18.0f, drawBox.y + 144.0f, 140.0f);
         ui::drawLabelValue("Energy", info.energySource ? info.energySource : "Fusion",
-                           box.x + 18.0f, box.y + 164.0f, 140.0f);
+                           drawBox.x + 18.0f, drawBox.y + 164.0f, 140.0f);
         ui::drawLabelValue("Surface g", (format(simulation.surfaceGravity(body), 2) + " m/s²").c_str(),
-                           box.x + 18.0f, box.y + 184.0f, 140.0f);
+                           drawBox.x + 18.0f, drawBox.y + 184.0f, 140.0f);
     } else {
         const double periodDays = body.orbitalPeriod > 0.0 ? (body.orbitalPeriod / PhysicsEngine::DAY) : 0.0;
         ui::drawLabelValue("Orbital Period", (periodDays > 0.0 ? format(periodDays, 2) + " days" : "—").c_str(),
-                           box.x + 18.0f, box.y + 144.0f, 140.0f);
+                           drawBox.x + 18.0f, drawBox.y + 144.0f, 140.0f);
         ui::drawLabelValue("Rotation", dayLengthLabel(body.rotationPeriod).c_str(),
-                           box.x + 18.0f, box.y + 164.0f, 140.0f);
+                           drawBox.x + 18.0f, drawBox.y + 164.0f, 140.0f);
         ui::drawLabelValue("Surface g", (format(simulation.surfaceGravity(body), 2) + " m/s²").c_str(),
-                           box.x + 18.0f, box.y + 184.0f, 140.0f);
+                           drawBox.x + 18.0f, drawBox.y + 184.0f, 140.0f);
     }
 
-    DrawLine(static_cast<int>(box.x + 16.0f), static_cast<int>(box.y + 208.0f),
-             static_cast<int>(box.x + box.width - 16.0f), static_cast<int>(box.y + 208.0f),
-             withAlpha(t.border, 0.7f));
+    raym3::Divider({drawBox.x + 16.0f, drawBox.y + 208.0f, drawBox.width - 32.0f, 1.0f});
 
     if (info.naturalSatelliteCount > 0 && info.classification != BodyClassification::NaturalSatellite) {
-        text("NATURAL SATELLITES", box.x + 18.0f, box.y + 218.0f, 11.0f, t.accent);
+        text("NATURAL SATELLITES", drawBox.x + 18.0f, drawBox.y + 218.0f, 11.0f, t.accent);
         ui::drawLabelValue("Count", std::to_string(info.naturalSatelliteCount).c_str(),
-                           box.x + 18.0f, box.y + 238.0f, 140.0f);
+                           drawBox.x + 18.0f, drawBox.y + 238.0f, 140.0f);
         if (info.largestPlanet) {
-            text("Largest planet in the Solar System", box.x + 18.0f, box.y + 258.0f, 11.0f, t.textMuted);
+            text("Largest planet in the Solar System", drawBox.x + 18.0f, drawBox.y + 258.0f, 11.0f, t.textMuted);
         }
     } else {
-        text("EDUCATIONAL NOTE", box.x + 18.0f, box.y + 218.0f, 11.0f, t.accent);
+        text("EDUCATIONAL NOTE", drawBox.x + 18.0f, drawBox.y + 218.0f, 11.0f, t.accent);
         const std::string note = info.description ? info.description : simulation.selectedBodyLesson();
-        drawWrapped(note, box.x + 18.0f, box.y + 238.0f, box.width - 36.0f, 11, t.textMuted, 3);
+        drawWrapped(note, drawBox.x + 18.0f, drawBox.y + 238.0f, drawBox.width - 36.0f, 11, t.textMuted, 3);
     }
 
     if (simulation.soloStudy || simulation.earthMoonFocus) {
         const char* modeNote = simulation.earthMoonFocus
             ? "Earth–Moon Focus · Press Q to return"
             : "Study Mode · Press Q to return";
-        text(modeNote, box.x + 18.0f, box.y + box.height - 28.0f, 11.0f, t.accentStrong);
+        text(modeNote, drawBox.x + 18.0f, drawBox.y + drawBox.height - 28.0f, 11.0f, t.accentStrong);
     }
 }
 
-void HUD::classificationOverlay(const Simulation& simulation) const {
-    // Classification details have been moved into selectedInfo panel
-    // This panel is now hidden to consolidate UI
-    return;
+void HUD::learningExplanation(const Simulation& simulation) const {
+    if (!simulation.educationalVisualization() || simulation.selected < 0 ||
+        simulation.selected >= static_cast<int>(simulation.bodies.size())) return;
+
     const auto& t = theme();
-    const float screenW = static_cast<float>(GetScreenWidth());
-    const Rectangle box = {screenW - 300.0f - 16.0f, ui::topBarHeight() + 14.0f, 300.0f, 280.0f};
-    ui::drawGlassPanel(box, true, 0.1f);
-
-    text("NAMES & CLASSIFICATION", box.x + 14.0f, box.y + 12.0f, 11.0f, t.accent);
-    text("Ctrl+N to close", box.x + 14.0f, box.y + 28.0f, 10.0f, t.textDim);
-
-    if (simulation.selected < 0 || simulation.selected >= static_cast<int>(simulation.bodies.size())) {
-        text("Select a body to inspect its", box.x + 14.0f, box.y + 60.0f, 12.0f, t.textMuted);
-        text("astronomical classification.", box.x + 14.0f, box.y + 78.0f, 12.0f, t.textMuted);
-        return;
-    }
-
     const Body& body = simulation.bodies[static_cast<std::size_t>(simulation.selected)];
-    const CelestialBodyInfo info = lookupCelestialInfo(body.id, body.type, body.luminous);
+    const Body* source = nullptr;
+    double strongestPull = 0.0;
+    for (const Body& candidate : simulation.bodies) {
+        if (!candidate.active || &candidate == &body || candidate.mass <= 0.0) continue;
+        const Vec3 delta = candidate.position - body.position;
+        const double distanceSquared = dot(delta, delta);
+        if (distanceSquared <= 1.0) continue;
+        const double pull = PhysicsEngine::G * candidate.mass / distanceSquared;
+        if (pull > strongestPull) { strongestPull = pull; source = &candidate; }
+    }
+    if (source == nullptr) return;
 
-    std::string title = body.name;
-    for (char& c : title) c = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
-    text(title.c_str(), box.x + 14.0f, box.y + 52.0f, 18.0f, t.text);
+    // Amber arrow = net N-body acceleration. The caption names the strongest
+    // single attractor so the lesson stays readable for multi-body systems.
+    const Vec3 towardSource = source->position - body.position;
+    const double radius = length(towardSource);
+    const double radialVelocity = radius > 0.0 ? dot(body.velocity, towardSource) / radius : 0.0;
+    const double speed = length(body.velocity);
+    std::string message;
+    if (simulation.visualizationMode == VisualizationMode::ExploreKids) {
+        message = "Gravity is pulling " + body.name + " toward " + source->name + ".";
+        if (speed > 1.0 && std::abs(radialVelocity) < speed * 0.65) {
+            message += " It is also moving sideways, so its path curves.";
+        }
+    } else if (radialVelocity < -speed * 0.65) {
+        message = body.name + " is falling toward " + source->name +
+            "; gravity is changing its velocity. (Amber arrow = net pull from all bodies.)";
+    } else if (std::abs(radialVelocity) < speed * 0.65) {
+        message = body.name + " moves forward while gravity pulls inward toward " +
+            source->name + ". Together, these make a curved orbit.";
+    } else {
+        message = "Gravity pulls " + body.name + " toward " + source->name +
+            ", even as it moves away. Gravity always acts — not only when falling.";
+    }
 
-    float y = box.y + 82.0f;
-    ui::drawLabelValue("Type", classificationLabel(info.classification), box.x + 14.0f, y, 140.0f);
-    y += 22.0f;
-    if (info.orderFromSun > 0) {
-        ui::drawLabelValue("Order from Sun", ordinalFromSun(info.orderFromSun), box.x + 14.0f, y, 140.0f);
-        y += 22.0f;
-    }
-    if (info.classification == BodyClassification::NaturalSatellite) {
-        ui::drawLabelValue("Parent Body", info.parentBodyId ? info.parentBodyId : "—", box.x + 14.0f, y, 140.0f);
-        y += 22.0f;
-    }
-    if (info.naturalSatelliteCount > 0 && info.classification != BodyClassification::NaturalSatellite) {
-        ui::drawLabelValue("Natural Satellites", std::to_string(info.naturalSatelliteCount).c_str(),
-                           box.x + 14.0f, y, 140.0f);
-        y += 22.0f;
-    }
-    if (info.largestPlanet) {
-        ui::drawLabelValue("Largest Planet", "Yes", box.x + 14.0f, y, 140.0f);
-        y += 22.0f;
-    }
-    if (info.spectralClass) {
-        ui::drawLabelValue("Spectral class", info.spectralClass, box.x + 14.0f, y, 140.0f);
-        y += 22.0f;
-    }
-    if (info.role) {
-        ui::drawLabelValue("Role", info.role, box.x + 14.0f, y, 140.0f);
-        y += 22.0f;
-    }
-    ui::drawLabelValue("System", "Solar System", box.x + 14.0f, y, 140.0f);
+    const float width = std::min(520.0f, static_cast<float>(GetScreenWidth()) - 120.0f);
+    // Sit above the scale/mode badge so both remain readable.
+    const Rectangle panel = {(static_cast<float>(GetScreenWidth()) - width) * 0.5f,
+                             static_cast<float>(GetScreenHeight()) - 132.0f, width, 56.0f};
+    raym3::Card(panel, raym3::CardVariant::Elevated);
+
+    text(visualizationModeName(simulation.visualizationMode), panel.x + 14.0f, panel.y + 8.0f, 10.0f, t.accentStrong);
+    drawWrapped(message, panel.x + 14.0f, panel.y + 22.0f, panel.width - 28.0f, 12, t.text, 2);
 }
 
 void HUD::forcesMotionOverlay(const Simulation& simulation) const {
@@ -523,7 +327,7 @@ void HUD::forcesMotionOverlay(const Simulation& simulation) const {
     // Shift down if classification is also open
     const float y0 = simulation.showClassification ? box.y + 290.0f : box.y;
     const Rectangle panel = {box.x, y0, box.width, 300.0f};
-    ui::drawGlassPanel(panel, true, 0.1f);
+    raym3::Card(panel, raym3::CardVariant::Elevated);
 
     text("FORCES & MOTION", panel.x + 14.0f, panel.y + 12.0f, 12.0f, t.accent);
     text("VECTOR LEGEND", panel.x + 14.0f, panel.y + 34.0f, 10.0f, t.textDim);
@@ -556,8 +360,8 @@ void HUD::gravityModeOverlay(const Simulation& simulation) const {
     const auto& t = theme();
     // Expanded panel (350x380) to fit centripetal/centrifugal calculations
     const float screenH = static_cast<float>(GetScreenHeight());
-    const Rectangle panel = {ui::pagePad() + 58.0f, screenH - 380.0f - 14.0f, 350.0f, 380.0f};
-    ui::drawGlassPanel(panel, true, 0.1f);
+    const Rectangle panel = {ui::contentGutter() + 58.0f, screenH - 380.0f - 14.0f, 350.0f, 380.0f};
+    raym3::Card(panel, raym3::CardVariant::Elevated);
 
     text("GRAVITY - INTERACTIVE", panel.x + 14.0f, panel.y + 8.0f, 11.0f, t.accent);
     text("↑/↓ adjust  TAB cycle  R reset  Q exit", panel.x + 14.0f, panel.y + 22.0f, 9.0f, t.textDim);
@@ -646,7 +450,7 @@ void HUD::earthMoonOverlay(const Simulation& simulation) const {
     const auto& t = theme();
     const float screenW = static_cast<float>(GetScreenWidth());
     const Rectangle panel = {screenW * 0.5f - 200.0f, ui::topBarHeight() + 14.0f, 400.0f, 200.0f};
-    ui::drawGlassPanel(panel, true, 0.08f);
+    raym3::Card(panel, raym3::CardVariant::Elevated);
 
     text("EARTH–MOON SYSTEM", panel.x + 16.0f, panel.y + 12.0f, 13.0f, t.accent);
     text("Earth", panel.x + 16.0f, panel.y + 40.0f, 12.0f, t.text);
@@ -662,123 +466,111 @@ void HUD::earthMoonOverlay(const Simulation& simulation) const {
 
 void HUD::scaleModeBadge(const Simulation& simulation) const {
     const auto& t = theme();
-    const char* label = visualScaleModeLabel(simulation.visualScaleMode);
+    const std::string mode = std::string(visualScaleModeLabel(simulation.visualScaleMode)) +
+        "   ·   " + visualizationModeName(simulation.visualizationMode) + "   F10";
+    const char* label = mode.c_str();
+
+    // Rendered through raym3 rather than DrawText. raylib's default font is
+    // ASCII-only, so the "•" separator used here came out as a literal "?", and
+    // MeasureText could not size it either -- the badge was both wrong and
+    // mis-sized. Roboto covers the separator.
+    //
+    // Width is estimated from the character count at Roboto's average advance
+    // rather than measured, because raym3 exposes no text-measurement API. The
+    // estimate is padded, so the pill is never too narrow for its label.
+    const float fontSize = 11.0f;
+    const float textW = static_cast<float>(std::strlen(label)) * fontSize * 0.54f;
     const float screenW = static_cast<float>(GetScreenWidth());
-    const float textW = static_cast<float>(MeasureText(label, 11));
-    const Rectangle badge = {screenW * 0.5f - (textW + 28.0f) * 0.5f,
-                             static_cast<float>(GetScreenHeight()) - 58.0f,
-                             textW + 28.0f, 22.0f};
-    DrawRectangleRounded(badge, 0.4f, 6, withAlpha(t.surfaceAlt, 0.85f));
-    DrawRectangleRoundedLines(badge, 0.4f, 6, withAlpha(t.borderSoft, 0.9f));
-    DrawText(label, static_cast<int>(badge.x + 14.0f), static_cast<int>(badge.y + 5.0f), 11,
-             simulation.visualScaleMode == VisualScaleMode::Realistic ? t.warn : t.textDim);
+    const Rectangle badge = {screenW * 0.5f - (textW + 32.0f) * 0.5f,
+                             static_cast<float>(GetScreenHeight()) - 54.0f,
+                             textW + 32.0f, 24.0f};
+    DrawRectangleRounded(badge, 0.42f, 8, withAlpha(t.surfaceAlt, 0.86f));
+    DrawRectangleRoundedLines(badge, 0.42f, 8, withAlpha(t.borderSoft, 0.9f));
+    raym3::Text(label, badge, fontSize,
+                simulation.visualScaleMode == VisualScaleMode::Realistic ? t.warn : t.textDim,
+                raym3::FontWeight::Medium, raym3::TextAlignment::Center);
 }
 
-void HUD::viewControls(const Simulation& simulation) const {
+// View presets as a segmented control. These are mutually exclusive framings, so
+// a segmented control states that exclusivity directly: exactly one is selected
+// at all times, and the whole segment is the target rather than a small glyph.
+//
+// This replaces a hand-rolled row of rectangles that measured its own labels
+// with raylib's default font while the shell rendered the same labels in Roboto,
+// and that computed a drag threshold against a moving pointer. Clicking it felt
+// unreliable because the hit region and the painted region were computed
+// independently.
+void HUD::viewControls(Simulation& simulation, Renderer& renderer) const {
     const auto& t = theme();
-    const ui::HudLayout layout = ui::buildHudLayout(static_cast<float>(GetScreenWidth()),
-                                               static_cast<float>(GetScreenHeight()),
-                                               simulation.selected >= 0, simulation.soloStudy);
-    const Rectangle box = layout.viewControls;
-    ui::drawGlassPanel(box, false, 0.08f);
+    const Rectangle box = shellLayout_.viewControls;
+    if (box.width <= 0.0f || box.height <= 0.0f) return;
 
-    // Header
-    text("VIEW CONTROLS", box.x + 14.0f, box.y + 8.0f, 10.0f, t.textDim);
-    text("⌃", box.x + box.width - 20.0f, box.y + 8.0f, 11.0f, t.textDim);
+    raym3::Card(box, raym3::CardVariant::Filled);
 
-    // 3 Buttons: Solar View (F1), Earth Orbit (F2), Empty Space (F3)
-    const Vector2 mouse = GetMousePosition();
-    const float btnW = (box.width - 28.0f) / 3.0f;
-    const float btnH = 46.0f;
-    const float btnY = box.y + 24.0f;
+    raym3::Text("VIEW PRESETS", {box.x + 14.0f, box.y + 9.0f, box.width - 28.0f, 14.0f},
+                9.0f, t.textDim, raym3::FontWeight::Bold);
 
-    struct ViewBtn { const char* label; const char* badge; const char* scenario; };
-    constexpr ViewBtn kViews[] = {
-        {"Solar View", "F1", "default_solar_system"},
-        {"Earth–Moon", "F2", "earth_orbit"},
-        {"Empty Space", "F3", "empty_space"},
+    enum class Preset { Solar, EarthMoon, Empty };
+    Preset active = Preset::Solar;
+    if (simulation.earthMoonFocus) {
+        active = Preset::EarthMoon;
+    } else if (simulation.scenarioId == "empty_space") {
+        active = Preset::Empty;
+    }
+
+    raym3::SegmentedButtonItem items[] = {
+        {"Solar", nullptr, false},
+        {"Earth–Moon", nullptr, false},
+        {"Empty", nullptr, false},
     };
 
-    for (int i = 0; i < 3; ++i) {
-        const Rectangle btnRect = {box.x + 10.0f + i * (btnW + 4.0f), btnY, btnW, btnH};
-        const bool isCur = (i == 1)
-            ? simulation.earthMoonFocus
-            : (simulation.scenarioId == kViews[i].scenario && !simulation.earthMoonFocus);
-        const bool hover = CheckCollisionPointRec(mouse, btnRect);
-
-        DrawRectangleRounded(btnRect, 0.2f, 8, isCur ? withAlpha(t.accent, 0.2f) : withAlpha(t.surfaceAlt, 0.65f));
-        DrawRectangleRoundedLines(btnRect, 0.2f, 8, isCur ? t.accent : withAlpha(t.borderSoft, 0.8f));
-
-        // Icon
-        const float cx = btnRect.x + btnRect.width * 0.5f;
-        if (i == 0) { // Solar icon
-            DrawCircleLines(static_cast<int>(cx), static_cast<int>(btnRect.y + 12.0f), 5.0f, isCur ? t.accentStrong : t.textMuted);
-            DrawCircle(static_cast<int>(cx), static_cast<int>(btnRect.y + 12.0f), 2.0f, t.warn);
-        } else if (i == 1) { // Earth orbit icon
-            DrawCircleLines(static_cast<int>(cx), static_cast<int>(btnRect.y + 12.0f), 6.0f, isCur ? t.accentStrong : t.textMuted);
-            DrawCircle(static_cast<int>(cx + 4.0f), static_cast<int>(btnRect.y + 10.0f), 2.0f, t.accent);
-        } else { // Empty space icon
-            DrawCircleLines(static_cast<int>(cx), static_cast<int>(btnRect.y + 12.0f), 5.0f, isCur ? t.accentStrong : t.textMuted);
-        }
-
-        const int fontSize = 10;
-        const float textW = static_cast<float>(MeasureText(kViews[i].label, fontSize));
-        DrawText(kViews[i].label, static_cast<int>(cx - textW * 0.5f), static_cast<int>(btnRect.y + 22.0f), fontSize,
-                 isCur ? t.text : (hover ? t.accentStrong : t.textMuted));
-        const float badgeW = static_cast<float>(MeasureText(kViews[i].badge, 9));
-        DrawText(kViews[i].badge, static_cast<int>(cx - badgeW * 0.5f), static_cast<int>(btnRect.y + 34.0f), 9, t.textDim);
-    }
-}
-
-void HUD::visualizationControls(const Simulation& simulation) const {
-    const auto& t = theme();
-    const ui::HudLayout layout = ui::buildHudLayout(static_cast<float>(GetScreenWidth()),
-                                               static_cast<float>(GetScreenHeight()),
-                                               simulation.selected >= 0, simulation.soloStudy);
-    const Rectangle box = layout.visualizationToggles;
-    ui::drawGlassPanel(box, false, 0.45f);
-
-    struct ToggleItem { const char* label; bool active; };
-    const ToggleItem items[] = {
-        {"Orbits", simulation.showOrbits},
-        {"Trails", simulation.showTrails},
-        {"Forces", simulation.showVectors},
-        {"Gravity", simulation.gravityMode},
-    };
-
-    const float itemW = box.width / 4.0f;
-    for (int i = 0; i < 4; ++i) {
-        const float itemX = box.x + i * itemW;
-        text(items[i].label, itemX + 8.0f, box.y + 11.0f, 11.0f, items[i].active ? t.text : t.textMuted);
-
-        // Rounded pill toggle switch
-        const float pillX = itemX + itemW - 28.0f;
-        const float pillY = box.y + 10.0f;
-        const Rectangle pillRect = {pillX, pillY, 24.0f, 14.0f};
-
-        DrawRectangleRounded(pillRect, 0.5f, 8, items[i].active ? withAlpha(t.accent, 0.5f) : withAlpha(t.surfaceAlt, 0.9f));
-        DrawRectangleRoundedLines(pillRect, 0.5f, 8, items[i].active ? t.accent : withAlpha(t.borderSoft, 0.8f));
-
-        const float knobX = items[i].active ? (pillX + 17.0f) : (pillX + 7.0f);
-        const float knobY = pillY + 7.0f;
-        DrawCircle(static_cast<int>(knobX), static_cast<int>(knobY), 4.5f, items[i].active ? t.text : t.textDim);
-        if (items[i].active) {
-            DrawCircleGradient({knobX, knobY}, 7.0f, withAlpha(t.accentStrong, 0.4f), withAlpha(t.accentStrong, 0.0f));
+    int selected = static_cast<int>(active);
+    const Rectangle strip = {box.x + 12.0f, box.y + 28.0f, box.width - 24.0f, 32.0f};
+    if (raym3::SegmentedButton(strip, items, 3, &selected)) {
+        switch (static_cast<Preset>(selected)) {
+        case Preset::Solar:
+            simulation.earthMoonFocus = false;
+            if (simulation.loadScenario("default_solar_system")) renderer.resetSystemView();
+            break;
+        case Preset::EarthMoon:
+            if (simulation.loadScenario("earth_orbit")) {
+                for (int index = 0; index < static_cast<int>(simulation.bodies.size()); ++index) {
+                    const auto& body = simulation.bodies[static_cast<std::size_t>(index)];
+                    if (body.id == "earth" && body.active) {
+                        simulation.selectBody(index);
+                        simulation.isolateSelected();
+                        simulation.earthMoonFocus = true;
+                        break;
+                    }
+                }
+                if (!simulation.earthMoonFocus) {
+                    simulation.earthMoonFocus = true;
+                    renderer.focusEarthMoonSystem(simulation, true);
+                }
+            }
+            break;
+        case Preset::Empty:
+            simulation.earthMoonFocus = false;
+            if (simulation.loadScenario("empty_space")) renderer.resetSystemView();
+            break;
         }
     }
+
+    // Shortcut legend, so the keyboard contract is discoverable. Placed below
+    // the segment, inside the card's bottom padding.
+    raym3::Text("F1  ·  F2  ·  F3", {box.x + 14.0f, box.y + 66.0f,
+                                     box.width - 28.0f, 12.0f}, 9.0f, t.textDim,
+                raym3::FontWeight::Medium);
 }
 
 void HUD::orientationIndicator(float cameraYaw) const {
     const auto& t = theme();
-    const ui::HudLayout layout = ui::buildHudLayout(static_cast<float>(GetScreenWidth()),
-                                               static_cast<float>(GetScreenHeight()),
-                                               false, false);
-    const float cx = layout.orientationCompass.x + layout.orientationCompass.width * 0.5f;
-    const float cy = layout.orientationCompass.y + layout.orientationCompass.height * 0.5f;
+    const float cx = shellLayout_.compass.x + shellLayout_.compass.width * 0.5f;
+    const float cy = shellLayout_.compass.y + shellLayout_.compass.height * 0.5f;
     const float r = 24.0f;
 
-    DrawCircleLines(static_cast<int>(cx), static_cast<int>(cy), r, withAlpha(t.accent, 0.55f));
-    DrawCircleLines(static_cast<int>(cx), static_cast<int>(cy), r * 0.5f, withAlpha(t.borderSoft, 0.5f));
+    DrawCircleLines(static_cast<int>(cx), static_cast<int>(cy), r, withAlpha(t.accent, 0.42f));
+    DrawCircleLines(static_cast<int>(cx), static_cast<int>(cy), r * 0.5f, withAlpha(t.border, 0.5f));
 
     // Compass crosshair ticks
     DrawLine(static_cast<int>(cx - r), static_cast<int>(cy), static_cast<int>(cx - r + 5.0f), static_cast<int>(cy), t.accent);
@@ -800,17 +592,17 @@ void HUD::orientationIndicator(float cameraYaw) const {
     DrawCircle(static_cast<int>(cx), static_cast<int>(cy), 2.0f, t.accentStrong);
 }
 
-void HUD::draw(const Simulation& simulation, float cameraYaw) const {
+void HUD::draw(Simulation& simulation, Renderer& renderer, float cameraYaw) const {
     switch (simulation.screen) {
     case AppScreen::Simulation:
-        topBar(simulation);
-        toolRail(simulation);
-        viewControls(simulation);
+        // The raym3 shell owns the application bar, navigation rail, tab strip,
+        // and primary display controls. Keep the scientific HUD's contextual
+        // panels and educational overlays below.
+        viewControls(simulation, renderer);
         selectedInfo(simulation);
-        visualizationControls(simulation);
+        learningExplanation(simulation);
         orientationIndicator(cameraYaw);
         scaleModeBadge(simulation);
-        classificationOverlay(simulation);
         forcesMotionOverlay(simulation);
         gravityModeOverlay(simulation);
         earthMoonOverlay(simulation);
@@ -828,13 +620,13 @@ void HUD::draw(const Simulation& simulation, float cameraYaw) const {
 
 void HUD::educationScreenPanel(const Simulation& simulation) const {
     const auto& t = theme();
-    pageChrome(simulation, "Learn", "Guided orbital-mechanics lessons, experiments, and challenges");
+    pageChrome("Learn", "Guided orbital-mechanics lessons, experiments, and challenges");
     const LearnerReport report = buildLearnerReport(simulation.educationProgress);
     const AuthoredLesson& lesson = authoredLessonAt(simulation.lesson);
 
-    const Rectangle left = {ui::pagePad(), ui::contentTop() + 70.0f, 340.0f, 560.0f};
-    const Rectangle mid = {ui::pagePad() + 360.0f, ui::contentTop() + 70.0f, 420.0f, 560.0f};
-    const Rectangle right = {ui::pagePad() + 800.0f, ui::contentTop() + 70.0f, 340.0f, 560.0f};
+    const Rectangle left = {ui::contentGutter(), ui::contentTop() + 70.0f, 340.0f, 560.0f};
+    const Rectangle mid = {ui::contentGutter() + 360.0f, ui::contentTop() + 70.0f, 420.0f, 560.0f};
+    const Rectangle right = {ui::contentGutter() + 800.0f, ui::contentTop() + 70.0f, 340.0f, 560.0f};
     ui::drawPanel(left);
     ui::drawPanel(mid);
     ui::drawPanel(right);
@@ -892,15 +684,15 @@ void HUD::educationScreenPanel(const Simulation& simulation) const {
          right.x + 20, right.y + 348, 15, t.accentStrong);
 
     text("A / D browse   Enter start   B observe   Y evaluate   N next   Esc back",
-         ui::pagePad(), static_cast<float>(GetScreenHeight()) - 28.0f, 13, t.textDim);
+         ui::contentGutter(), static_cast<float>(GetScreenHeight()) - 28.0f, 13, t.textDim);
 }
 
 void HUD::learningLabScreenPanel(const Simulation& simulation) const {
     const auto& t = theme();
-    pageChrome(simulation, "Learning Lab", "Ghana curriculum activities on the shared simulation engine");
+    pageChrome("Learning Lab", "Ghana curriculum activities on the shared simulation engine");
 
     if (!simulation.curriculumReady) {
-        const Rectangle box = {ui::pagePad(), ui::contentTop() + 70.0f, 900.0f, 140.0f};
+        const Rectangle box = {ui::contentGutter(), ui::contentTop() + 70.0f, 900.0f, 140.0f};
         ui::drawPanel(box);
         text("Curriculum pack failed to load", box.x + 24, box.y + 36, 20, t.warn);
         DrawTextEx(GetFontDefault(), simulation.curriculumLoadError.c_str(),
@@ -912,11 +704,11 @@ void HUD::learningLabScreenPanel(const Simulation& simulation) const {
     const std::string gradeLabel = simulation.curriculumI18n.translate(gradeKey, gradeIdString(simulation.learnerGrade));
     text((gradeLabel + "  ·  " + presentationLayerName(simulation.learnerPresentationLayer()) +
           "  ·  " + simulation.curriculumCatalog.manifest.curriculumVersion).c_str(),
-         ui::pagePad(), ui::contentTop() + 58.0f, 14, t.textMuted);
+         ui::contentGutter(), ui::contentTop() + 58.0f, 14, t.textMuted);
 
     const auto activities = simulation.activitiesForLearnerGrade();
-    const Rectangle left = {ui::pagePad(), ui::contentTop() + 90.0f, 360.0f, 520.0f};
-    const Rectangle right = {ui::pagePad() + 380.0f, ui::contentTop() + 90.0f, 760.0f, 520.0f};
+    const Rectangle left = {ui::contentGutter(), ui::contentTop() + 90.0f, 360.0f, 520.0f};
+    const Rectangle right = {ui::contentGutter() + 380.0f, ui::contentTop() + 90.0f, 760.0f, 520.0f};
     ui::drawPanel(left);
     ui::drawPanel(right);
 
@@ -1004,22 +796,22 @@ void HUD::learningLabScreenPanel(const Simulation& simulation) const {
     }
 
     text("[ ] grade   A/D activity   Enter start   N next   1–6 answers   C submit   Esc back",
-         ui::pagePad(), static_cast<float>(GetScreenHeight()) - 28.0f, 13, t.textDim);
+         ui::contentGutter(), static_cast<float>(GetScreenHeight()) - 28.0f, 13, t.textDim);
 }
 
 void HUD::scenarioScreen(const Simulation& simulation) const {
     const auto& t = theme();
-    pageChrome(simulation, "Scenes", "Choose a starting system for the laboratory");
+    pageChrome("Scenes", "Choose a starting system for the laboratory");
 
     const struct Scenario { const char* id; const char* title; const char* description; const char* bodies; } scenarios[] = {
-        {"default_solar_system", "Solar System", "Sun, planets, Moon, and BAGSOLAR-1.", "11 bodies"},
+        {"default_solar_system", "Solar System", "Sun, planets, Moon, and expanded major moons.", "30 bodies"},
         {"earth_orbit", "Earth Orbit", "Focused Sun–Earth–Moon study.", "3 bodies"},
         {"empty_space", "Empty Space", "Blank scene for custom systems.", "0 bodies"},
     };
 
     for (int index = 0; index < 3; ++index) {
         const float y = ui::contentTop() + 80.0f + index * 110.0f;
-        const Rectangle card = {ui::pagePad(), y, 720.0f, 92.0f};
+        const Rectangle card = {ui::contentGutter(), y, 720.0f, 92.0f};
         const bool selected = index == simulation.scenarioBrowserSelection;
         ui::drawPanel(card, selected);
         if (selected) DrawRectangleRoundedLines(card, 0.08f, 16, t.accent);
@@ -1028,7 +820,7 @@ void HUD::scenarioScreen(const Simulation& simulation) const {
         text(scenarios[index].bodies, card.x + 560, card.y + 36, 14, t.accentStrong);
     }
 
-    const Rectangle side = {ui::pagePad() + 760.0f, ui::contentTop() + 80.0f, 380.0f, 320.0f};
+    const Rectangle side = {ui::contentGutter() + 760.0f, ui::contentTop() + 80.0f, 380.0f, 320.0f};
     ui::drawPanel(side);
     text("Current", side.x + 22, side.y + 22, 12, t.accent);
     text(simulation.scenarioMetadata.name.c_str(), side.x + 22, side.y + 52, 22, t.text);
@@ -1037,15 +829,15 @@ void HUD::scenarioScreen(const Simulation& simulation) const {
     ui::drawLabelValue("Epoch", simulation.scenarioMetadata.epoch.c_str(), side.x + 22, side.y + 170);
     ui::drawLabelValue("Frame", simulation.scenarioMetadata.referenceFrame.c_str(), side.x + 22, side.y + 196);
 
-    text("↑↓ select   Enter load   Esc back", ui::pagePad(), static_cast<float>(GetScreenHeight()) - 28.0f, 13, t.textDim);
+    text("↑↓ select   Enter load   Esc back", ui::contentGutter(), static_cast<float>(GetScreenHeight()) - 28.0f, 13, t.textDim);
 }
 
 void HUD::telemetryScreen(const Simulation& simulation) const {
     const auto& t = theme();
-    pageChrome(simulation, "Telemetry", "Deterministic sampling of scientific state");
+    pageChrome("Telemetry", "Deterministic sampling of scientific state");
 
-    const Rectangle main = {ui::pagePad(), ui::contentTop() + 70.0f, 760.0f, 500.0f};
-    const Rectangle side = {ui::pagePad() + 790.0f, ui::contentTop() + 70.0f, 350.0f, 500.0f};
+    const Rectangle main = {ui::contentGutter(), ui::contentTop() + 70.0f, 760.0f, 500.0f};
+    const Rectangle side = {ui::contentGutter() + 790.0f, ui::contentTop() + 70.0f, 350.0f, 500.0f};
     ui::drawPanel(main);
     ui::drawPanel(side);
 
@@ -1079,16 +871,16 @@ void HUD::telemetryScreen(const Simulation& simulation) const {
     ui::drawLabelValue("Integrator", simulation.telemetry.metadata.integrator.c_str(), side.x + 22, side.y + 164);
 
     text("K start/stop   J JSON   C CSV   Esc back",
-         ui::pagePad(), static_cast<float>(GetScreenHeight()) - 28.0f, 13, t.textDim);
+         ui::contentGutter(), static_cast<float>(GetScreenHeight()) - 28.0f, 13, t.textDim);
 }
 
 void HUD::missionScreen(const Simulation& simulation) const {
     (void)simulation;
     const auto& t = theme();
-    pageChrome(simulation, "Mission Tools", "Analytical APIs for maneuvers and trajectory studies");
+    pageChrome("Mission Tools", "Analytical APIs for maneuvers and trajectory studies");
 
-    const Rectangle main = {ui::pagePad(), ui::contentTop() + 70.0f, 820.0f, 420.0f};
-    const Rectangle side = {ui::pagePad() + 850.0f, ui::contentTop() + 70.0f, 290.0f, 420.0f};
+    const Rectangle main = {ui::contentGutter(), ui::contentTop() + 70.0f, 820.0f, 420.0f};
+    const Rectangle side = {ui::contentGutter() + 850.0f, ui::contentTop() + 70.0f, 290.0f, 420.0f};
     ui::drawPanel(main);
     ui::drawPanel(side);
 
@@ -1109,15 +901,15 @@ void HUD::missionScreen(const Simulation& simulation) const {
                "Use the mission and spacecraft APIs for deterministic analysis. Return to Sim for visual context.",
                {side.x + 20, side.y + 60}, 14, 1, t.textMuted);
 
-    text("Esc back", ui::pagePad(), static_cast<float>(GetScreenHeight()) - 28.0f, 13, t.textDim);
+    text("Esc back", ui::contentGutter(), static_cast<float>(GetScreenHeight()) - 28.0f, 13, t.textDim);
 }
 
 void HUD::settingsScreen(const Simulation& simulation) const {
     const auto& t = theme();
-    pageChrome(simulation, "Settings", "Live simulation and presentation controls");
+    pageChrome("Settings", "Live simulation and presentation controls");
 
-    const Rectangle left = {ui::pagePad(), ui::contentTop() + 70.0f, 560.0f, 460.0f};
-    const Rectangle right = {ui::pagePad() + 590.0f, ui::contentTop() + 70.0f, 550.0f, 460.0f};
+    const Rectangle left = {ui::contentGutter(), ui::contentTop() + 70.0f, 560.0f, 460.0f};
+    const Rectangle right = {ui::contentGutter() + 590.0f, ui::contentTop() + 70.0f, 550.0f, 460.0f};
     ui::drawPanel(left);
     ui::drawPanel(right);
 
@@ -1148,15 +940,16 @@ void HUD::settingsScreen(const Simulation& simulation) const {
     text("F fullscreen", right.x + 24, right.y + 240, 15, t.text);
     text("V O T G   vectors / orbits / trails / grid", right.x + 24, right.y + 290, 14, t.textMuted);
 
-    text("Esc back", ui::pagePad(), static_cast<float>(GetScreenHeight()) - 28.0f, 13, t.textDim);
+    text("Esc back", ui::contentGutter(), static_cast<float>(GetScreenHeight()) - 28.0f, 13, t.textDim);
 }
 
 void HUD::helpScreen(const Simulation& simulation) const {
+    (void)simulation; // The help page is a static legend; it reads no live state.
     const auto& t = theme();
-    pageChrome(simulation, "Help", "Controls that exist in the current build");
+    pageChrome("Help", "Controls that exist in the current build");
 
-    const Rectangle left = {ui::pagePad(), ui::contentTop() + 70.0f, 560.0f, 520.0f};
-    const Rectangle right = {ui::pagePad() + 590.0f, ui::contentTop() + 70.0f, 550.0f, 520.0f};
+    const Rectangle left = {ui::contentGutter(), ui::contentTop() + 70.0f, 560.0f, 520.0f};
+    const Rectangle right = {ui::contentGutter() + 590.0f, ui::contentTop() + 70.0f, 550.0f, 520.0f};
     ui::drawPanel(left);
     ui::drawPanel(right);
 
@@ -1168,9 +961,9 @@ void HUD::helpScreen(const Simulation& simulation) const {
 
     text("Simulate", left.x + 24, left.y + 200, 12, t.accent);
     text("Space pause   ± speed   R reset", left.x + 24, left.y + 234, 15, t.text);
-    text("V Forces & Motion   G Gravity mass mode", left.x + 24, left.y + 264, 14, t.text);
-    text("F2 Earth–Moon   Ctrl+N Names   / scale", left.x + 24, left.y + 294, 14, t.text);
-    text("1–6 speed   Ctrl+G grid   P probe", left.x + 24, left.y + 324, 14, t.textMuted);
+    text("Ctrl+S select   V Forces & Motion   G Gravity mass mode", left.x + 24, left.y + 264, 13, t.text);
+    text("F2 Earth–Moon   / visual scale   Z isolate · Q back", left.x + 24, left.y + 294, 13, t.text);
+    text("1–6 speed   Ctrl+G grid   P probe", left.x + 24, left.y + 324, 13, t.textMuted);
 
     text("Camera", left.x + 24, left.y + 370, 12, t.accent);
     text("Drag orbit · Right/Middle pan · Wheel zoom", left.x + 24, left.y + 404, 14, t.text);
@@ -1189,7 +982,7 @@ void HUD::helpScreen(const Simulation& simulation) const {
     text("G then ↑/↓ changes mass — orbits respond.", right.x + 24, right.y + 344, 13, t.textMuted);
     text("Paused: zoom/pan never advances physics.", right.x + 24, right.y + 374, 13, t.textMuted);
 
-    text("Esc back", ui::pagePad(), static_cast<float>(GetScreenHeight()) - 28.0f, 13, t.textDim);
+    text("Esc back", ui::contentGutter(), static_cast<float>(GetScreenHeight()) - 28.0f, 13, t.textDim);
 }
 
 } // namespace bag
